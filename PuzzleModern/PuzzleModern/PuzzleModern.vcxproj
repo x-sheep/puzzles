@@ -310,6 +310,9 @@
     <None Include="Help\towers.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="Help\tracks.html">
+		<DeploymentContent>true</DeploymentContent>
+	</None>
     <None Include="Help\twiddle.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -471,6 +474,8 @@
     <Image Include="Icons\tents-small.png" />
     <Image Include="Icons\towers-large.png" />
     <Image Include="Icons\towers-small.png" />
+    <Image Include="Icons\tracks-large.png" />
+    <Image Include="Icons\tracks-small.png" />
     <Image Include="Icons\twiddle-large.png" />
     <Image Include="Icons\twiddle-small.png" />
     <Image Include="Icons\undead-large.png" />
@@ -680,6 +685,9 @@
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="towers.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="tracks.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="tree234.c">

@@ -40,6 +40,7 @@
     A(solo) \
     A(tents) \
     A(towers) \
+    A(tracks) \
     A(twiddle) \
     A(undead) \
     A(unequal) \

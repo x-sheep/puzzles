@@ -224,7 +224,6 @@
     <ClCompile Include="gluefe.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="HelpPage.xaml.cpp" />
     <ClCompile Include="AboutFlyout.xaml.cpp" />
     <ClCompile Include="ShapePuzzleCanvas.xaml.cpp" />
     <ClCompile Include="PuzzleImageSource.cpp" />
@@ -237,6 +236,9 @@
     </ClCompile>
     <ClCompile Include="GeneralSettingsFlyout.xaml.cpp" />
     <ClCompile Include="HelpFlyout.xaml.cpp" />
+    <ClCompile Include="tracks.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -285,7 +287,6 @@
     <ClInclude Include="gluefe.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="HelpPage.xaml.h" />
     <ClInclude Include="IPuzzleCanvas.h" />
     <ClInclude Include="AboutFlyout.xaml.h" />
     <ClInclude Include="ShapePuzzleCanvas.xaml.h" />
@@ -431,6 +432,9 @@
     </None>
     <None Include="Package.StoreAssociation.xml" />
     <None Include="PuzzleModern_StoreKey.pfx" />
+    <None Include="Help\tracks.html">
+      <Filter>Help</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="SelectorPage.xaml" />
@@ -738,6 +742,12 @@
     </Image>
     <Image Include="Assets\SplashScreen.scale-180.png">
       <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Icons\tracks-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\tracks-small.png">
+      <Filter>Icons</Filter>
     </Image>
   </ItemGroup>
 </Project>
