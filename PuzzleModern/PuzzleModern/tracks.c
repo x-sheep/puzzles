@@ -60,14 +60,21 @@ static game_params *default_params(void)
 static const struct game_params tracks_presets[] = {
     {8, 8, DIFF_EASY, 1},
     {8, 8, DIFF_TRICKY, 1},
-    {10, 8, DIFF_EASY, 1},
-    {10, 8, DIFF_TRICKY, 1 },
+#ifdef PORTRAIT_SCREEN
+    {8, 10, DIFF_EASY, 1},
+    {8, 10, DIFF_TRICKY, 1 },
+#else
+	{ 10, 8, DIFF_EASY, 1 },
+	{ 10, 8, DIFF_TRICKY, 1 },
+#endif
     {10, 10, DIFF_EASY, 1},
     {10, 10, DIFF_TRICKY, 1},
+#ifndef SMALL_SCREEN
     {15, 10, DIFF_EASY, 1},
     {15, 10, DIFF_TRICKY, 1},
     {15, 15, DIFF_EASY, 1},
     {15, 15, DIFF_TRICKY, 1},
+#endif
 };
 
 static int game_fetch_preset(int i, char **name, game_params **params)
@@ -1911,7 +1918,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             if (!INGRID(state, gx, gy) || FROMCOORD(x) != gx || FROMCOORD(y) != gy)
                 return "";
 
-            if (max(abs(x-cx),abs(y-cy)) < TILE_SIZE/4) {
+			/* Decrease click target for squares when left-clicking. */
+			if (max(abs(x - cx), abs(y - cy)) < TILE_SIZE / (button == RIGHT_RELEASE ? 4 : 6)) {
                 if (ui_can_flip_square(state, gx, gy, button == RIGHT_RELEASE))
                     return square_flip_str(state, gx, gy, button == RIGHT_RELEASE, tmpbuf);
                 return "";

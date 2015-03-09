@@ -38,6 +38,7 @@ const struct help_item helpitems[] {
 	{ "Solo", "Fill in the grid so that each row, column and square block contains one of every digit." },
 	{ "Tents", "Place a tent next to each tree." },
 	{ "Towers", "Complete the latin square of towers in accordance with the clues." },
+	{ "Train Tracks", "Fill in the railway track according to the clues." },
 	{ "Twiddle", "Rotate the tiles around themselves to arrange them into order." },
 	{ "Undead", "Place monsters so that the right numbers of them can be seen in mirrors." },
 	{ "Unequal", "Complete the latin square in accordance with the > signs." },
