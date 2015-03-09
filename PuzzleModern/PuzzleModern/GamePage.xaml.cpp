@@ -135,7 +135,7 @@ void GamePage::ResizeWindow(int newWidth, int newHeight)
 /// session.  This will be null the first time a page is visited.</param>
 void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 {
-	auto launch = safe_cast<GameLaunchParameters^>(e->NavigationParameter);
+	auto launch = GameLaunchParameters::Parse(safe_cast<String^>(e->NavigationParameter));
 	_puzzleName = launch->Name;
 	fe = new WindowsModern();
 	bool hasGame = fe->CreateForGame(_puzzleName, DrawCanvas, this);
@@ -158,12 +158,40 @@ void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 		HighlightPreset(fe->GetCurrentPreset());
 		hasGame = false;
 	}
-	if (launch->SaveFile)
-		BeginLoadGame(launch->SaveFile, true);
+	if (launch->LoadTempFile)
+		BeginLoadTemp(hasGame, true);
 	else if (hasGame)
 		BeginResumeGame();
 	else
 		BeginNewGame();
+}
+
+void GamePage::BeginLoadTemp(bool hasGame, bool firstLaunch)
+{
+	if (_generatingGame)
+		return;
+
+	BusyLabel->Text = "Loading game";
+	AddOverlay();
+
+	create_task(fe->LoadGameFromTemporary()).then([=](Platform::String ^err)
+	{
+		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([=]{
+			_generatingGame = false;
+			if (err)
+			{
+				(ref new Windows::UI::Popups::MessageDialog(err, "Could not load game"))->ShowAsync();
+				if (firstLaunch)
+				{
+					if (hasGame)
+						BeginResumeGame();
+					else
+						BeginNewGame();
+				}
+			}
+			RemoveOverlay();
+		}));
+	});
 }
 
 void GamePage::BeginLoadGame(Windows::Storage::StorageFile ^file, bool makeNew)

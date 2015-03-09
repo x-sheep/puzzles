@@ -751,6 +751,24 @@ namespace PuzzleModern
 		});
 	}
 
+	concurrency::task<Platform::String^> WindowsModern::LoadGameFromTemporary()
+	{
+		return concurrency::create_task([](){
+			return ApplicationData::Current->TemporaryFolder->GetFileAsync("temp.puzzle");
+		}).then([=](concurrency::task<StorageFile^> prevTask){
+			StorageFile ^file = nullptr;
+			try
+			{
+				file = prevTask.get();
+			}
+			catch (Platform::Exception^)
+			{
+			}
+
+			return LoadGameFromFile(file);
+		});
+	}
+
 	concurrency::task<Platform::String^> WindowsModern::LoadGameFromFile(Windows::Storage::StorageFile ^file)
 	{
 		return concurrency::create_task([file](){
@@ -780,11 +798,24 @@ namespace PuzzleModern
 		return FromChars(err);
 	}
 
-	concurrency::task<GameLaunchParameters^> WindowsModern::LoadAndIdentify(Windows::Storage::StorageFile ^file)
+	concurrency::task<GameLaunchParameters^> WindowsModern::LoadAndIdentify(StorageFile ^inputFile)
 	{
-		return concurrency::create_task([file](){
-			return FileIO::ReadTextAsync(file);
-		}).then([=](concurrency::task<Platform::String^> prevTask){
+		return concurrency::create_task([=](){
+			return ApplicationData::Current->TemporaryFolder->CreateFileAsync("temp.puzzle", CreationCollisionOption::ReplaceExisting);
+		}).then([inputFile](StorageFile ^temp){
+			return LoadAndIdentify(inputFile, temp);
+		});
+	}
+
+	concurrency::task<GameLaunchParameters^> WindowsModern::LoadAndIdentify(StorageFile ^inputFile, StorageFile ^tempFile)
+	{
+		auto errorRef = std::make_shared<Platform::String^>(nullptr);
+
+		return concurrency::create_task([inputFile, tempFile](){
+			return inputFile->CopyAndReplaceAsync(tempFile);
+		}).then([tempFile](){
+			return FileIO::ReadTextAsync(tempFile);
+		}).then([tempFile, errorRef](concurrency::task<Platform::String^> prevTask){
 			Platform::String ^saved;
 			try
 			{
@@ -793,7 +824,11 @@ namespace PuzzleModern
 			catch (Platform::Exception^)
 			{
 				auto ret = ref new GameLaunchParameters();
-				ret->Error = file ? "The file was corrupted" : "Not a puzzle file";
+				if (*errorRef)
+					ret->Error = *errorRef;
+				else
+					ret->Error = tempFile ? "The file was corrupted." : "Not a puzzle file";
+				*errorRef = nullptr;
 				return ret;
 			}
 
@@ -822,7 +857,7 @@ namespace PuzzleModern
 			else
 			{
 				ret->Name = FromChars(name, true);
-				ret->SaveFile = file;
+				ret->LoadTempFile = true;
 			}
 			return ret;
 		});
@@ -1095,6 +1130,8 @@ namespace PuzzleModern
 			button->Key = VirtualKey::A;
 			button->Type = VirtualButtonType::TOOL;
 			ret->Append(button);
+
+			collection->ToolButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Filling"))
 		{
@@ -1118,7 +1155,9 @@ namespace PuzzleModern
 			button->Name = "Jumble";
 			button->Key = VirtualKey::J;
 			button->Type = VirtualButtonType::TOOL;
+			button->Icon = ref new Windows::UI::Xaml::Controls::SymbolIcon(Windows::UI::Xaml::Controls::Symbol::Shuffle);
 			ret->Append(button);
+			collection->ToolButton = button;
 		}
 		if (!strcmp(ourgame->name, "Solo"))
 		{
@@ -1134,6 +1173,7 @@ namespace PuzzleModern
 				ret->Append(VirtualButton::FromNumber(i));
 
 			ret->Append(VirtualButton::Backspace());
+			collection->ToolButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Keen") || !strcmp(ourgame->name, "Towers"))
 		{
@@ -1141,6 +1181,7 @@ namespace PuzzleModern
 			for (i = 1; i <= n; i++)
 				ret->Append(VirtualButton::FromNumber(i));
 			ret->Append(VirtualButton::Backspace());
+			collection->ToolButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Unequal"))
 		{
@@ -1155,6 +1196,23 @@ namespace PuzzleModern
 			for (i = s; i <= n; i++)
 				ret->Append(VirtualButton::FromNumber(i));
 			ret->Append(VirtualButton::Backspace());
+			collection->ToolButton = VirtualButton::Pencil();
+		}
+		if (!strcmp(ourgame->name, "Dominosa"))
+		{
+			collection->ToolButton = VirtualButton::ToggleButton("Mark lines", Windows::UI::Xaml::Controls::Symbol::Highlight);
+		}
+		if (!strcmp(ourgame->name, "Signpost"))
+		{
+			collection->ToolButton = VirtualButton::ToggleButton("Invert", Windows::UI::Xaml::Controls::Symbol::Switch);
+		}
+		if (!strcmp(ourgame->name, "Magnets") || !strcmp(ourgame->name, "Map"))
+		{
+			collection->ToolButton = VirtualButton::Pencil();
+		}
+		if (!strcmp(ourgame->name, "Mines"))
+		{
+			collection->ToolButton = VirtualButton::ToggleButton("Flag", Windows::UI::Xaml::Controls::Symbol::Flag);
 		}
 
 		sfree(params);

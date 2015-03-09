@@ -44,6 +44,7 @@ namespace PuzzleModern
 
 		void ForceRedraw();
 		void BeginLoadGame(Windows::Storage::StorageFile ^file, bool makeNew);
+		void BeginLoadTemp(bool hasGame, bool firstLaunch);
 
 		virtual void StartTimer();
 		virtual void EndTimer();

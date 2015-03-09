@@ -142,7 +142,7 @@ void SelectorPage::itemGridView_ItemClick(Platform::Object^ sender, Windows::UI:
 	// by passing required information as a navigation parameter
 	auto item = safe_cast<Puzzle^>(e->ClickedItem);
 
-	Frame->Navigate(TypeName(GamePage::typeid), ref new GameLaunchParameters(item->Name));
+	Frame->Navigate(TypeName(GamePage::typeid), item->Name);
 }
 
 
@@ -300,7 +300,7 @@ void SelectorPage::ButtonOpen_Click(Platform::Object^ sender, Windows::UI::Xaml:
 			}
 			else
 			{
-				this->Frame->Navigate(TypeName(GamePage::typeid), result);
+				this->Frame->Navigate(TypeName(GamePage::typeid), result->Stringify());
 			}
 		});
 	});

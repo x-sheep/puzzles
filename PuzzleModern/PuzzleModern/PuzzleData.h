@@ -201,7 +201,7 @@ namespace PuzzleModern
 
 	public enum class VirtualButtonType
 	{
-		INPUT, TOOL, COLORBLIND
+		INPUT, TOOL, COLORBLIND, TOGGLE_MOUSE
 	};
 
 	[Windows::UI::Xaml::Data::Bindable]
@@ -223,6 +223,12 @@ namespace PuzzleModern
 			void set(Windows::System::VirtualKey value){ _key = value; }
 		}
 
+		property Windows::UI::Xaml::Controls::IconElement ^Icon
+		{
+			Windows::UI::Xaml::Controls::IconElement ^get(){ return _icon; }
+			void set(Windows::UI::Xaml::Controls::IconElement ^value){ _icon = value; }
+		}
+
 		property VirtualButtonType Type
 		{
 			VirtualButtonType get(){ return _type; }
@@ -237,10 +243,25 @@ namespace PuzzleModern
 			return button;
 		}
 
+		static VirtualButton ^ToggleButton(Platform::String ^name, Windows::UI::Xaml::Controls::Symbol icon)
+		{
+			auto button = ref new VirtualButton();
+			button->Name = name;
+			button->Type = VirtualButtonType::TOGGLE_MOUSE;
+			button->Icon = ref new Windows::UI::Xaml::Controls::SymbolIcon(icon);
+			return button;
+		}
+
+		static VirtualButton ^Pencil()
+		{
+			return ToggleButton("Mark", Windows::UI::Xaml::Controls::Symbol::Edit);
+		}
+
 	private:
 		Platform::String ^_label;
 		VirtualButtonType _type;
 		Windows::System::VirtualKey _key;
+		Windows::UI::Xaml::Controls::IconElement ^_icon;
 	};
 
 	[Windows::UI::Xaml::Data::Bindable]
@@ -268,9 +289,37 @@ namespace PuzzleModern
 				_colorBlind = val;
 			}
 		}
+
+		property VirtualButton^ ToolButton
+		{
+			VirtualButton^ get()
+			{
+				return _toolButton;
+			}
+			void set(VirtualButton ^val)
+			{
+				_toolButton = val;
+			}
+		}
+
+		property bool HasInputButtons
+		{
+			bool get() {
+				if (!_buttons)
+					return false;
+
+				for each(auto b in _buttons)
+				{
+					if (b->Type == VirtualButtonType::INPUT)
+						return true;
+				}
+				return false;
+			}
+		}
+
 	private:
 		Windows::Foundation::Collections::IVector<VirtualButton^>^ _buttons;
-		VirtualButton ^_colorBlind;
+		VirtualButton ^_colorBlind, ^_toolButton;
 	};
 
 	public ref class GameLaunchParameters sealed
@@ -279,16 +328,21 @@ namespace PuzzleModern
 		GameLaunchParameters(){};
 		GameLaunchParameters(Platform::String ^name) : _name(name){};
 
+		static GameLaunchParameters ^Parse(Platform::String ^serialized);
+		Platform::String ^Stringify();
+
 		property Platform::String ^Name
 		{
 			Platform::String ^get(){ return _name; }
 			void set(Platform::String ^value){ _name = value; }
 		}
-		property Windows::Storage::StorageFile ^SaveFile
+		
+		property bool LoadTempFile
 		{
-			Windows::Storage::StorageFile ^get(){ return _saveFile; }
-			void set(Windows::Storage::StorageFile ^value){ _saveFile = value; }
+			bool get(){ return _loadTempFile; }
+			void set(bool value){ _loadTempFile = value; }
 		}
+
 		property Platform::String ^GameID
 		{
 			Platform::String ^get(){ return _gameID; }
@@ -302,6 +356,7 @@ namespace PuzzleModern
 	private:
 		Platform::String ^_name;
 		Windows::Storage::StorageFile ^_saveFile;
+		bool _loadTempFile;
 		Platform::String ^_gameID;
 		Platform::String ^_error;
 	};

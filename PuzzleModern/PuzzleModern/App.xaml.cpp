@@ -74,7 +74,7 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 			/* Always put the Selector page first on the navigation stack */
 			rootFrame->Navigate(TypeName(SelectorPage::typeid), nullptr);
 			if (launch)
-				rootFrame->Navigate(TypeName(GamePage::typeid), launch);
+				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Stringify());
 		}
 
 		// Place the frame in the current Window
@@ -89,7 +89,7 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 			/* Always put the Selector page first on the navigation stack */
 			rootFrame->Navigate(TypeName(SelectorPage::typeid), nullptr);
 			if (launch)
-				rootFrame->Navigate(TypeName(GamePage::typeid), launch);
+				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Stringify());
 		}
 		else if (launch)
 		{
@@ -100,8 +100,8 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 				auto page = safe_cast<GamePage^>(rootFrame->Content);
 				currentName = safe_cast<String^>(page->DefaultViewModel->Lookup("PuzzleName"));
 
-				if (puzzleName == currentName && launch->SaveFile)
-					page->BeginLoadGame(launch->SaveFile, false);
+				if (puzzleName == currentName && launch->LoadTempFile)
+					page->BeginLoadTemp(false, false);
 			}
 			if (puzzleName != currentName)
 			{
@@ -109,8 +109,7 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 				while (rootFrame->CanGoBack)
 					rootFrame->GoBack();
 
-				// TODO This will break if a game is loaded. GamePage doesn't shut down properly before loading the next one
-				rootFrame->Navigate(TypeName(GamePage::typeid), launch);
+				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Stringify());
 			}
 		}
 		// Ensure the current window is active

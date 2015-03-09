@@ -46,9 +46,11 @@ namespace PuzzleModern
 		void Redraw(IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^timer, bool force);
 		void UpdateTimer(IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^timer, float delta);
 		concurrency::task<bool> LoadGameFromStorage(Platform::String ^name);
+		concurrency::task<Platform::String^> LoadGameFromTemporary();
 		concurrency::task<Platform::String^> LoadGameFromFile(Windows::Storage::StorageFile ^file);
 		Platform::String ^LoadGameFromString(Platform::String ^saved);
 		static concurrency::task<GameLaunchParameters^> LoadAndIdentify(Windows::Storage::StorageFile ^file);
+		static concurrency::task<GameLaunchParameters^> LoadAndIdentify(Windows::Storage::StorageFile ^file, Windows::Storage::StorageFile ^tempFile);
 		concurrency::task<bool> SaveGameToStorage(Platform::String ^name);
 		concurrency::task<bool> SaveGameToFile(Windows::Storage::StorageFile ^file);
 		Platform::String ^SaveGameToString();
