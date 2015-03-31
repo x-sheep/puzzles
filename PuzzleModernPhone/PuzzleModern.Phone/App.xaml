@@ -1,0 +1,92 @@
+﻿<Application
+    x:Class="PuzzleModern.Phone.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PuzzleModern.Phone">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="HighContrast">
+                    <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="{x:Null}"/>
+                </ResourceDictionary>
+
+
+                
+            </ResourceDictionary.ThemeDictionaries>
+            
+                <!-- This is the entire style for a content dialog, with minor modifications to allow a scrollviewer to actually work -->    
+            
+                <Style x:Key="ScrollingContentDialogStyle" TargetType="ContentDialog">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ContentDialog">
+                                <Border x:Name="Container">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="Orientation">
+                                            <VisualState x:Name="Portrait" />
+                                            <VisualState x:Name="Landscape">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Width" Storyboard.TargetName="ContentPanel" EnableDependentAnimation="True">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ContentDialogContentLandscapeWidth}" />
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="HorizontalAlignment" Storyboard.TargetName="ContentPanel">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="Left" />
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+
+
+                                    <Grid x:Name="LayoutRoot">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Border x:Name="BackgroundElement"
+                                                Background="{TemplateBinding Background}"
+                                                FlowDirection="LeftToRight">
+                                            <Border FlowDirection="{TemplateBinding FlowDirection}">
+                                                <Grid x:Name="ContentPanel">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" MinHeight="{ThemeResource ContentDialogTitleMinHeight}" />
+                                                        <RowDefinition Height="*" MinHeight="{ThemeResource ContentDialogContentMinHeight}" />
+
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <ContentControl x:Name="Title"
+                                                                    Margin="{ThemeResource ContentDialogTitleMargin}"
+                                                                    Content="{TemplateBinding Title}"
+                                                                    ContentTemplate="{TemplateBinding TitleTemplate}"
+                                                                    FontSize="{StaticResource TextStyleExtraLargeFontSize}"
+                                                                    FontFamily="{ThemeResource PhoneFontFamilyNormal}"
+                                                                    FontWeight="SemiBold"
+                                                                    Grid.ColumnSpan="2" />
+                                                    <ScrollViewer Grid.Row="1" x:Name="LayoutScrollViewer"
+                                                                  Grid.ColumnSpan="2" HorizontalScrollMode="Disabled" >
+                                                        <ContentPresenter x:Name="Content"
+                                                                          Margin="{ThemeResource ContentDialogContentMargin}"
+                                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                          Content="{TemplateBinding Content}"
+                                                                          FontSize="{StaticResource TextStyleLargeFontSize}"
+                                                                          FontFamily="{ThemeResource PhoneFontFamilyNormal}"
+                                                                          />
+                                                    </ScrollViewer>
+                                                    <Border x:Name="Button1Host" Padding="{ThemeResource ContentDialogButton1HostPadding}" Grid.Row="2" />
+                                                    <Border x:Name="Button2Host" Padding="{ThemeResource ContentDialogButton2HostPadding}" Grid.Row="2" Grid.Column="1" />
+                                                </Grid>
+                                            </Border>
+                                        </Border>
+                                    </Grid >
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
