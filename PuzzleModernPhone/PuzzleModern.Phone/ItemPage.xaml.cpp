@@ -765,12 +765,18 @@ void ItemPage::LeftRightButton_Checked(Platform::Object^ sender, Windows::UI::Xa
 {
 	_leftAction = ButtonType::RIGHT;
 	_rightAction = ButtonType::LEFT;
+
+	if (!_generatingGame)
+		fe->SendKey(VirtualKey::XButton1, false);
 }
 
 void ItemPage::LeftRightButton_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	_leftAction = ButtonType::LEFT;
 	_rightAction = ButtonType::RIGHT;
+
+	if (!_generatingGame)
+		fe->SendKey(VirtualKey::XButton2, false);
 }
 
 void ItemPage::LoadGame_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)
