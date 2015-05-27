@@ -55,6 +55,9 @@ enum {
     MOD_MASK       = 0x7000 /* mask for all modifiers */
 };
 
+#define BUTTON_MARK_ON  5
+#define BUTTON_MARK_OFF 6
+
 #define IS_MOUSE_DOWN(m) ( (unsigned)((m) - LEFT_BUTTON) <= \
                                (unsigned)(RIGHT_BUTTON - LEFT_BUTTON))
 #define IS_MOUSE_DRAG(m) ( (unsigned)((m) - LEFT_DRAG) <= \

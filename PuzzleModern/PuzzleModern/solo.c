@@ -4579,6 +4579,17 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         return "";
     }
 
+	if (button == BUTTON_MARK_ON && ui->hshow && !ui->hpencil)
+	{
+		ui->hpencil = 1;
+		return "";
+	}
+	if (button == BUTTON_MARK_OFF && ui->hshow && ui->hpencil)
+	{
+		ui->hpencil = 0;
+		return "";
+	}
+
     if (ui->hshow &&
 	((button >= '0' && button <= '9' && button - '0' <= cr) ||
 	 (button >= 'a' && button <= 'z' && button - 'a' + 10 <= cr) ||
@@ -4609,7 +4620,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	sprintf(buf, "%c%d,%d,%d",
 		(char)(ui->hpencil && n > 0 ? 'P' : 'R'), ui->hx, ui->hy, n);
 
-        if (!ui->hcursor) ui->hshow = 0;
+        if (!ui->hcursor && !ui->hpencil) ui->hshow = 0;
 
 	return dupstr(buf);
     }
@@ -4927,7 +4938,8 @@ static void draw_number(drawing *dr, game_drawstate *ds,
 
     /* new number needs drawing? */
     if (state->grid[y*cr+x]) {
-	str[1] = '\0';
+	str[2] = '\0';
+	str[1] = (hl & 16) && !state->immutable[y*cr + x] ? '!' : '\0';
 	str[0] = state->grid[y*cr+x] + '0';
 	if (str[0] > '9')
 	    str[0] += 'a' - ('9'+1);
