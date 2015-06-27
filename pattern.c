@@ -53,7 +53,7 @@ struct game_state {
     int completed, cheated;
 };
 
-#define FLASH_TIME 0.13F
+#define FLASH_TIME 0.39F
 
 static game_params *default_params(void)
 {

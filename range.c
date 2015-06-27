@@ -901,12 +901,10 @@ static char *validate_params(const game_params *params, int full)
     if (w * h < 1) return "Error: size is less than 1";
     if (w + h - 1 > SCHAR_MAX) return "Error: w + h is too big";
     /* I might be unable to store clues in my puzzle_size *grid; */
-    if (full) {
-        if (w == 2 && h == 2) return "Error: can't create 2x2 puzzles";
-        if (w == 1 && h == 2) return "Error: can't create 1x2 puzzles";
-        if (w == 2 && h == 1) return "Error: can't create 2x1 puzzles";
-        if (w == 1 && h == 1) return "Error: can't create 1x1 puzzles";
-    }
+    if (w == 2 && h == 2) return "Error: can't create 2x2 puzzles";
+    if (w == 1 && h == 2) return "Error: can't create 1x2 puzzles";
+    if (w == 2 && h == 1) return "Error: can't create 2x1 puzzles";
+    if (w == 1 && h == 1) return "Error: can't create 1x1 puzzles";
     return NULL;
 }
 

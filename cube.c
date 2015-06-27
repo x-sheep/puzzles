@@ -541,7 +541,7 @@ static void count_grid_square_callback(void *ctx, struct grid_square *sq)
 static char *validate_params(const game_params *params, int full)
 {
     int classes[5];
-    int i;
+    int i, area;
 
     if (params->solid < 0 || params->solid >= lenof(solids))
 	return "Unrecognised solid type";
@@ -568,9 +568,11 @@ static char *validate_params(const game_params *params, int full)
 	if (classes[i] < solids[params->solid]->nfaces / classes[4])
 	    return "Not enough grid space to place all blue faces";
 
-    if (grid_area(params->d1, params->d2, solids[params->solid]->order) <
-	solids[params->solid]->nfaces + 1)
-	return "Not enough space to place the solid on an empty square";
+	area = grid_area(params->d1, params->d2, solids[params->solid]->order);
+    if (area < solids[params->solid]->nfaces + 1)
+		return "Not enough space to place the solid on an empty square";
+	if (area > 200)
+		return "Grid is too big";
 
     return NULL;
 }

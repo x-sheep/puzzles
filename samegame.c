@@ -1056,6 +1056,7 @@ struct game_ui {
     int *tiles; /* selected-ness only */
     int nselected;
     int xsel, ysel, displaysel;
+	char labels;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -1066,6 +1067,7 @@ static game_ui *new_ui(const game_state *state)
     ui->tiles = snewn(state->n, int);
     memset(ui->tiles, 0, state->n*sizeof(int));
     ui->nselected = 0;
+	ui->labels = FALSE;
 
     ui->xsel = ui->ysel = ui->displaysel = 0;
 
@@ -1266,6 +1268,7 @@ struct game_drawstate {
     int started, bgcolour;
     int tileinner, tilegap;
     int *tiles; /* contains colour and SELECTED. */
+	char labels;
 };
 
 static char *interpret_move(const game_state *state, game_ui *ui,
@@ -1276,6 +1279,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     char *ret = "";
 
     ui->displaysel = 0;
+
+	if (button == 'l' || button == 'L')
+	{
+		ui->labels = !ui->labels;
+		return "";
+	}
 
     if (button == RIGHT_BUTTON || button == LEFT_BUTTON) {
 	tx = FROMCOORD(x); ty= FROMCOORD(y);
@@ -1367,6 +1376,10 @@ static void game_compute_size(const game_params *params, int tilesize,
     *y = TILE_SIZE * params->h + 2 * BORDER - TILE_GAP;
 }
 
+static const char samegame_labels[9] = {
+	FALSE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE
+};
+
 static float *game_colours(frontend *fe, int *ncolours)
 {
     float *ret = snewn(3 * NCOLOURS, float);
@@ -1440,6 +1453,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->bgcolour = -1;
     for (i = 0; i < state->n; i++)
 	ds->tiles[i] = -1;
+	ds->labels = FALSE;
 
     return ds;
 }
@@ -1458,7 +1472,7 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
 
 static void tile_redraw(drawing *dr, game_drawstate *ds,
 			int x, int y, int dright, int dbelow,
-                        int tile, int bgcolour)
+                        int tile, int bgcolour, char labels)
 {
     int outer = bgcolour, inner = outer, col = tile & TILE_COLMASK;
 
@@ -1495,6 +1509,17 @@ static void tile_redraw(drawing *dr, game_drawstate *ds,
 	draw_line(dr, sx+ssz, sy+ssz, sx,     sy+ssz, scol);
 	draw_line(dr, sx,     sy+ssz, sx,     sy,     scol);
     }
+
+	if (labels && col && outer == inner)
+	{
+		char buf[2];
+		buf[0] = 'A' + col - 1;
+		buf[1] = '\0';
+
+		draw_text(dr, COORD(x) + (TILE_SIZE / 2), COORD(y) + (TILE_SIZE / 2), 
+			FONT_VARIABLE, TILE_SIZE*0.7, ALIGN_HCENTRE | ALIGN_VCENTRE, 
+			samegame_labels[col-1] ? COL_IMPOSSIBLE : COL_HIGHLIGHT, buf);
+	}
 
     draw_update(dr, COORD(x), COORD(y), TILE_SIZE, TILE_SIZE);
 }
@@ -1571,14 +1596,15 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	     * no animation); when we do we might well want to be looking
 	     * at the tile colours from oldstate, not state. */
 	    if ((oldstate && COL(oldstate,x,y) != col) ||
-		(ds->bgcolour != bgcolour) ||
+			(ds->bgcolour != bgcolour) || (ds->labels != ui->labels) ||
 		(tile != ds->tiles[i])) {
-		tile_redraw(dr, ds, x, y, dright, dbelow, tile, bgcolour);
+		tile_redraw(dr, ds, x, y, dright, dbelow, tile, bgcolour, ui->labels);
 		ds->tiles[i] = tile;
 	    }
 	}
     }
     ds->bgcolour = bgcolour;
+	ds->labels = ui->labels;
 
     {
 	char status[255], score[80];

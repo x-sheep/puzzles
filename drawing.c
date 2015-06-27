@@ -284,18 +284,23 @@ void print_get_colour(drawing *dr, int colour, int printing_in_colour,
 static int print_generic_colour(drawing *dr, float r, float g, float b,
 				float grey, int hatch, int hatch_when)
 {
+	int idx = dr->ncolours;
     if (dr->ncolours >= dr->coloursize) {
 	dr->coloursize = dr->ncolours + 16;
 	dr->colours = sresize(dr->colours, dr->coloursize,
 			      struct print_colour);
     }
-    dr->colours[dr->ncolours].hatch = hatch;
-    dr->colours[dr->ncolours].hatch_when = hatch_when;
-    dr->colours[dr->ncolours].r = r;
-    dr->colours[dr->ncolours].g = g;
-    dr->colours[dr->ncolours].b = b;
-    dr->colours[dr->ncolours].grey = grey;
-    return dr->ncolours++;
+	dr->ncolours++;
+
+    dr->colours[idx].hatch = hatch;
+	dr->colours[idx].hatch_when = hatch_when;
+	dr->colours[idx].r = r;
+	dr->colours[idx].g = g;
+	dr->colours[idx].b = b;
+	dr->colours[idx].grey = grey;
+	if (dr->api->add_print_colour)
+		dr->api->add_print_colour(dr->handle, idx);
+	return idx;
 }
 
 int print_mono_colour(drawing *dr, int grey)

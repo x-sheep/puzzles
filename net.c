@@ -294,7 +294,7 @@ static config_item *game_configure(const game_params *params)
     ret[3].type = C_STRING;
     sprintf(buf, "%g", params->barrier_probability);
     ret[3].sval = dupstr(buf);
-    ret[3].ival = 0;
+	ret[3].ival = CONFIGS_FLOAT;
 
     ret[4].name = "Ensure unique solution";
     ret[4].type = C_BOOLEAN;

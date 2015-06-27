@@ -57,12 +57,22 @@ static game_params *default_params(void)
 
 static int game_fetch_preset(int i, char **name, game_params **params)
 {
+	game_params *ret;
     if (i == 0) {
-	*params = default_params();
-	*name = dupstr("4x4");
-	return TRUE;
+		ret = snew(game_params);
+		ret->w = ret->h = 3;
+		*name = dupstr("3x3");
     }
-    return FALSE;
+	else if (i == 1) {
+		ret = snew(game_params);
+		ret->w = ret->h = 4;
+		*name = dupstr("4x4");
+	}
+	else
+		return FALSE;
+
+	*params = ret;
+	return TRUE;
 }
 
 static void free_params(game_params *params)

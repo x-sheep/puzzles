@@ -120,18 +120,19 @@ static void get_puzzle_size(document *doc, struct puzzle *pz,
 void document_print(document *doc, drawing *dr)
 {
     int ppp;			       /* puzzles per page */
-    int pages, passes;
+	int pages, passes;
     int page, pass;
     int pageno;
 
     ppp = doc->pw * doc->ph;
     pages = (doc->npuzzles + ppp - 1) / ppp;
-    passes = (doc->got_solns ? 2 : 1);
+    pass = (doc->got_solns ? 1 : 0);
+	passes = 1;
 
     print_begin_doc(dr, pages * passes);
 
     pageno = 1;
-    for (pass = 0; pass < passes; pass++) {
+    //for (pass = 0; pass < passes; pass++) {
 	for (page = 0; page < pages; page++) {
 	    int i, n, offset;
 	    float colsum, rowsum;
@@ -241,7 +242,7 @@ void document_print(document *doc, drawing *dr)
 	    print_end_page(dr, pageno);
 	    pageno++;
 	}
-    }
+    //}
 
     print_end_doc(dr);
 }

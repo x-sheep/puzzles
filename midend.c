@@ -199,14 +199,19 @@ static void midend_purge_states(midend *me)
 
 static void midend_free_game(midend *me)
 {
-    while (me->nstates > 0) {
-        me->nstates--;
-	me->ourgame->free_game(me->states[me->nstates].state);
-	sfree(me->states[me->nstates].movestr);
-    }
+	while (me->nstates > 0) {
+		me->nstates--;
+		me->ourgame->free_game(me->states[me->nstates].state);
+		sfree(me->states[me->nstates].movestr);
+		me->states[me->nstates].state = NULL;
+		me->states[me->nstates].movestr = NULL;
+	}
 
-    if (me->drawstate)
-        me->ourgame->free_drawstate(me->drawing, me->drawstate);
+	if (me->drawstate)
+	{
+		me->ourgame->free_drawstate(me->drawing, me->drawstate);
+		me->drawstate = NULL;
+	}
 }
 
 void midend_free(midend *me)

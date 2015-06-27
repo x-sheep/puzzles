@@ -1427,6 +1427,16 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         return "";
     }
 
+	if (button == BUTTON_MARK_ON && ui->hshow && !ui->hpencil)
+	{
+		ui->hpencil = 1;
+		return "";
+	}
+	if (button == BUTTON_MARK_OFF && ui->hshow && ui->hpencil)
+	{
+		ui->hpencil = 0;
+		return "";
+	}
 
     if (ui->hshow) {
         debug(("button %d, cbutton %d", button, (int)((char)button)));
@@ -1448,7 +1458,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         sprintf(buf, "%c%d,%d,%d",
                 (char)(ui->hpencil && n > 0 ? 'P' : 'R'), ui->hx, ui->hy, n);
 
-        if (!ui->hcursor) ui->hshow = 0;
+		if (!ui->hcursor && !ui->hpencil) ui->hshow = 0;
 
         return dupstr(buf);
     }
@@ -1737,13 +1747,14 @@ static void draw_num(drawing *dr, game_drawstate *ds, int x, int y)
 {
     int ox = COORD(x), oy = COORD(y);
     unsigned int f = GRID(ds,flags,x,y);
-    char str[2];
+    char str[3];
 
     /* (can assume square has just been cleared) */
 
     /* Draw number, choosing appropriate colour */
     str[0] = n2c(GRID(ds, nums, x, y), ds->order);
-    str[1] = '\0';
+	str[1] = (f & F_ERROR) && !(f & F_IMMUTABLE) ? '!' : '\0';
+	str[2] = '\0';
     draw_text(dr, ox + TILE_SIZE/2, oy + TILE_SIZE/2,
               FONT_VARIABLE, 3*TILE_SIZE/4, ALIGN_VCENTRE | ALIGN_HCENTRE,
               (f & F_IMMUTABLE) ? COL_TEXT : (f & F_ERROR) ? COL_ERROR : COL_GUESS, str);

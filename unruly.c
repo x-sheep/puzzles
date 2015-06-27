@@ -50,6 +50,7 @@
 #include <math.h>
 
 #include "puzzles.h"
+#include "gluefe.h"
 
 #ifdef STANDALONE_SOLVER
 int solver_verbose = FALSE;
@@ -1127,7 +1128,7 @@ static int unruly_solve_game(game_state *state,
 
     while (TRUE) {
         done = 0;
-
+		check_abort();
         /* Check for impending 3's */
         done += unruly_solver_check_all_threes(state, scratch);
 

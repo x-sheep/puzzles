@@ -47,6 +47,7 @@
 #include <math.h>
 
 #include "puzzles.h"
+#include "gluefe.h"
 
 /* nth triangular number */
 #define TRI(n) ( (n) * ((n) + 1) / 2 )
@@ -590,6 +591,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
      */
 
     do {
+		check_abort();
         domino_layout_prealloc(w, h, rs, grid, grid2, list);
 
         /*

@@ -1606,13 +1606,24 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	sprintf(buf, "%c%d,%d,%d",
 		(char)(ui->hpencil && n > 0 ? 'P' : 'R'), ui->hx, ui->hy, n);
 
-        if (!ui->hcursor) ui->hshow = 0;
+        if (!ui->hcursor && !ui->hpencil) ui->hshow = 0;
 
 	return dupstr(buf);
     }
 
     if (button == 'M' || button == 'm')
         return dupstr("M");
+
+	if (button == BUTTON_MARK_ON && ui->hshow && !ui->hpencil)
+	{
+		ui->hpencil = 1;
+		return "";
+	}
+	if (button == BUTTON_MARK_OFF && ui->hshow && ui->hpencil)
+	{
+		ui->hpencil = 0;
+		return "";
+	}
 
     return NULL;
 }
@@ -1842,7 +1853,8 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
 
     /* new number needs drawing? */
     if (tile & DF_DIGIT_MASK) {
-	str[1] = '\0';
+	str[2] = '\0';
+	str[1] = (tile & DF_ERR_LATIN) ?  '!' : '\0';
 	str[0] = (tile & DF_DIGIT_MASK) + '0';
 	draw_text(dr, tx + TILESIZE/2, ty + TILESIZE/2,
 		  FONT_VARIABLE, TILESIZE/2, ALIGN_VCENTRE | ALIGN_HCENTRE,

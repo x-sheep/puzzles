@@ -55,6 +55,9 @@ enum {
     MOD_MASK       = 0x7000 /* mask for all modifiers */
 };
 
+#define BUTTON_MARK_ON  5
+#define BUTTON_MARK_OFF 6
+
 #define IS_MOUSE_DOWN(m) ( (unsigned)((m) - LEFT_BUTTON) <= \
                                (unsigned)(RIGHT_BUTTON - LEFT_BUTTON))
 #define IS_MOUSE_DRAG(m) ( (unsigned)((m) - LEFT_DRAG) <= \
@@ -152,6 +155,9 @@ struct config_item {
      */
     int ival;
 };
+
+#define CONFIGS_STRING 1
+#define CONFIGS_FLOAT  2
 
 /*
  * Platform routines
@@ -559,7 +565,8 @@ struct drawing_api {
     void (*blitter_free)(void *handle, blitter *bl);
     void (*blitter_save)(void *handle, blitter *bl, int x, int y);
     void (*blitter_load)(void *handle, blitter *bl, int x, int y);
-    void (*begin_doc)(void *handle, int pages);
+	void (*add_print_colour)(void *handle, int colour);
+	void (*begin_doc)(void *handle, int pages);
     void (*begin_page)(void *handle, int number);
     void (*begin_puzzle)(void *handle, float xm, float xc,
 			 float ym, float yc, int pw, int ph, float wmm);

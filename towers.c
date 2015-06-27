@@ -1373,7 +1373,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (is_clue(state, tx, ty)) {
             sprintf(buf, "%c%d,%d", 'D', tx, ty);
             return dupstr(buf);
-        }
+    }
     }
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->hx, &ui->hy, w, w, 0);
@@ -1410,13 +1410,24 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	sprintf(buf, "%c%d,%d,%d",
 		(char)(ui->hpencil && n > 0 ? 'P' : 'R'), ui->hx, ui->hy, n);
 
-        if (!ui->hcursor) ui->hshow = 0;
+	if (!ui->hcursor && !ui->hpencil) ui->hshow = 0;
 
 	return dupstr(buf);
     }
 
     if (button == 'M' || button == 'm')
         return dupstr("M");
+
+	if (button == BUTTON_MARK_ON && ui->hshow && !ui->hpencil)
+	{
+		ui->hpencil = 1;
+		return "";
+	}
+	if (button == BUTTON_MARK_OFF && ui->hshow && ui->hpencil)
+	{
+		ui->hpencil = 0;
+		return "";
+	}
 
     return NULL;
 }
@@ -1474,7 +1485,7 @@ static game_state *execute_move(const game_state *from, const char *move)
         int index = clue_index(from, x, y);
         ret->clues_done[index] = !ret->clues_done[index];
         return ret;
-    }
+}
 
   badmove:
     /* couldn't parse move string */
@@ -1640,9 +1651,9 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
 
     /* new number needs drawing? */
     if (tile & DF_DIGIT_MASK) {
-        int color;
-
-	str[1] = '\0';
+	str[2] = '\0';
+	str[1] = (tile & DF_ERROR) && (tile & DF_PLAYAREA) && !(tile & DF_IMMUTABLE) ? '!' : '\0';
+	int color;
 	str[0] = (tile & DF_DIGIT_MASK) + '0';
 
         if (tile & DF_ERROR)

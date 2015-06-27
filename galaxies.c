@@ -192,7 +192,7 @@ static int game_fetch_preset(int i, char **name, game_params **params)
 
 static game_params *default_params(void)
 {
-    game_params *ret;
+    game_params *ret = NULL;
     game_fetch_preset(DEFAULT_PRESET, NULL, &ret);
     return ret;
 }
@@ -3477,7 +3477,7 @@ static void game_print(drawing *dr, const game_state *state, int sz)
 
     white = print_mono_colour(dr, 1);
     black = print_mono_colour(dr, 0);
-    blackish = print_hatched_colour(dr, HATCH_X);
+    blackish = print_grey_colour(dr, 0.5);
 
     /*
      * Get the completion information.

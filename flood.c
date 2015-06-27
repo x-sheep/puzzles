@@ -767,6 +767,7 @@ struct game_ui {
     int cursor_visible;
     int cx, cy;
     enum { VICTORY, DEFEAT } flash_type;
+	char labels;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -775,6 +776,7 @@ static game_ui *new_ui(const game_state *state)
     ui->cursor_visible = FALSE;
     ui->cx = FILLX;
     ui->cy = FILLY;
+	ui->labels = FALSE;
     return ui;
 }
 
@@ -801,6 +803,7 @@ struct game_drawstate {
     int started;
     int tilesize;
     int *grid;
+	char labels;
 };
 
 #define TILESIZE (ds->tilesize)
@@ -812,7 +815,7 @@ struct game_drawstate {
 #define COORD(x)  ( (x) * TILESIZE + BORDER )
 #define FROMCOORD(x)  ( ((x) - BORDER + TILESIZE) / TILESIZE - 1 )
 #define VICTORY_FLASH_FRAME 0.03F
-#define DEFEAT_FLASH_FRAME 0.10F
+#define DEFEAT_FLASH_FRAME 0.25F
 
 static char *interpret_move(const game_state *state, game_ui *ui,
                             const game_drawstate *ds,
@@ -847,7 +850,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     } else if (button == CURSOR_SELECT2 &&
                state->soln && state->solnpos < state->soln->nmoves) {
 	move = state->soln->moves[state->solnpos];
-    } else {
+	} else if (button == 'l' || button == 'L'){
+		ui->labels = !ui->labels;
+		return "";
+	} else {
         return NULL;
     }
 
@@ -1039,6 +1045,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 
     ds->started = FALSE;
     ds->tilesize = 0;
+	ds->labels = FALSE;
     ds->grid = snewn(wh, int);
     for (i = 0; i < wh; i++)
         ds->grid[i] = -1;
@@ -1063,7 +1070,8 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
 #define CURSOR    0x100
 #define BADFLASH  0x200
 #define SOLNNEXT  0x400
-#define COLOUR_SHIFT 11
+#define LABELED   0x800
+#define COLOUR_SHIFT 12
 
 static void draw_tile(drawing *dr, game_drawstate *ds,
                       int x, int y, int tile)
@@ -1111,9 +1119,25 @@ static void draw_tile(drawing *dr, game_drawstate *ds,
                           COL_SEPARATOR);
 
     if (tile & SOLNNEXT) {
-        draw_circle(dr, tx + TILESIZE/2, ty + TILESIZE/2, TILESIZE/6,
-                    COL_SEPARATOR, COL_SEPARATOR);
+		if (tile & LABELED){
+			draw_circle(dr, tx + TILESIZE / 2, ty + TILESIZE / 2, TILESIZE / 2.5,
+				COL_SEPARATOR, COL_SEPARATOR);
+			draw_circle(dr, tx + TILESIZE / 2, ty + TILESIZE / 2, TILESIZE / 2.7,
+				colour, colour);
+		}
+		else {
+			draw_circle(dr, tx + TILESIZE / 2, ty + TILESIZE / 2, TILESIZE / 6,
+				COL_SEPARATOR, COL_SEPARATOR);
+		}
     }
+
+	if (tile & LABELED) {
+		char buf[2];
+		buf[1] = '\0';
+		buf[0] = (tile >> COLOUR_SHIFT) == 9 ? '0' : '1' + (tile >> COLOUR_SHIFT);
+		draw_text(dr, tx + TILESIZE / 2, ty + TILESIZE / 2, FONT_VARIABLE, 
+			TILESIZE / 2, ALIGN_HCENTRE | ALIGN_VCENTRE, COL_SEPARATOR, buf);
+	}
 
     draw_update(dr, tx, ty, TILESIZE, TILESIZE);
 }
@@ -1249,6 +1273,9 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 
             if (flashframe >= 0 && ui->flash_type == DEFEAT && flashframe != 1)
                 tile |= BADFLASH;
+
+			if (ui->labels)
+				tile |= LABELED;
 
             if (ds->grid[pos] != tile) {
 		draw_tile(dr, ds, x, y, tile);

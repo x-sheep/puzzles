@@ -164,7 +164,7 @@ static config_item *game_configure(const game_params *params)
     else
         sprintf(buf, "%d-%d", params->minballs, params->maxballs);
     ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+	ret[2].ival = CONFIGS_STRING;
 
     ret[3].name = NULL;
     ret[3].type = C_END;

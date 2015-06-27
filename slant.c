@@ -31,6 +31,7 @@
 #include <math.h>
 
 #include "puzzles.h"
+#include "gluefe.h"
 
 enum {
     COL_BACKGROUND,
@@ -388,7 +389,7 @@ static void fill_square(int w, int h, int x, int y, int v,
     if (soln[y*w+x] != 0) {
 	return;			       /* do nothing */
     }
-
+	check_abort();
 #ifdef SOLVER_DIAGNOSTICS
     if (verbose)
 	printf("  placing %c in %d,%d\n", v == -1 ? '\\' : '/', x, y);

@@ -2780,7 +2780,7 @@ static void draw_island(drawing *dr, game_drawstate *ds,
           COL_FOREGROUND);
     bg = ((idata & DI_BGMASK) == DI_BG_CURSOR ? COL_CURSOR :
           (idata & DI_BGMASK) == DI_BG_MARK ? COL_MARK :
-          COL_BACKGROUND);
+		  COL_BACKGROUND);
 
     /* draw a thick circle */
     draw_circle(dr, ox+half, oy+half, orad, fg, fg);
@@ -2875,7 +2875,7 @@ static void draw_line_tile(drawing *dr, game_drawstate *ds,
 }
 
 static void draw_edge_tile(drawing *dr, game_drawstate *ds,
-                           int x, int y, int dx, int dy, unsigned long data)
+                           int x, int y, int dx, int dy, int clue, unsigned long data)
 {
     int ox = COORD(x), oy = COORD(y);
     int cx = ox, cy = oy, cw = TILE_SIZE, ch = TILE_SIZE;
@@ -2892,7 +2892,7 @@ static void draw_edge_tile(drawing *dr, game_drawstate *ds,
     clip(dr, cx, cy, cw, ch);
     draw_rect(dr, cx, cy, cw, ch, COL_BACKGROUND);
 
-    draw_island(dr, ds, ox + TILE_SIZE*dx, oy + TILE_SIZE*dy, -1,
+	draw_island(dr, ds, ox + TILE_SIZE*dx, oy + TILE_SIZE*dy, clue,
                 (data >> D_I_ISLAND_SHIFT) & DI_MASK);
 
     unclip(dr);
@@ -3068,15 +3068,15 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
                      * iff we redraw their parent island tile.
                      */
                     if (x == 0)
-                        draw_edge_tile(dr, ds, x-1, y, +1, 0, newval);
+						draw_edge_tile(dr, ds, x - 1, y, +1, 0, is->count, newval);
                     if (y == 0)
-                        draw_edge_tile(dr, ds, x, y-1, 0, +1, newval);
+						draw_edge_tile(dr, ds, x, y - 1, 0, +1, is->count, newval);
                     if (x == state->w-1)
-                        draw_edge_tile(dr, ds, x+1, y, -1, 0, newval);
+						draw_edge_tile(dr, ds, x + 1, y, -1, 0, is->count, newval);
                     if (y == state->h-1)
-                        draw_edge_tile(dr, ds, x, y+1, 0, -1, newval);
+						draw_edge_tile(dr, ds, x, y + 1, 0, -1, is->count, newval);
                 } else {
-                    draw_line_tile(dr, ds, x, y, newval);
+					draw_line_tile(dr, ds, x, y, newval);
                 }
                 INDEX(ds,grid,x,y) = newval;
             }

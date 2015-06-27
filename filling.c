@@ -106,13 +106,25 @@ struct game_state {
     int completed, cheated;
 };
 
-static const struct game_params filling_defaults[3] = {{7, 9}, {9, 13}, {13, 17}};
+static const struct game_params filling_defaults[3] = {
+#ifdef PORTRAIT_SCREEN
+	{9, 7}, {13, 9}, {17, 13}
+#else
+	{7, 9}, {9, 13}, {13, 17}
+#endif
+};
+
+#ifdef SMALL_SCREEN
+#define DEFAULT_PRESET 0
+#else
+#define DEFAULT_PRESET 1
+#endif
 
 static game_params *default_params(void)
 {
     game_params *ret = snew(game_params);
 
-    *ret = filling_defaults[1]; /* struct copy */
+	*ret = filling_defaults[DEFAULT_PRESET]; /* struct copy */
 
     return ret;
 }
@@ -124,7 +136,7 @@ static int game_fetch_preset(int i, char **name, game_params **params)
     if (i < 0 || i >= lenof(filling_defaults)) return FALSE;
     *params = snew(game_params);
     **params = filling_defaults[i]; /* struct copy */
-    sprintf(buf, "%dx%d", filling_defaults[i].h, filling_defaults[i].w);
+    sprintf(buf, "%dx%d", filling_defaults[i].w, filling_defaults[i].h);
     *name = dupstr(buf);
 
     return TRUE;

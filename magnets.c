@@ -94,6 +94,16 @@ struct game_params {
 #define DEFAULT_PRESET 2
 
 static const struct game_params magnets_presets[] = {
+#ifdef PORTRAIT_SCREEN
+	{5, 6, DIFF_EASY, 0},
+	{5, 6, DIFF_TRICKY, 0},
+	{5, 6, DIFF_TRICKY, 1},
+	{7, 8, DIFF_EASY, 0},
+	{7, 8, DIFF_TRICKY, 0},
+	{7, 8, DIFF_TRICKY, 1},
+	{9, 10, DIFF_TRICKY, 0},
+	{9, 10, DIFF_TRICKY, 1}
+#else
     {6, 5, DIFF_EASY, 0},
     {6, 5, DIFF_TRICKY, 0},
     {6, 5, DIFF_TRICKY, 1},
@@ -102,6 +112,7 @@ static const struct game_params magnets_presets[] = {
     {8, 7, DIFF_TRICKY, 1},
     {10, 9, DIFF_TRICKY, 0},
     {10, 9, DIFF_TRICKY, 1}
+#endif
 };
 
 static game_params *default_params(void)

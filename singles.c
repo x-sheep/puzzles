@@ -1491,7 +1491,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 {
     char buf[80], c;
     int i, x = FROMCOORD(mx), y = FROMCOORD(my);
-    enum { NONE, TOGGLE_BLACK, TOGGLE_CIRCLE, UI } action = NONE;
+    enum { NONE, TOGGLE_BLACK, TOGGLE_CIRCLE, CYCLE_FORWARD, CYCLE_BACKWARD, UI } action = NONE;
 
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->cx, &ui->cy, state->w, state->h, 1);
@@ -1516,11 +1516,20 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (!INGRID(state, x, y)) {
             ui->show_black_nums = 1 - ui->show_black_nums;
             action = UI; /* this wants to be a per-game option. */
-        } else if (button == LEFT_BUTTON) {
+        } 
+#ifdef STYLUS_BASED
+		else if (button == LEFT_BUTTON) {
+			action = CYCLE_FORWARD;
+		} else if (button == RIGHT_BUTTON) {
+			action = CYCLE_BACKWARD;
+		}
+#else
+		else if (button == LEFT_BUTTON) {
             action = TOGGLE_BLACK;
         } else if (button == RIGHT_BUTTON) {
             action = TOGGLE_CIRCLE;
         }
+#endif
     }
     if (action == UI) return "";
 
@@ -1533,6 +1542,20 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         sprintf(buf, "%c%d,%d", (int)c, x, y);
         return dupstr(buf);
     }
+
+	if (action == CYCLE_FORWARD || action == CYCLE_BACKWARD) {
+		i = y * state->w + x;
+		if ((state->flags[i] & F_BLACK && action == CYCLE_FORWARD) ||
+			(!(state->flags[i] & (F_BLACK | F_CIRCLE)) && action == CYCLE_BACKWARD))
+			c = 'C';
+		else if ((state->flags[i] & F_CIRCLE && action == CYCLE_BACKWARD) ||
+			(!(state->flags[i] & (F_BLACK | F_CIRCLE)) && action == CYCLE_FORWARD))
+			c = 'B';
+		else
+			c = 'E';
+		sprintf(buf, "%c%d,%d", (int)c, x, y);
+		return dupstr(buf);
+	}
 
     return NULL;
 }
@@ -1677,7 +1700,7 @@ static void tile_redraw(drawing *dr, game_drawstate *ds, int x, int y,
         if (strlen(buf) == 1)
             tsz = TEXTSZ;
         else
-            tsz = (CRAD*2 - 1) / strlen(buf);
+			tsz = TEXTSZ*0.9;
         draw_text(dr, cx, cy, FONT_VARIABLE, tsz,
                   ALIGN_VCENTRE | ALIGN_HCENTRE, tcol, buf);
     }

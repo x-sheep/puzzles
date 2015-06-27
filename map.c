@@ -2272,7 +2272,8 @@ struct game_ui {
     int drag_colour;
     int drag_pencil;
     int dragx, dragy;
-    int show_numbers;
+    int last_tilesize;
+    int show_labels;
 
     int cur_x, cur_y, cur_visible, cur_moved, cur_lastmove;
 };
@@ -2281,9 +2282,10 @@ static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->dragx = ui->dragy = -1;
+    ui->last_tilesize = -1;
     ui->drag_colour = -2;
     ui->drag_pencil = 0;
-    ui->show_numbers = FALSE;
+    ui->show_labels = NO_LABELS;
     ui->cur_x = ui->cur_y = ui->cur_visible = ui->cur_moved = 0;
     ui->cur_lastmove = 0;
     return ui;
@@ -2324,7 +2326,9 @@ struct game_drawstate {
 #define PENCIL_B_BASE 0x00008000L
 #define PENCIL_B_MASK 0x00078000L
 #define PENCIL_MASK   0x007F8000L
-#define SHOW_NUMBERS  0x00004000L
+#define SHOW_REG_LAB  0x00004000L
+#define SHOW_COL_LAB  0x00002000L
+#define SHOW_LAB_MASK 0x00006000L
 
 #define TILESIZE (ds->tilesize)
 #define BORDER (TILESIZE)
@@ -2373,11 +2377,18 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     /*
      * Enable or disable numeric labels on regions.
      */
+	/*
     if (button == 'l' || button == 'L') {
-        ui->show_numbers = !ui->show_numbers;
+        ui->show_labels = (ui->show_labels == REGION_LABELS) ? NO_LABELS : REGION_LABELS;
         return "";
     }
-
+	*/
+	
+    if (button == 'l' || button == 'L') {
+        ui->show_labels = (ui->show_labels == COLOUR_LABELS) ? NO_LABELS : COLOUR_LABELS;
+        return "";
+    }
+	
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->cur_x, &ui->cur_y, state->p.w, state->p.h, 0);
         ui->cur_visible = 1;
@@ -2385,12 +2396,16 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->cur_lastmove = button;
         ui->dragx = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(button);
         ui->dragy = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(button);
+        ui->last_tilesize = TILESIZE;
         return "";
     }
     if (IS_CURSOR_SELECT(button)) {
-        if (!ui->cur_visible) {
+        if (!ui->cur_visible || ui->dragx < 0 || ui->last_tilesize != TILESIZE) {
             ui->dragx = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(ui->cur_lastmove);
             ui->dragy = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(ui->cur_lastmove);
+            ui->last_tilesize = TILESIZE;
+        }
+        if (!ui->cur_visible) {
             ui->cur_visible = 1;
             return "";
         }
@@ -2429,6 +2444,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	}
         ui->dragx = x;
         ui->dragy = y;
+        ui->last_tilesize = TILESIZE;
         ui->cur_visible = 0;
         return "";
     }
@@ -2437,6 +2453,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->drag_colour > -2) {
         ui->dragx = x;
         ui->dragy = y;
+        ui->last_tilesize = TILESIZE;
         return "";
     }
 
@@ -2615,9 +2632,6 @@ const float map_colours[FOUR][3] = {
     {0.55F, 0.45F, 0.35F},
 #endif
 };
-const int map_hatching[FOUR] = {
-    HATCH_VERT, HATCH_SLASH, HATCH_HORIZ, HATCH_BACKSLASH
-};
 
 static float *game_colours(frontend *fe, int *ncolours)
 {
@@ -2710,14 +2724,14 @@ static void draw_square(drawing *dr, game_drawstate *ds,
 {
     int w = params->w, h = params->h, wh = w*h;
     int tv, bv, xo, yo, i, j, oldj;
-    unsigned long errs, pencil, show_numbers;
+    unsigned long errs, pencil, show_labels;
 
     errs = v & ERR_MASK;
     v &= ~ERR_MASK;
     pencil = v & PENCIL_MASK;
     v &= ~PENCIL_MASK;
-    show_numbers = v & SHOW_NUMBERS;
-    v &= ~SHOW_NUMBERS;
+    show_labels = v & SHOW_LAB_MASK;
+    v &= ~SHOW_LAB_MASK;
     tv = v / FIVE;
     bv = v % FIVE;
 
@@ -2807,7 +2821,7 @@ static void draw_square(drawing *dr, game_drawstate *ds,
     /*
      * Draw region numbers, if desired.
      */
-    if (show_numbers) {
+    if (show_labels) {
         oldj = -1;
         for (i = 0; i < 2; i++) {
             j = map->map[(i?BE:TE)*wh+y*w+x];
@@ -2819,10 +2833,25 @@ static void draw_square(drawing *dr, game_drawstate *ds,
             yo = map->regiony[j] - 2*y;
             if (xo >= 0 && xo <= 2 && yo >= 0 && yo <= 2) {
                 char buf[80];
-                sprintf(buf, "%d", j);
+                int sz, len;
+                if (show_labels == SHOW_COL_LAB) {
+                    int pos = 0;
+                    int c;
+                    int mc = i ? bv : tv;
+                    for (c = 0; c < FOUR; c++) {
+                        if (mc == c) buf[pos++] = 'A' + c;
+                        else if (pencil & ((i ? PENCIL_B_BASE : PENCIL_T_BASE) << c)) buf[pos++] = 'a' + c;
+                    }
+                    buf[pos] = '\0';
+                } else if (show_labels == SHOW_REG_LAB) {
+                    sprintf(buf, "%d", j);
+                }
+                sz = 3*TILESIZE/5;
+                len = strlen(buf);
+                if (len > 2) sz = floor(sz * 2.0/len);
                 draw_text(dr, (COORD(x)*2+TILESIZE*xo)/2,
                           (COORD(y)*2+TILESIZE*yo)/2,
-                          FONT_VARIABLE, 3*TILESIZE/5,
+                          FONT_VARIABLE, sz,
                           ALIGN_HCENTRE|ALIGN_VCENTRE,
                           COL_GRID, buf);
             }
@@ -2920,8 +2949,11 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 		    v |= PENCIL_B_BASE << i;
 	    }
 
-            if (ui->show_numbers)
-                v |= SHOW_NUMBERS;
+            if (ui->show_labels == REGION_LABELS) {
+                v |= SHOW_REG_LAB;
+            } else if (ui->show_labels == COLOUR_LABELS) {
+                v |= SHOW_COL_LAB;
+            }
 
 	    ds->todraw[y*w+x] = v;
 	}
@@ -2976,13 +3008,18 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
      * Draw the dragged colour blob if any.
      */
     if ((ui->drag_colour > -2) || ui->cur_visible) {
+        int ui_dragx = ui->dragx, ui_dragy = ui->dragy;
+        if (ui_dragx < 0 || ui->last_tilesize != TILESIZE) {
+            ui_dragx = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(ui->cur_lastmove);
+            ui_dragy = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(ui->cur_lastmove);
+        }
         int bg, iscur = 0;
         if (ui->drag_colour >= 0)
             bg = COL_0 + ui->drag_colour;
         else if (ui->drag_colour == -1) {
             bg = COL_BACKGROUND;
         } else {
-            int r = region_from_coords(state, ds, ui->dragx, ui->dragy);
+            int r = region_from_coords(state, ds, ui_dragx, ui_dragy);
             int c = (r < 0) ? -1 : state->colouring[r];
             assert(ui->cur_visible);
             /*bg = COL_GRID;*/
@@ -2990,16 +3027,16 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
             iscur = 1;
         }
 
-        ds->dragx = ui->dragx - TILESIZE/2 - 2;
-        ds->dragy = ui->dragy - TILESIZE/2 - 2;
+        ds->dragx = ui_dragx - TILESIZE/2 - 2;
+        ds->dragy = ui_dragy - TILESIZE/2 - 2;
         blitter_save(dr, ds->bl, ds->dragx, ds->dragy);
-        draw_circle(dr, ui->dragx, ui->dragy,
+        draw_circle(dr, ui_dragx, ui_dragy,
                     iscur ? TILESIZE/4 : TILESIZE/2, bg, COL_GRID);
-	for (i = 0; i < FOUR; i++)
-	    if (ui->drag_pencil & (1 << i))
-		draw_circle(dr, ui->dragx + ((i*4+2)%10-3) * TILESIZE/10,
-			    ui->dragy + (i*2-3) * TILESIZE/10,
-			    TILESIZE/8, COL_0 + i, COL_0 + i);
+        for (i = 0; i < FOUR; i++)
+            if (ui->drag_pencil & (1 << i))
+                draw_circle(dr, ui_dragx + ((i*4+2)%10-3) * TILESIZE/10,
+                            ui_dragy + (i*2-3) * TILESIZE/10,
+                            TILESIZE/8, COL_0 + i, COL_0 + i);
         draw_update(dr, ds->dragx, ds->dragy, TILESIZE + 3, TILESIZE + 3);
         ds->drag_visible = TRUE;
     }
@@ -3059,7 +3096,9 @@ static void game_print(drawing *dr, const game_state *state, int tilesize)
     int ink, c[FOUR], i;
     int x, y, r;
     int *coords, ncoords, coordsize;
-
+	char buf[2];
+	buf[1] = '\0';
+	
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
     struct { int tilesize; } ads, *ds = &ads;
     /* We can't call game_set_size() here because we don't want a blitter */
@@ -3067,9 +3106,9 @@ static void game_print(drawing *dr, const game_state *state, int tilesize)
 
     ink = print_mono_colour(dr, 0);
     for (i = 0; i < FOUR; i++)
-	c[i] = print_rgb_hatched_colour(dr, map_colours[i][0],
+	c[i] = print_rgb_mono_colour(dr, map_colours[i][0],
 					map_colours[i][1], map_colours[i][2],
-					map_hatching[i]);
+					1);
 
     coordsize = 0;
     coords = NULL;
@@ -3188,6 +3227,16 @@ static void game_print(drawing *dr, const game_state *state, int tilesize)
 	draw_polygon(dr, coords, ncoords/2,
 		     state->colouring[r] >= 0 ?
 		     c[state->colouring[r]] : -1, ink);
+		
+		if(state->colouring[r] >= 0)
+		{
+			buf[0] = 'A' + state->colouring[r];
+			draw_text(dr, (2+state->map->regionx[r])*TILESIZE/2,
+							  (2+state->map->regiony[r])*TILESIZE/2,
+							  FONT_VARIABLE, 3*TILESIZE/5,
+							  ALIGN_HCENTRE|ALIGN_VCENTRE,
+							  ink, buf);
+		}
     }
     sfree(coords);
 }

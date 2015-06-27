@@ -37,9 +37,10 @@
 #include "tree234.h"
 
 #define CIRCLE_RADIUS 6
-#define DRAG_THRESHOLD (CIRCLE_RADIUS * 2)
+#define DRAG_THRESHOLD (CIRCLE_RADIUS * 10)
 #define PREFERRED_TILESIZE 64
 
+#define FLASH_CYCLES 1.5
 #define FLASH_TIME 0.30F
 #define ANIM_TIME 0.13F
 #define SOLVEANIM_TIME 0.50F
@@ -257,6 +258,7 @@ static int64 mulu32to64(unsigned long x, unsigned long y)
 static int64 mul32to64(long x, long y)
 {
     int sign = +1;
+	long *lol;
     int64 ret;
 #ifdef DIAGNOSTIC_VIA_LONGLONG
     long long realret = (long long)x * y;
@@ -271,7 +273,11 @@ static int64 mul32to64(long x, long y)
 
     if (sign < 0) {
 	ret.hi = -ret.hi;
-	ret.lo = -ret.lo;
+	
+	/* WinRT does not allow the - unary operator on unsigned longs */
+	lol = (long*)&ret.lo;
+	*lol = -*lol;
+	
 	if (ret.lo)
 	    ret.hi--;
     }
@@ -1299,7 +1305,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     int w, h;
     edge *e;
     int i, j;
-    int bg, points_moved;
+    int line, points_moved;
 
     /*
      * There's no terribly sensible way to do partial redraws of
@@ -1307,12 +1313,12 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
      * whole thing every time.
      */
 
-    if (flashtime == 0)
-        bg = COL_BACKGROUND;
+	if (flashtime == 0)
+		line = COL_LINE;
     else if ((int)(flashtime * 4 / FLASH_TIME) % 2 == 0)
-        bg = COL_FLASH1;
+		line = COL_FLASH1;
     else
-        bg = COL_FLASH2;
+		line = COL_FLASH2;
 
     /*
      * To prevent excessive spinning on redraw during a completion
@@ -1345,14 +1351,14 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
         ds->y[i] = y;
     }
 
-    if (ds->bg == bg && ds->dragpoint == ui->dragpoint && !points_moved)
+	if (ds->bg == line && ds->dragpoint == ui->dragpoint && !points_moved)
         return;                        /* nothing to do */
 
     ds->dragpoint = ui->dragpoint;
-    ds->bg = bg;
+	ds->bg = line;
 
     game_compute_size(&state->params, ds->tilesize, &w, &h);
-    draw_rect(dr, 0, 0, w, h, bg);
+	draw_rect(dr, 0, 0, w, h, COL_BACKGROUND);
 
     /*
      * Draw the edges.
@@ -1364,7 +1370,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 		  (oldstate?oldstate:state)->crosses[i] ?
 		  COL_CROSSEDLINE :
 #endif
-		  COL_LINE);
+						  line);
     }
 
     /*
@@ -1426,7 +1432,7 @@ static float game_flash_length(const game_state *oldstate,
 {
     if (!oldstate->completed && newstate->completed &&
 	!oldstate->cheated && !newstate->cheated)
-        return FLASH_TIME;
+        return FLASH_TIME * FLASH_CYCLES;
     return 0.0F;
 }
 

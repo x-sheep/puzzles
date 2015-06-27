@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "puzzles.h"
+#include "gluefe.h"
 
 /*
  * smalloc should guarantee to return a useful pointer - Halibut
@@ -15,6 +16,7 @@ void *smalloc(size_t size) {
     p = malloc(size);
     if (!p)
 	fatal("out of memory");
+	check_abort();
     return p;
 }
 
@@ -39,7 +41,8 @@ void *srealloc(void *p, size_t size) {
     }
     if (!q)
 	fatal("out of memory");
-    return q;
+	check_abort();
+	return q;
 }
 
 /*
