@@ -96,20 +96,19 @@
     <ClInclude Include="Direct2DPuzzleCanvas.xaml.h">
       <DependentUpon>Direct2DPuzzleCanvas.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="empty.h" />
-    <ClInclude Include="gluefe.h" />
-    <ClInclude Include="grid.h" />
+    <ClInclude Include="..\..\gluefe.h" />
+    <ClInclude Include="..\..\grid.h" />
     <ClInclude Include="HelpPage.xaml.h">
       <DependentUpon>HelpPage.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="IPuzzleCanvas.h" />
-    <ClInclude Include="latin.h" />
-    <ClInclude Include="loopgen.h" />
-    <ClInclude Include="maxflow.h" />
+    <ClInclude Include="..\..\latin.h" />
+    <ClInclude Include="..\..\loopgen.h" />
+    <ClInclude Include="..\..\maxflow.h" />
     <ClInclude Include="ParamsDialog.xaml.h">
       <DependentUpon>ParamsDialog.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="penrose.h" />
+    <ClInclude Include="..\..\penrose.h" />
     <ClInclude Include="PresetDialog.xaml.h">
       <DependentUpon>PresetDialog.xaml</DependentUpon>
     </ClInclude>
@@ -122,8 +121,8 @@
     <ClInclude Include="PuzzleKeyboard.xaml.h">
       <DependentUpon>PuzzleKeyboard.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="puzzles.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\puzzles.h" />
+    <ClInclude Include="..\..\resource.h" />
     <ClInclude Include="SettingsPage.xaml.h">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </ClInclude>
@@ -136,7 +135,7 @@
     <ClInclude Include="TileButton.xaml.h">
       <DependentUpon>TileButton.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="tree234.h" />
+    <ClInclude Include="..\..\tree234.h" />
     <ClInclude Include="Common\NavigationHelper.h" />
     <ClInclude Include="Common\RelayCommand.h" />
     <ClInclude Include="Common\SuspensionManager.h" />
@@ -450,179 +449,179 @@
     <ClCompile Include="App.xaml.cpp">
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="blackbox.c">
+    <ClCompile Include="..\..\blackbox.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="bridges.c">
+    <ClCompile Include="..\..\bridges.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="combi.c">
+    <ClCompile Include="..\..\combi.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="cube.c">
+    <ClCompile Include="..\..\cube.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Direct2DPuzzleCanvas.xaml.cpp">
       <DependentUpon>Direct2DPuzzleCanvas.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="divvy.c">
+    <ClCompile Include="..\..\divvy.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="dominosa.c">
+    <ClCompile Include="..\..\dominosa.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="drawing.c">
+    <ClCompile Include="..\..\drawing.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="dsf.c">
+    <ClCompile Include="..\..\dsf.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="fifteen.c">
+    <ClCompile Include="..\..\fifteen.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="filling.c">
+    <ClCompile Include="..\..\filling.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="flip.c">
+    <ClCompile Include="..\..\flip.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="flood.c">
+    <ClCompile Include="..\..\flood.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="galaxies.c">
+    <ClCompile Include="..\..\galaxies.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="gluefe.c">
+    <ClCompile Include="..\..\gluefe.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="grid.c">
+    <ClCompile Include="..\..\grid.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="guess.c">
+    <ClCompile Include="..\..\guess.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="HelpPage.xaml.cpp">
       <DependentUpon>HelpPage.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="inertia.c">
+    <ClCompile Include="..\..\inertia.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="keen.c">
+    <ClCompile Include="..\..\keen.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="latin.c">
+    <ClCompile Include="..\..\latin.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="laydomino.c">
+    <ClCompile Include="..\..\laydomino.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="lightup.c">
+    <ClCompile Include="..\..\lightup.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="list.c">
+    <ClCompile Include="..\..\list.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="loopgen.c">
+    <ClCompile Include="..\..\loopgen.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="loopy.c">
+    <ClCompile Include="..\..\loopy.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="magnets.c">
+    <ClCompile Include="..\..\magnets.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="malloc.c">
+    <ClCompile Include="..\..\malloc.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="map.c">
+    <ClCompile Include="..\..\map.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="maxflow.c">
+    <ClCompile Include="..\..\maxflow.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="midend.c">
+    <ClCompile Include="..\..\midend.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="mines.c">
+    <ClCompile Include="..\..\mines.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="misc.c">
+    <ClCompile Include="..\..\misc.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="net.c">
+    <ClCompile Include="..\..\net.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="netslide.c">
+    <ClCompile Include="..\..\netslide.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="no-icon.c">
+    <ClCompile Include="..\..\no-icon.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="nullgame.c">
+    <ClCompile Include="..\..\nullgame.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="obfusc.c">
+    <ClCompile Include="..\..\obfusc.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ParamsDialog.xaml.cpp">
       <DependentUpon>ParamsDialog.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="pattern.c">
+    <ClCompile Include="..\..\pattern.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="pearl.c">
+    <ClCompile Include="..\..\pearl.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="pegs.c">
+    <ClCompile Include="..\..\pegs.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="penrose.c">
+    <ClCompile Include="..\..\penrose.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PresetDialog.xaml.cpp">
       <DependentUpon>PresetDialog.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="printing.c">
+    <ClCompile Include="..\..\printing.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -634,19 +633,19 @@
     <ClCompile Include="PuzzleKeyboard.xaml.cpp">
       <DependentUpon>PuzzleKeyboard.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="random.c">
+    <ClCompile Include="..\..\random.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="range.c">
+    <ClCompile Include="..\..\range.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="rect.c">
+    <ClCompile Include="..\..\rect.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="samegame.c">
+    <ClCompile Include="..\..\samegame.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -656,69 +655,69 @@
     <ClCompile Include="ShapePuzzleCanvas.xaml.cpp">
       <DependentUpon>ShapePuzzleCanvas.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="signpost.c">
+    <ClCompile Include="..\..\signpost.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="singles.c">
+    <ClCompile Include="..\..\singles.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="sixteen.c">
+    <ClCompile Include="..\..\sixteen.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="slant.c">
+    <ClCompile Include="..\..\slant.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="solo.c">
+    <ClCompile Include="..\..\solo.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SpecificDialog.xaml.cpp">
       <DependentUpon>SpecificDialog.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="tdq.c">
+    <ClCompile Include="..\..\tdq.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tents.c">
+    <ClCompile Include="..\..\tents.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TileButton.xaml.cpp">
       <DependentUpon>TileButton.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="towers.c">
+    <ClCompile Include="..\..\towers.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tree234.c">
+    <ClCompile Include="..\..\tree234.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tracks.c">
+    <ClCompile Include="..\..\tracks.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="twiddle.c">
+    <ClCompile Include="..\..\twiddle.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="undead.c">
+    <ClCompile Include="..\..\undead.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="unequal.c">
+    <ClCompile Include="..\..\unequal.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="unruly.c">
+    <ClCompile Include="..\..\unruly.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="untangle.c">
+    <ClCompile Include="..\..\untangle.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
