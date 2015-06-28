@@ -50,193 +50,193 @@
     <ClCompile Include="PuzzleData.cpp" />
     <ClCompile Include="GamePage.xaml.cpp" />
     <ClCompile Include="ParamsFlyout.xaml.cpp" />
-    <ClCompile Include="blackbox.c">
+    <ClCompile Include="..\..\blackbox.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="bridges.c">
+    <ClCompile Include="..\..\bridges.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="combi.c">
+    <ClCompile Include="..\..\combi.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="cube.c">
+    <ClCompile Include="..\..\cube.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="divvy.c">
+    <ClCompile Include="..\..\divvy.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="dominosa.c">
+    <ClCompile Include="..\..\dominosa.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="drawing.c">
+    <ClCompile Include="..\..\drawing.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="dsf.c">
+    <ClCompile Include="..\..\dsf.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="fifteen.c">
+    <ClCompile Include="..\..\fifteen.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="filling.c">
+    <ClCompile Include="..\..\filling.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="flip.c">
+    <ClCompile Include="..\..\flip.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="galaxies.c">
+    <ClCompile Include="..\..\galaxies.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="grid.c">
+    <ClCompile Include="..\..\grid.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="guess.c">
+    <ClCompile Include="..\..\guess.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="inertia.c">
+    <ClCompile Include="..\..\inertia.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="keen.c">
+    <ClCompile Include="..\..\keen.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="latin.c">
+    <ClCompile Include="..\..\latin.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="laydomino.c">
+    <ClCompile Include="..\..\laydomino.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="lightup.c">
+    <ClCompile Include="..\..\lightup.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="list.c">
+    <ClCompile Include="..\..\list.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="loopgen.c">
+    <ClCompile Include="..\..\loopgen.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="loopy.c">
+    <ClCompile Include="..\..\loopy.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="magnets.c">
+    <ClCompile Include="..\..\magnets.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="malloc.c">
+    <ClCompile Include="..\..\malloc.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="map.c">
+    <ClCompile Include="..\..\map.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="maxflow.c">
+    <ClCompile Include="..\..\maxflow.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="midend.c">
+    <ClCompile Include="..\..\midend.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="mines.c">
+    <ClCompile Include="..\..\mines.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="misc.c">
+    <ClCompile Include="..\..\misc.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="net.c">
+    <ClCompile Include="..\..\net.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="netslide.c">
+    <ClCompile Include="..\..\netslide.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="no-icon.c">
+    <ClCompile Include="..\..\no-icon.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="nullgame.c">
+    <ClCompile Include="..\..\nullgame.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="obfusc.c">
+    <ClCompile Include="..\..\obfusc.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="pattern.c">
+    <ClCompile Include="..\..\pattern.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="pearl.c">
+    <ClCompile Include="..\..\pearl.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="pegs.c">
+    <ClCompile Include="..\..\pegs.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="penrose.c">
+    <ClCompile Include="..\..\penrose.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="printing.c">
+    <ClCompile Include="..\..\printing.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="ps.c">
+    <ClCompile Include="..\..\ps.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="signpost.c">
+    <ClCompile Include="..\..\signpost.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="singles.c">
+    <ClCompile Include="..\..\singles.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="sixteen.c">
+    <ClCompile Include="..\..\sixteen.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="slant.c">
+    <ClCompile Include="..\..\slant.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="solo.c">
+    <ClCompile Include="..\..\solo.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="tdq.c">
+    <ClCompile Include="..\..\tdq.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="tents.c">
+    <ClCompile Include="..\..\tents.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="towers.c">
+    <ClCompile Include="..\..\towers.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="tree234.c">
+    <ClCompile Include="..\..\tree234.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="twiddle.c">
+    <ClCompile Include="..\..\twiddle.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="undead.c">
+    <ClCompile Include="..\..\undead.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="unequal.c">
+    <ClCompile Include="..\..\unequal.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="unruly.c">
+    <ClCompile Include="..\..\unruly.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="random.c">
+    <ClCompile Include="..\..\random.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="range.c">
+    <ClCompile Include="..\..\range.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="rect.c">
+    <ClCompile Include="..\..\rect.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="samegame.c">
+    <ClCompile Include="..\..\samegame.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="gluefe.c">
+    <ClCompile Include="..\..\gluefe.c">
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="AboutFlyout.xaml.cpp" />
     <ClCompile Include="ShapePuzzleCanvas.xaml.cpp" />
     <ClCompile Include="PuzzleImageSource.cpp" />
     <ClCompile Include="Direct2DPuzzleCanvas.xaml.cpp" />
-    <ClCompile Include="untangle.c">
+    <ClCompile Include="..\..\untangle.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="flood.c">
+    <ClCompile Include="..\..\flood.c">
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="GeneralSettingsFlyout.xaml.cpp" />
     <ClCompile Include="HelpFlyout.xaml.cpp" />
-    <ClCompile Include="tracks.c">
+    <ClCompile Include="..\..\tracks.c">
       <Filter>Source Code</Filter>
     </ClCompile>
   </ItemGroup>
@@ -257,9 +257,6 @@
     <ClInclude Include="PuzzleData.h" />
     <ClInclude Include="GamePage.xaml.h" />
     <ClInclude Include="ParamsFlyout.xaml.h" />
-    <ClInclude Include="empty.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
     <ClInclude Include="grid.h">
       <Filter>Source Headers</Filter>
     </ClInclude>

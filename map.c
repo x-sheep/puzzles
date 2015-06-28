@@ -74,6 +74,8 @@ enum {
     NCOLOURS
 };
 
+enum { NO_LABELS, REGION_LABELS, COLOUR_LABELS };
+
 struct game_params {
     int w, h, n, diff;
 };
