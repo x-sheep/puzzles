@@ -80,7 +80,7 @@
                                     <RowDefinition Height="210" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <Border Grid.Row="0" Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}">
+                                <Border Grid.Row="0" Background="#dcdad5">
                                     <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Name}"/>
                                 </Border>
                                 <StackPanel Grid.Row="0" VerticalAlignment="Bottom" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
@@ -112,7 +112,7 @@
                                     <ColumnDefinition Width="50" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0" Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}">
+                                <Border Grid.Column="0" Background="#dcdad5">
                                     <Image Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
                                 </Border>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Stretch" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
