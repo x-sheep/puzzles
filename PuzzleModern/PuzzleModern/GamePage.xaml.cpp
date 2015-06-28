@@ -319,7 +319,7 @@ void GamePage::UpdateUndoButtons()
 			messageDialog->Commands->Append(ref new UICommand("Menu", nullptr, PropertyValue::CreateInt32(1)));
 			messageDialog->Commands->Append(ref new UICommand("Close", nullptr, PropertyValue::CreateInt32(2)));
 
-			messageDialog->DefaultCommandIndex = 1;
+			messageDialog->DefaultCommandIndex = 0;
 			messageDialog->CancelCommandIndex = 2;
 
 			create_task(messageDialog->ShowAsync()).then([this](IUICommand^ command)
