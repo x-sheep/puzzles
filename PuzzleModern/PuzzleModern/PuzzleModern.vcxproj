@@ -139,12 +139,12 @@
     <ClInclude Include="GamePage.xaml.h">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="gluefe.h" />
-    <ClInclude Include="grid.h" />
+    <ClInclude Include="..\..\gluefe.h" />
+    <ClInclude Include="..\..\grid.h" />
     <ClInclude Include="IPuzzleCanvas.h" />
-    <ClInclude Include="latin.h" />
-    <ClInclude Include="loopgen.h" />
-    <ClInclude Include="maxflow.h" />
+    <ClInclude Include="..\..\latin.h" />
+    <ClInclude Include="..\..\loopgen.h" />
+    <ClInclude Include="..\..\maxflow.h" />
     <ClInclude Include="ParamsFlyout.xaml.h">
       <DependentUpon>ParamsFlyout.xaml</DependentUpon>
     </ClInclude>
@@ -153,13 +153,13 @@
       <DependentUpon>App.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="PuzzleData.h" />
-    <ClInclude Include="penrose.h" />
-    <ClInclude Include="puzzles.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\penrose.h" />
+    <ClInclude Include="..\..\puzzles.h" />
+    <ClInclude Include="..\..\resource.h" />
     <ClInclude Include="SelectorPage.xaml.h">
       <DependentUpon>SelectorPage.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="tree234.h" />
+    <ClInclude Include="..\..\tree234.h" />
     <ClInclude Include="WindowsModern.h" />
   </ItemGroup>
   <ItemGroup>

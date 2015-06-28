@@ -257,31 +257,31 @@
     <ClInclude Include="PuzzleData.h" />
     <ClInclude Include="GamePage.xaml.h" />
     <ClInclude Include="ParamsFlyout.xaml.h" />
-    <ClInclude Include="grid.h">
+    <ClInclude Include="..\..\grid.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="latin.h">
+    <ClInclude Include="..\..\latin.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="loopgen.h">
+    <ClInclude Include="..\..\loopgen.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="maxflow.h">
+    <ClInclude Include="..\..\maxflow.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="penrose.h">
+    <ClInclude Include="..\..\penrose.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="puzzles.h">
+    <ClInclude Include="..\..\puzzles.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="..\..\resource.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="tree234.h">
+    <ClInclude Include="..\..\tree234.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="gluefe.h">
+    <ClInclude Include="..\..\gluefe.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
     <ClInclude Include="IPuzzleCanvas.h" />
