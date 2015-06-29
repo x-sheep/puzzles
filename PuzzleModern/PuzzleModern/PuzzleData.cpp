@@ -70,45 +70,4 @@ namespace PuzzleModern
 		}
 		return ret;
 	}
-
-	GameLaunchParameters ^GameLaunchParameters::Parse(Platform::String ^serialized)
-	{
-		if (!serialized) return nullptr;
-
-		// Puzzle name only
-		if (serialized->Begin()[0] != L'{')
-			return ref new GameLaunchParameters(serialized);
-
-		auto ret = ref new GameLaunchParameters();
-		
-		auto json = JsonObject::Parse(serialized);
-		if (json->HasKey("Name"))
-			ret->Name = json->GetNamedString("Name");
-		if (json->HasKey("TempFile"))
-			ret->LoadTempFile = json->GetNamedBoolean("TempFile");
-		if (json->HasKey("GameId"))
-			ret->GameID = json->GetNamedString("GameId");
-		if (json->HasKey("Error"))
-			ret->Error = json->GetNamedString("Error");
-
-		return ret;
-	}
-
-	Platform::String ^GameLaunchParameters::Stringify()
-	{
-		if (!_loadTempFile && !_gameID && !_error)
-			return _name;
-
-		auto json = ref new JsonObject();
-		json->Insert("Name", JsonValue::CreateStringValue(_name));
-
-		if (_loadTempFile)
-			json->Insert("TempFile", JsonValue::CreateBooleanValue(true));
-		if (_gameID)
-			json->Insert("GameId", JsonValue::CreateStringValue(_gameID));
-		if (_error)
-			json->Insert("Error", JsonValue::CreateStringValue(_error));
-
-		return json->Stringify();
-	}
 }

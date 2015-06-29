@@ -47,6 +47,7 @@ void App::OnWindowCreated(Windows::UI::Xaml::WindowCreatedEventArgs^ e)
 void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 {
 	Frame ^rootFrame;
+	GamePage ^page;
 	try
 	{
 		rootFrame = dynamic_cast<Frame^>(Window::Current->Content);
@@ -74,13 +75,11 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 			/* Always put the Selector page first on the navigation stack */
 			rootFrame->Navigate(TypeName(SelectorPage::typeid), nullptr);
 			if (launch)
-				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Stringify());
+				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Name);
 		}
 
 		// Place the frame in the current Window
 		Window::Current->Content = rootFrame;
-		// Ensure the current window is active
-		Window::Current->Activate();
 	}
 	else
 	{
@@ -89,7 +88,7 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 			/* Always put the Selector page first on the navigation stack */
 			rootFrame->Navigate(TypeName(SelectorPage::typeid), nullptr);
 			if (launch)
-				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Stringify());
+				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Name);
 		}
 		else if (launch)
 		{
@@ -97,11 +96,8 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 			String ^currentName = nullptr;
 			if (rootFrame->CurrentSourcePageType.Name == TypeName(GamePage::typeid).Name)
 			{
-				auto page = safe_cast<GamePage^>(rootFrame->Content);
+				page = safe_cast<GamePage^>(rootFrame->Content);
 				currentName = safe_cast<String^>(page->DefaultViewModel->Lookup("PuzzleName"));
-
-				if (puzzleName == currentName && launch->LoadTempFile)
-					page->BeginLoadTemp(false, false);
 			}
 			if (puzzleName != currentName)
 			{
@@ -109,11 +105,17 @@ void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
 				while (rootFrame->CanGoBack)
 					rootFrame->GoBack();
 
-				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Stringify());
+				rootFrame->Navigate(TypeName(GamePage::typeid), launch->Name);
 			}
 		}
-		// Ensure the current window is active
-		Window::Current->Activate();
+	}
+
+	// Ensure the current window is active
+	Window::Current->Activate();
+	page = dynamic_cast<GamePage^>(rootFrame->Content);
+	if (page)
+	{
+		page->BeginActivatePuzzle(launch);
 	}
 }
 
@@ -135,10 +137,7 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
 
 	if (e->Arguments != nullptr)
 	{
-		GameLaunchParameters ^launch = nullptr;
-		String ^puzzleName = e->Arguments;
-		launch = ref new GameLaunchParameters(puzzleName);
-		ActivatePuzzle(launch);
+		ActivatePuzzle(ref new GameLaunchParameters(e->Arguments));
 	}
 	// Open the selector page
 	else

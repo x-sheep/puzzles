@@ -8,6 +8,7 @@
 #include "GamePage.g.h"
 #include "ParamsFlyout.g.h"
 #include "Common\NavigationHelper.h"
+#include "PuzzleData.h"
 #include "WindowsModern.h"
 
 namespace PuzzleModern
@@ -44,7 +45,7 @@ namespace PuzzleModern
 
 		void ForceRedraw();
 		void BeginLoadGame(Windows::Storage::StorageFile ^file, bool makeNew);
-		void BeginLoadTemp(bool hasGame, bool firstLaunch);
+		void BeginActivatePuzzle(PuzzleModern::GameLaunchParameters ^p);
 
 		virtual void StartTimer();
 		virtual void EndTimer();
@@ -105,7 +106,7 @@ namespace PuzzleModern
 		void pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 		void DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 
-		bool _leftPressed, _rightPressed, _isFlyoutOpen, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame;
+		bool _leftPressed, _rightPressed, _isFlyoutOpen, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
 		Windows::Foundation::IAsyncAction^ generatingWorkItem;
 
 		void DrawCanvas_Holding(Platform::Object^ sender, Windows::UI::Xaml::Input::HoldingRoutedEventArgs^ e);

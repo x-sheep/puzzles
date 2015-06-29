@@ -30,6 +30,7 @@ namespace PuzzleModern
 
 		event SettingsChangedEventHandler ^SettingChanged;
 		void NotifySettingChanged(Platform::Object ^sender, Platform::String ^key, Platform::Object ^value);
+		void ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch);
 
 	protected:
 		virtual void OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^ e) override;
@@ -40,7 +41,6 @@ namespace PuzzleModern
 		App();
 
 	private:
-		void ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch);
 
 		void OnSettingsCommand(Windows::UI::Popups::IUICommand^ command);
 		void OnCommandsRequested(SettingsPane^ settingsPane, SettingsPaneCommandsRequestedEventArgs^ e);

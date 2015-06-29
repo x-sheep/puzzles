@@ -50,7 +50,6 @@ namespace PuzzleModern
 		concurrency::task<Platform::String^> LoadGameFromFile(Windows::Storage::StorageFile ^file);
 		Platform::String ^LoadGameFromString(Platform::String ^saved);
 		static concurrency::task<GameLaunchParameters^> LoadAndIdentify(Windows::Storage::StorageFile ^file);
-		static concurrency::task<GameLaunchParameters^> LoadAndIdentify(Windows::Storage::StorageFile ^file, Windows::Storage::StorageFile ^tempFile);
 		concurrency::task<bool> SaveGameToStorage(Platform::String ^name);
 		concurrency::task<bool> SaveGameToFile(Windows::Storage::StorageFile ^file);
 		Platform::String ^SaveGameToString();

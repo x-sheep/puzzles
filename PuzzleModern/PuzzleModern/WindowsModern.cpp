@@ -800,22 +800,9 @@ namespace PuzzleModern
 
 	concurrency::task<GameLaunchParameters^> WindowsModern::LoadAndIdentify(StorageFile ^inputFile)
 	{
-		return concurrency::create_task([=](){
-			return ApplicationData::Current->TemporaryFolder->CreateFileAsync("temp.puzzle", CreationCollisionOption::ReplaceExisting);
-		}).then([inputFile](StorageFile ^temp){
-			return LoadAndIdentify(inputFile, temp);
-		});
-	}
-
-	concurrency::task<GameLaunchParameters^> WindowsModern::LoadAndIdentify(StorageFile ^inputFile, StorageFile ^tempFile)
-	{
-		auto errorRef = std::make_shared<Platform::String^>(nullptr);
-
-		return concurrency::create_task([inputFile, tempFile](){
-			return inputFile->CopyAndReplaceAsync(tempFile);
-		}).then([tempFile](){
-			return FileIO::ReadTextAsync(tempFile);
-		}).then([tempFile, errorRef](concurrency::task<Platform::String^> prevTask){
+		return concurrency::create_task([inputFile](){
+			return FileIO::ReadTextAsync(inputFile);
+		}).then([inputFile](concurrency::task<Platform::String^> prevTask){
 			Platform::String ^saved;
 			try
 			{
@@ -824,11 +811,7 @@ namespace PuzzleModern
 			catch (Platform::Exception^)
 			{
 				auto ret = ref new GameLaunchParameters();
-				if (*errorRef)
-					ret->Error = *errorRef;
-				else
-					ret->Error = tempFile ? "The file was corrupted." : "Not a puzzle file";
-				*errorRef = nullptr;
+				ret->Error = inputFile ? "The file was corrupted." : "Not a puzzle file";
 				return ret;
 			}
 
@@ -857,7 +840,7 @@ namespace PuzzleModern
 			else
 			{
 				ret->Name = FromChars(name, true);
-				ret->LoadTempFile = true;
+				ret->SaveFile = inputFile;
 			}
 			return ret;
 		});

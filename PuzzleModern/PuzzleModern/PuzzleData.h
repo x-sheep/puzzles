@@ -328,19 +328,16 @@ namespace PuzzleModern
 		GameLaunchParameters(){};
 		GameLaunchParameters(Platform::String ^name) : _name(name){};
 
-		static GameLaunchParameters ^Parse(Platform::String ^serialized);
-		Platform::String ^Stringify();
-
 		property Platform::String ^Name
 		{
 			Platform::String ^get(){ return _name; }
 			void set(Platform::String ^value){ _name = value; }
 		}
 		
-		property bool LoadTempFile
+		property Windows::Storage::StorageFile ^SaveFile
 		{
-			bool get(){ return _loadTempFile; }
-			void set(bool value){ _loadTempFile = value; }
+			Windows::Storage::StorageFile ^get(){ return _saveFile; }
+			void set(Windows::Storage::StorageFile ^value){ _saveFile = value; }
 		}
 
 		property Platform::String ^GameID
@@ -356,7 +353,6 @@ namespace PuzzleModern
 	private:
 		Platform::String ^_name;
 		Windows::Storage::StorageFile ^_saveFile;
-		bool _loadTempFile;
 		Platform::String ^_gameID;
 		Platform::String ^_error;
 	};
