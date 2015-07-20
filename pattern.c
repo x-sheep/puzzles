@@ -59,7 +59,11 @@ static game_params *default_params(void)
 {
     game_params *ret = snew(game_params);
 
+#ifdef SMALL_SCREEN
+	ret->w = ret->h = 10;
+#else
     ret->w = ret->h = 15;
+#endif
 
     return ret;
 }
