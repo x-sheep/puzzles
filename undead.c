@@ -1727,6 +1727,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->ascii = !ui->ascii;
         return "";      
     }
+
+    if (button == 'm' || button == 'M') {
+        return dupstr("M");
+    }
     
     if (ui->hshow == 1 && ui->hpencil == 0) {
         xi = state->common->xinfo[ui->hx + ui->hy*(state->common->params.w+2)];
@@ -2030,6 +2034,18 @@ static game_state *execute_move(const game_state *state, const char *move)
             is_clue(ret, x, y)) {
             ret->hints_done[clue_index(ret, x, y)] ^= 1;
             move += n + 1;
+        }
+        if (c == 'M') {
+            /*
+             * Fill in absolutely all pencil marks in unfilled
+             * squares, for those who like to play by the rigorous
+             * approach of starting off in that state and eliminating
+             * things.
+             */
+            for (i = 0; i < ret->common->wh; i++)
+                if (ret->guess[i] == 7)
+                    ret->pencils[i] = 7;
+            move++;
         }
         if (*move == ';') move++;
     }
@@ -2517,20 +2533,21 @@ static void draw_pencils(drawing *dr, game_drawstate *ds,
 static int is_hint_stale(const game_drawstate *ds, int hflash,
                          const game_state *state, int index)
 {
-    if (!ds->started) return TRUE;
-    if (ds->hflash != hflash) return TRUE;
+    int ret = FALSE;
+    if (!ds->started) ret = TRUE;
+    if (ds->hflash != hflash) ret = TRUE;
 
     if (ds->hint_errors[index] != state->hint_errors[index]) {
         ds->hint_errors[index] = state->hint_errors[index];
-        return TRUE;
+        ret = TRUE;
     }
 
     if (ds->hints_done[index] != state->hints_done[index]) {
         ds->hints_done[index] = state->hints_done[index];
-        return TRUE;
+        ret = TRUE;
     }
 
-    return FALSE;
+    return ret;
 }
 
 static void game_redraw(drawing *dr, game_drawstate *ds,
