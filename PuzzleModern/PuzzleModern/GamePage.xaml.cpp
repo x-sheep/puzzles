@@ -889,6 +889,7 @@ void GamePage::DrawCanvas_Holding(Platform::Object^ sender, Windows::UI::Xaml::I
 
 		fe->SendClick(x, y, ButtonType::RIGHT, ButtonState::DOWN);
 		_rightPressed = true;
+		DrawCanvas->Pulsate(x, y);
 		e->Handled = true;
 	}
 }

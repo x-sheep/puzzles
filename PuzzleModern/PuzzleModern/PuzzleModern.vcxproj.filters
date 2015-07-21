@@ -442,6 +442,7 @@
     <Page Include="Direct2DPuzzleCanvas.xaml" />
     <Page Include="GeneralSettingsFlyout.xaml" />
     <Page Include="HelpFlyout.xaml" />
+    <Page Include="PulseEffect.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Common\ReadMe.txt">

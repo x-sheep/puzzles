@@ -5,6 +5,7 @@
 
 #include "pch.h"
 #include "Direct2DPuzzleCanvas.xaml.h"
+#include "PulseEffect.xaml.h"
 
 using namespace PuzzleModern;
 
@@ -60,6 +61,25 @@ void Direct2DPuzzleCanvas::CreateSource(int w, int h)
 	img->EndDraw();
 	
 	isDrawing = false;
+}
+
+void Direct2DPuzzleCanvas::Pulsate(int x, int y)
+{
+	auto circle = ref new PulseEffect();
+	circle->Margin = Thickness(x, y, 0, 0);
+	BaseCanvas->Children->Append(circle);
+	circle->Completed += ref new Windows::Foundation::EventHandler<Platform::Object ^>(this, &PuzzleModern::Direct2DPuzzleCanvas::OnPulsateCompleted);
+	circle->Start();
+}
+
+void PuzzleModern::Direct2DPuzzleCanvas::OnPulsateCompleted(Platform::Object ^sender, Platform::Object ^args)
+{
+	auto circle = static_cast<PulseEffect^>(sender);
+	unsigned int idx = -1;
+	if (BaseCanvas->Children->IndexOf(circle, &idx))
+	{
+		BaseCanvas->Children->RemoveAt(idx);
+	}
 }
 
 Windows::UI::Xaml::Media::Brush^ Direct2DPuzzleCanvas::GetFirstColor()

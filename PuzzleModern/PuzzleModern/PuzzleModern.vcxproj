@@ -131,6 +131,9 @@
     <ClInclude Include="HelpFlyout.xaml.h">
       <DependentUpon>HelpFlyout.xaml</DependentUpon>
     </ClInclude>
+    <ClInclude Include="PulseEffect.xaml.h">
+      <DependentUpon>PulseEffect.xaml</DependentUpon>
+    </ClInclude>
     <ClInclude Include="PuzzleHelpData.h" />
     <ClInclude Include="PuzzleImageSource.h" />
     <ClInclude Include="ShapePuzzleCanvas.xaml.h">
@@ -178,6 +181,7 @@
     <Page Include="HelpFlyout.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PulseEffect.xaml" />
     <Page Include="ShapePuzzleCanvas.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -543,6 +547,9 @@
     </ClCompile>
     <ClCompile Include="HelpFlyout.xaml.cpp">
       <DependentUpon>HelpFlyout.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="PulseEffect.xaml.cpp">
+      <DependentUpon>PulseEffect.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="PuzzleImageSource.cpp" />
     <ClCompile Include="ShapePuzzleCanvas.xaml.cpp">

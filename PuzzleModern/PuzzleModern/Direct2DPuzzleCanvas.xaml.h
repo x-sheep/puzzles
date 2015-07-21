@@ -48,6 +48,7 @@ namespace PuzzleModern
 		virtual void BlitterSave(int id, int x, int y, int w, int h);
 		virtual void BlitterLoad(int id, int x, int y, int w, int h);
 
+		void Pulsate(int x, int y);
 	private:
 		PuzzleImageSource ^img;
 		Windows::Foundation::Collections::IVector<uint32> ^colors;
@@ -55,5 +56,6 @@ namespace PuzzleModern
 		void OnSizeChanged(Platform::Object ^sender, Windows::UI::Xaml::SizeChangedEventArgs ^e);
 
 		bool isDrawing;
+		void OnPulsateCompleted(Platform::Object ^sender, Platform::Object ^args);
 	};
 }

@@ -10,7 +10,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Canvas>
+    <Canvas x:Name="BaseCanvas">
         <Image x:Name="DrawImage" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
     </Canvas>
 </UserControl>
