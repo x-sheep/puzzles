@@ -801,6 +801,8 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 	if (_generatingGame)
 		return;
 	
+	auto ptrPt = e->GetCurrentPoint(DrawCanvas);
+	int x = ptrPt->Position.X, y = ptrPt->Position.Y;
 	/* 
 	 * When using touch, we use gestures to differentiate between left and right clicks.
 	 * Tapping and dragging count as left button, while holding counts as right button.
@@ -808,9 +810,6 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 	 */
 	if (e->Pointer->PointerDeviceType != Windows::Devices::Input::PointerDeviceType::Touch)
 	{
-		auto ptrPt = e->GetCurrentPoint(DrawCanvas);
-		int x = ptrPt->Position.X, y = ptrPt->Position.Y;
-
 		if (ptrPt->Properties->IsLeftButtonPressed)
 		{
 			fe->SendClick(x, y, ButtonType::LEFT, ButtonState::DOWN);
@@ -823,6 +822,39 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 			_rightPressed = true;
 			e->Handled = true;
 		}
+	}
+
+	/*
+	* When using touch, we use gestures to differentiate between left and right clicks.
+	* Tapping and dragging count as left button, while holding counts as right button.
+	* If this is a right button, we can not yet process the Pressed event.
+	*/
+	else
+	{
+		_initialPoint = ptrPt->Position;
+		_initialPressed = true;
+		e->Handled = true;
+		auto uiDelegate = [this]()
+		{
+			if (!_generatingGame && _initialPressed)
+			{
+				float x = _initialPoint.X, y = _initialPoint.Y;
+				_initialPressed = false;
+				fe->SendClick(x, y, ButtonType::RIGHT, ButtonState::DOWN);
+				_rightPressed = true;
+				DrawCanvas->Pulsate(x, y);
+			}
+		};
+		auto handle = ref new Windows::UI::Core::DispatchedHandler(uiDelegate);
+		auto timerDelegate = [this, handle](Windows::System::Threading::ThreadPoolTimer^ timer)
+		{
+			Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::High, handle);
+		};
+		Windows::Foundation::TimeSpan period = TimeSpan();
+		period.Duration = 600 * 10000; // 0.6 seconds
+		if (RightClickTimer)
+			RightClickTimer->Cancel();
+		RightClickTimer = Windows::System::Threading::ThreadPoolTimer::CreateTimer(ref new Windows::System::Threading::TimerElapsedHandler(timerDelegate), period);
 	}
 }
 
@@ -846,21 +878,43 @@ void GamePage::pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::X
 		_rightPressed = false;
 		e->Handled = true;
 	}
+	if (_initialPressed)
+	{
+		fe->SendClick(_initialPoint.X, _initialPoint.Y, ButtonType::LEFT, ButtonState::DOWN);
+		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::UP);
+		_initialPressed = false;
+		e->Handled = true;
+	}
+
+	if (RightClickTimer)
+	{
+		RightClickTimer->Cancel();
+		RightClickTimer = nullptr;
+	}
 	UpdateUndoButtons();
 }
 
+#define LEFT_DISTANCE 10
 
 void GamePage::DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e)
 {
 	if (_generatingGame)
 		return;
 
-	if (!_leftPressed && !_rightPressed)
-		return;
-
 	auto ptrPt = e->GetCurrentPoint(DrawCanvas);
 	int x = ptrPt->Position.X, y = ptrPt->Position.Y;
 
+	/* When moving outside a certain region, confirm this as a left drag */
+	if (_initialPressed)
+	{
+		float xdiff = fabs(x - _initialPoint.X), ydiff = fabs(y - _initialPoint.Y);
+		if ((xdiff*xdiff) + (ydiff*ydiff) > LEFT_DISTANCE*LEFT_DISTANCE)
+		{
+			_initialPressed = false;
+			fe->SendClick(_initialPoint.X, _initialPoint.Y, ButtonType::LEFT, ButtonState::DOWN);
+			_leftPressed = true;
+		}
+	}
 	if (_leftPressed)
 	{
 		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::DRAG);
@@ -873,85 +927,6 @@ void GamePage::DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xa
 	}
 }
 
-
-void GamePage::DrawCanvas_Holding(Platform::Object^ sender, Windows::UI::Xaml::Input::HoldingRoutedEventArgs^ e)
-{
-	if (_generatingGame)
-		return;
-
-	/*
-	 * The Holding gesture starts a right-click, which is completed by the PointerMoved and PointerReleased events.
-	 */
-	if (e->HoldingState == Windows::UI::Input::HoldingState::Started)
-	{
-		auto pos = e->GetPosition(DrawCanvas);
-		int x = pos.X, y = pos.Y;
-
-		fe->SendClick(x, y, ButtonType::RIGHT, ButtonState::DOWN);
-		_rightPressed = true;
-		DrawCanvas->Pulsate(x, y);
-		e->Handled = true;
-	}
-}
-
-
-void GamePage::DrawCanvas_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)
-{
-	if (_generatingGame)
-		return;
-
-	/* A short tap is processed here entirely. */
-	if (e->PointerDeviceType == Windows::Devices::Input::PointerDeviceType::Touch)
-	{
-		auto pos = e->GetPosition(DrawCanvas);
-		int x = pos.X, y = pos.Y;
-
-		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::TAP);
-		e->Handled = true;
-		UpdateUndoButtons();
-	}
-}
-
-
-void GamePage::DrawCanvas_DoubleTapped(Platform::Object^ sender, Windows::UI::Xaml::Input::DoubleTappedRoutedEventArgs^ e)
-{
-	if (_generatingGame)
-		return;
-
-	/* In the case of two short taps, the first tap is caught by the Tapped event handler, and the second tap sends a DoubleTapped event. */
-	if (e->PointerDeviceType == Windows::Devices::Input::PointerDeviceType::Touch)
-	{
-		auto pos = e->GetPosition(DrawCanvas);
-		int x = pos.X, y = pos.Y;
-
-		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::TAP);
-		e->Handled = true;
-		UpdateUndoButtons();
-	}
-}
-
-
-void GamePage::DrawCanvas_ManipulationStarted(Platform::Object^ sender, Windows::UI::Xaml::Input::ManipulationStartedRoutedEventArgs^ e)
-{
-	if (_generatingGame)
-		return;
-
-	/* 
-	 * This event fires once per dragging motion, but can be preceded by a Holding event. 
-	 * If a right-drag has started, don't start a left-drag at the same time.
-	 */
-	if (!_leftPressed && !_rightPressed)
-	{
-		int x = e->Position.X, y = e->Position.Y;
-
-		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::DOWN);
-		_leftPressed = true;
-		e->Handled = true;
-		e->Complete();
-	}
-}
-
-
 void GamePage::DrawCanvas_RightTapped(Platform::Object^ sender, Windows::UI::Xaml::Input::RightTappedRoutedEventArgs^ e)
 {
 	if (_generatingGame)
@@ -959,7 +934,7 @@ void GamePage::DrawCanvas_RightTapped(Platform::Object^ sender, Windows::UI::Xam
 
 	/* 
 	 * This is used to suppress the appbar appearing when right-clicking inside the game canvas.
-	 * Actual right taps are processed by the Holding and PointerReleased events.
+	 * Actual right taps are processed by the PointerPressed and PointerReleased events.
 	 */
 	e->Handled = true;
 }

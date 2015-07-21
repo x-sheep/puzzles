@@ -75,14 +75,8 @@
         <Grid Grid.Row="1" x:Name="contentRegion">
             <Border x:Name="GameBorder" Background="{Binding PageBackground}" Margin="0" SizeChanged="GameBorder_SizeChanged">
                 <local:Direct2DPuzzleCanvas x:Name="DrawCanvas" Width="800" Height="800"
-                                  ManipulationMode="All"
-                                  ManipulationStarted="DrawCanvas_ManipulationStarted"
-                                  IsHoldingEnabled="True" IsTapEnabled="True"
-                                  IsRightTapEnabled="True" IsDoubleTapEnabled="False"
-                                  DoubleTapped="DrawCanvas_DoubleTapped"
-                                  Tapped="DrawCanvas_Tapped"
+                                  IsRightTapEnabled="True"
                                   RightTapped="DrawCanvas_RightTapped"
-                                  Holding="DrawCanvas_Holding"
                                   PointerPressed="DrawCanvas_PointerPressed"
                                   PointerMoved="DrawCanvas_PointerMoved"
                                   PointerCanceled="pageRoot_PointerReleased"
