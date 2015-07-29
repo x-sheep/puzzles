@@ -25,11 +25,10 @@
     <Page.BottomAppBar>
         <CommandBar>
             <CommandBar.PrimaryCommands>
-                <AppBarButton x:Name="SwitchViewButton" Click="SwitchViewButton_Click" Icon="ViewAll" />
+                <AppBarButton Icon="Setting" Label="settings" Click="SettingsButton_Click"/>
                 <AppBarButton Icon="Help"  Label="help" Click="HelpButton_Click"/>
             </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
-                <AppBarButton Label="settings" Click="SettingsButton_Click"/>
                 <AppBarButton Label="load game" Click="LoadGameButton_Click"/>
                 <AppBarButton Label="about this app" Click="AboutButton_Click"/>
             </CommandBar.SecondaryCommands>

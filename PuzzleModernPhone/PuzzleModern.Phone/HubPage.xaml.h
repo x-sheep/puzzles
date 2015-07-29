@@ -49,7 +49,6 @@ namespace PuzzleModern
 			void ListViewItem_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e);
 			void HelpButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 			void SettingsButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-			void SwitchViewButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 			void SwitchView();
 
 			Control ^AllPuzzlesGridView, ^AllPuzzlesListView;

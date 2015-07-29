@@ -41,6 +41,8 @@ SettingsPage::SettingsPage()
 		ColorblindSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_colorblind"));
 	if (settings->Values->HasKey("cfg_newgameprompt"))
 		NewGameSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt"));
+	if (settings->Values->HasKey("cfg_gridview"))
+		GridViewSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_gridview"));
 
 	_loaded = true;
 }
@@ -137,4 +139,12 @@ void SettingsPage::NewGameSwitch_Toggled(Platform::Object^ sender, Windows::UI::
 	if (!_loaded) return;
 
 	ApplicationData::Current->RoamingSettings->Values->Insert("cfg_newgameprompt", NewGameSwitch->IsOn);
+}
+
+
+void PuzzleModern::Phone::SettingsPage::GridViewSwitch_Toggled(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	if (!_loaded) return;
+
+	ApplicationData::Current->RoamingSettings->Values->Insert("cfg_gridview", GridViewSwitch->IsOn);
 }

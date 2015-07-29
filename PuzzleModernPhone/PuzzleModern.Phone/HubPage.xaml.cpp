@@ -183,16 +183,6 @@ void HubPage::SettingsButton_Click(Platform::Object^ sender, Windows::UI::Xaml::
 	Frame->Navigate(TypeName(SettingsPage::typeid), nullptr);
 }
 
-
-void HubPage::SwitchViewButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-	auto settings = ApplicationData::Current->RoamingSettings;
-	bool oldval = settings->Values->HasKey("cfg_gridview") ? safe_cast<bool>(settings->Values->Lookup("cfg_gridview")) : false;
-	settings->Values->Insert("cfg_gridview", !oldval);
-
-	SwitchView();
-}
-
 void HubPage::SwitchView()
 {
 	if (!AllPuzzlesGridView || !AllPuzzlesListView)
@@ -205,15 +195,11 @@ void HubPage::SwitchView()
 	{
 		AllPuzzlesGridView->Visibility = Windows::UI::Xaml::Visibility::Visible;
 		AllPuzzlesListView->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
-		SwitchViewButton->Label = "list view";
-		SwitchViewButton->Icon = ref new SymbolIcon(Symbol::AllApps);
 	}
 	else
 	{
 		AllPuzzlesGridView->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 		AllPuzzlesListView->Visibility = Windows::UI::Xaml::Visibility::Visible;
-		SwitchViewButton->Label = "grid view";
-		SwitchViewButton->Icon = ref new SymbolIcon(Symbol::ViewAll);
 	}
 }
 
