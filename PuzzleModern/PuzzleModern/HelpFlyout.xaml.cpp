@@ -31,6 +31,8 @@ PuzzleModern::HelpFlyout::HelpFlyout(Platform::String ^page)
 
 	String^ url = "ms-appx-web:///Help/" + page + ".html";
 	HelpView->Navigate(ref new Uri(url));
+
+	Width = Window::Current->Bounds.Width < 646 ? 346 : 646;
 }
 
 

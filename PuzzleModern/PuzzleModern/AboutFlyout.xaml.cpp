@@ -25,4 +25,5 @@ using namespace Windows::UI::Popups;
 PuzzleModern::AboutFlyout::AboutFlyout()
 {
 	InitializeComponent();
+	Width = Window::Current->Bounds.Width < 646 ? 346 : 646;
 }
