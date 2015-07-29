@@ -123,6 +123,11 @@
             
         </Grid>
 
+        <StackPanel x:Name="LeftRightGrid" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Collapsed" Grid.Row="2" Margin="{Binding LargePageUndoMargin}">
+            <AppBarToggleButton x:Name="ButtonLeftRight" IsCompact="True" Icon="Edit" Checked="ButtonLeftRight_Checked" Unchecked="ButtonLeftRight_Unchecked" />
+            <TextBlock x:Name="LabelLeftRight" Text="?" Margin="0,20,0,0"  Style="{StaticResource BodyTextBlockStyle}" Tapped="LabelLeftRight_Tapped" />
+        </StackPanel>
+        
         <StackPanel x:Name="UndoGrid" Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="{Binding LargePageUndoMargin}">
             <AppBarButton x:Name="ButtonUndo" ToolTipService.ToolTip="Undo" Label="Undo" Icon="Undo" IsCompact="True" Click="ButtonUndo_Click"/>
             <AppBarButton x:Name="ButtonRedo" ToolTipService.ToolTip="Redo" Label="Redo" Icon="Redo" IsCompact="True" Click="ButtonRedo_Click"/>

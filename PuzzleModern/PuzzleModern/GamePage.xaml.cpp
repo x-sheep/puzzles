@@ -38,7 +38,8 @@ using namespace Windows::UI::Xaml::Navigation;
 using namespace Windows::UI::Xaml::Printing;
 
 GamePage::GamePage()
-	:fe(nullptr), _leftPressed(false), _rightPressed(false), _ctrlPressed(false), _shiftPressed(false), generatingWorkItem(nullptr), _colorBlindKey(VirtualKey::None)
+	:fe(nullptr), _leftPressed(false), _rightPressed(false), _ctrlPressed(false), _shiftPressed(false), 
+	generatingWorkItem(nullptr), _colorBlindKey(VirtualKey::None), _leftAction(ButtonType::LEFT), _rightAction(ButtonType::RIGHT)
 {
 	InitializeComponent();
 	_forceRedrawEventToken = DrawCanvas->NeedsRedraw += ref new ForceRedrawDelegate(this, &GamePage::ForceRedraw);
@@ -118,7 +119,7 @@ void GamePage::ResizeWindow(int newWidth, int newHeight)
 		PromptPopupBorder->Padding = Thickness(100, 25, 100, 25);
 	}
 	
-	if (newWidth < 640 && VirtualButtonBar->Items->Size > 4)
+	if (newWidth < 640 && VirtualButtonBar->Items->Size > 3)
 		DefaultViewModel->Insert("LargePageUndoMargin", Thickness(0, -70, 0, 0));
 	else
 		DefaultViewModel->Insert("LargePageUndoMargin", Thickness(0, 0, 0, 0));
@@ -380,6 +381,16 @@ void GamePage::RemoveOverlay()
 		_colorBlindKey = buttonbar->ColorBlindKey->Key;
 
 	VirtualButtonBar->DataContext = buttonbar;
+
+	if (buttonbar->ToolButton && buttonbar->ToolButton->Type == VirtualButtonType::TOGGLE_MOUSE)
+	{
+		LabelLeftRight->Text = buttonbar->ToolButton->Name;
+		ButtonLeftRight->Icon = buttonbar->ToolButton->Icon;
+		LeftRightGrid->Visibility = Windows::UI::Xaml::Visibility::Visible;
+	}
+	else
+		LeftRightGrid->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+
 	_wonGame = fe->GameWon() == 1;
 	UpdateUndoButtons();
 	HighlightPreset(fe->GetCurrentPreset());
@@ -816,13 +827,13 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 	{
 		if (ptrPt->Properties->IsLeftButtonPressed)
 		{
-			fe->SendClick(x, y, ButtonType::LEFT, ButtonState::DOWN);
+			fe->SendClick(x, y, _leftAction, ButtonState::DOWN);
 			_leftPressed = true;
 			e->Handled = true;
 		}
 		if (ptrPt->Properties->IsRightButtonPressed)
 		{
-			fe->SendClick(x, y, ButtonType::RIGHT, ButtonState::DOWN);
+			fe->SendClick(x, y, _rightAction, ButtonState::DOWN);
 			_rightPressed = true;
 			e->Handled = true;
 		}
@@ -844,7 +855,7 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 			{
 				float x = _initialPoint.X, y = _initialPoint.Y;
 				_initialPressed = false;
-				fe->SendClick(x, y, ButtonType::RIGHT, ButtonState::DOWN);
+				fe->SendClick(x, y, _rightAction, ButtonState::DOWN);
 				_rightPressed = true;
 				DrawCanvas->Pulsate(x, y);
 			}
@@ -872,20 +883,20 @@ void GamePage::pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::X
 
 	if (_leftPressed)
 	{
-		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::UP);
+		fe->SendClick(x, y, _leftAction, ButtonState::UP);
 		_leftPressed = false;
 		e->Handled = true;
 	}
 	if (_rightPressed)
 	{
-		fe->SendClick(x, y, ButtonType::RIGHT, ButtonState::UP);
+		fe->SendClick(x, y, _rightAction, ButtonState::UP);
 		_rightPressed = false;
 		e->Handled = true;
 	}
 	if (_initialPressed)
 	{
-		fe->SendClick(_initialPoint.X, _initialPoint.Y, ButtonType::LEFT, ButtonState::DOWN);
-		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::UP);
+		fe->SendClick(_initialPoint.X, _initialPoint.Y, _leftAction, ButtonState::DOWN);
+		fe->SendClick(x, y, _leftAction, ButtonState::UP);
 		_initialPressed = false;
 		e->Handled = true;
 	}
@@ -915,18 +926,18 @@ void GamePage::DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xa
 		if ((xdiff*xdiff) + (ydiff*ydiff) > LEFT_DISTANCE*LEFT_DISTANCE)
 		{
 			_initialPressed = false;
-			fe->SendClick(_initialPoint.X, _initialPoint.Y, ButtonType::LEFT, ButtonState::DOWN);
+			fe->SendClick(_initialPoint.X, _initialPoint.Y, _leftAction, ButtonState::DOWN);
 			_leftPressed = true;
 		}
 	}
 	if (_leftPressed)
 	{
-		fe->SendClick(x, y, ButtonType::LEFT, ButtonState::DRAG);
+		fe->SendClick(x, y, _leftAction, ButtonState::DRAG);
 		e->Handled = true;
 	}
 	if (_rightPressed)
 	{
-		fe->SendClick(x, y, ButtonType::RIGHT, ButtonState::DRAG);
+		fe->SendClick(x, y, _rightAction, ButtonState::DRAG);
 		e->Handled = true;
 	}
 }
@@ -1293,4 +1304,30 @@ void GamePage::OnSettingChanged(Platform::Object ^sender, Platform::String ^key,
 {
 	if (key == "cfg_colorblind" && _colorBlindKey != VirtualKey::None && !_generatingGame)
 		fe->SendKey(_colorBlindKey, false);
+}
+
+
+void GamePage::ButtonLeftRight_Checked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	_leftAction = ButtonType::RIGHT;
+	_rightAction = ButtonType::LEFT;
+
+	if (!_generatingGame)
+		fe->SendKey(VirtualKey::XButton1, false);
+}
+
+
+void GamePage::ButtonLeftRight_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	_leftAction = ButtonType::LEFT;
+	_rightAction = ButtonType::RIGHT;
+
+	if (!_generatingGame)
+		fe->SendKey(VirtualKey::XButton2, false);
+}
+
+
+void GamePage::LabelLeftRight_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)
+{
+	ButtonLeftRight->IsChecked = (_leftAction == ButtonType::LEFT);
 }

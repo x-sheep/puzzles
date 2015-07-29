@@ -111,6 +111,8 @@ namespace PuzzleModern
 
 		Windows::Foundation::IAsyncAction^ generatingWorkItem;
 
+		ButtonType _leftAction, _rightAction;
+
 		void DrawCanvas_RightTapped(Platform::Object^ sender, Windows::UI::Xaml::Input::RightTappedRoutedEventArgs^ e);
 		void ButtonUndo_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ButtonRedo_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
@@ -148,5 +150,8 @@ namespace PuzzleModern
 
 		void BusyCancelButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void OnSettingChanged(Platform::Object ^sender, Platform::String ^key, Platform::Object ^value);
+		void ButtonLeftRight_Checked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void ButtonLeftRight_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void LabelLeftRight_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e);
 };
 }

@@ -1108,12 +1108,6 @@ namespace PuzzleModern
 
 			ret->Append(VirtualButton::Backspace());
 
-			button = ref new VirtualButton();
-			button->Name = "Alpha";
-			button->Key = VirtualKey::A;
-			button->Type = VirtualButtonType::TOOL;
-			ret->Append(button);
-
 			collection->ToolButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Filling"))
@@ -1189,7 +1183,7 @@ namespace PuzzleModern
 		{
 			collection->ToolButton = VirtualButton::ToggleButton("Invert", Windows::UI::Xaml::Controls::Symbol::Switch);
 		}
-		if (!strcmp(ourgame->name, "Magnets") || !strcmp(ourgame->name, "Map") || !strcmp(ourgame->name, "Train Tracks"))
+		if (!strcmp(ourgame->name, "Magnets") || !strcmp(ourgame->name, "Map") || !strcmp(ourgame->name, "Train Tracks") || !strcmp(ourgame->name, "Loopy"))
 		{
 			collection->ToolButton = VirtualButton::Pencil();
 		}
