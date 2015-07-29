@@ -135,6 +135,7 @@ namespace PuzzleModern
 		void OnDeferredDataRequestedHandler(Windows::ApplicationModel::DataTransfer::DataProviderRequest^ request);
 		void OnPrintTaskRequested(Windows::Graphics::Printing::PrintManager ^sender, Windows::Graphics::Printing::PrintTaskRequestedEventArgs ^args);
 
+#ifdef WIN10_PRINTING
 		Windows::UI::Xaml::Printing::PrintDocument ^_printDoc;
 		Windows::Graphics::Printing::PrintTaskOptions ^_printOptions;
 		Windows::Graphics::Printing::IPrintDocumentSource ^_printSource;
@@ -143,6 +144,8 @@ namespace PuzzleModern
 		void OnPaginate(Platform::Object ^sender, Windows::UI::Xaml::Printing::PaginateEventArgs ^e);
 		void OnGetPreviewPage(Platform::Object ^sender, Windows::UI::Xaml::Printing::GetPreviewPageEventArgs ^e);
 		void OnPrintTaskOptionChanged(Windows::Graphics::Printing::OptionDetails::PrintTaskOptionDetails ^sender, Windows::Graphics::Printing::OptionDetails::PrintTaskOptionChangedEventArgs ^args);
+#endif
+
 		void BusyCancelButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void OnSettingChanged(Platform::Object ^sender, Platform::String ^key, Platform::Object ^value);
 };

@@ -19,8 +19,10 @@ using namespace Windows::ApplicationModel::DataTransfer;
 using namespace Windows::System;
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Collections;
+#ifdef WIN10_PRINTING
 using namespace Windows::Graphics::Printing;
 using namespace Windows::Graphics::Printing::OptionDetails;
+#endif
 using namespace Windows::Storage;
 using namespace Windows::Storage::Pickers;
 using namespace Windows::UI::ApplicationSettings;
@@ -675,7 +677,7 @@ void GamePage::OnLoaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEvent
 	// event handler is active at a time. It also needs a function for generating puzzles in bulk,
 	// while allowing the print handlers to access any random page at a time (as opposed to the sequential
 	// printing currently present in the main version)
-#if 0
+#ifdef WIN10_PRINTING
 	if (fe->CanPrint())
 	{
 		_printEventToken = PrintManager::GetForCurrentView()->PrintTaskRequested +=
@@ -704,7 +706,9 @@ void GamePage::OnUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEve
 	SettingsPane::GetForCurrentView()->CommandsRequested -= _commandsRequestedEventRegistrationToken;
 	Window::Current->CoreWindow->VisibilityChanged -= _visibilityChangedEventToken;
 	DataTransferManager::GetForCurrentView()->DataRequested -= _shareEventToken;
+#ifdef WIN10_PRINTING
 	PrintManager::GetForCurrentView()->PrintTaskRequested -= _printEventToken;
+#endif
 	EndTimer();
 	DrawCanvas->NeedsRedraw -= _forceRedrawEventToken;
 	Application::Current->Suspending -= _suspendingEventToken;
@@ -1140,6 +1144,7 @@ void GamePage::OnDeferredDataRequestedHandler(DataProviderRequest^ request)
 	});
 }
 
+#ifdef WIN10_PRINTING
 void GamePage::OnPrintTaskRequested(PrintManager ^sender, PrintTaskRequestedEventArgs ^e)
 {
 	if (_generatingGame)
@@ -1271,7 +1276,7 @@ void GamePage::OnPrintTaskOptionChanged(PrintTaskOptionDetails ^sender, PrintTas
 		}));
 	}
 }
-
+#endif
 
 void GamePage::BusyCancelButton_Click(Platform::Object^ sender, RoutedEventArgs^ e)
 {
