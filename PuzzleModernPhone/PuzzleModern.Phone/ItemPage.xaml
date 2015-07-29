@@ -189,7 +189,7 @@
     </Grid>
 
     <Page.BottomAppBar>
-        <CommandBar Opacity="0.8">
+        <CommandBar>
             <CommandBar.PrimaryCommands>
                 <AppBarButton x:Name="ToolButton" Label="?" Click="ToolButton_Click" Visibility="Collapsed" />
                 <AppBarToggleButton x:Name="LeftRightButton" Label="?" Checked="LeftRightButton_Checked" Unchecked="LeftRightButton_Unchecked" Visibility="Collapsed" />
