@@ -239,6 +239,7 @@
     <ClCompile Include="..\..\tracks.c">
       <Filter>Source Code</Filter>
     </ClCompile>
+    <ClCompile Include="PulseEffect.xaml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -292,6 +293,7 @@
     <ClInclude Include="GeneralSettingsFlyout.xaml.h" />
     <ClInclude Include="PuzzleHelpData.h" />
     <ClInclude Include="HelpFlyout.xaml.h" />
+    <ClInclude Include="PulseEffect.xaml.h" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
