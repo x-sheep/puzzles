@@ -115,7 +115,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Content="{Binding Name}" Click="ButtonBar_Click" FontSize="24" />
+                        <Button Content="{Binding Name}" Click="ButtonBar_Click" FontSize="24" IsTabStop="False" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -124,13 +124,13 @@
         </Grid>
 
         <StackPanel x:Name="LeftRightGrid" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Collapsed" Grid.Row="2" Margin="{Binding LargePageUndoMargin}">
-            <AppBarToggleButton x:Name="ButtonLeftRight" IsCompact="True" Icon="Edit" Checked="ButtonLeftRight_Checked" Unchecked="ButtonLeftRight_Unchecked" />
+            <AppBarToggleButton x:Name="ButtonLeftRight" IsCompact="True" Icon="Edit" Checked="ButtonLeftRight_Checked" Unchecked="ButtonLeftRight_Unchecked" IsTabStop="False" />
             <TextBlock x:Name="LabelLeftRight" Text="?" Margin="0,20,0,0"  Style="{StaticResource BodyTextBlockStyle}" Tapped="LabelLeftRight_Tapped" />
         </StackPanel>
         
         <StackPanel x:Name="UndoGrid" Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="{Binding LargePageUndoMargin}">
-            <AppBarButton x:Name="ButtonUndo" ToolTipService.ToolTip="Undo" Label="Undo" Icon="Undo" IsCompact="True" Click="ButtonUndo_Click"/>
-            <AppBarButton x:Name="ButtonRedo" ToolTipService.ToolTip="Redo" Label="Redo" Icon="Redo" IsCompact="True" Click="ButtonRedo_Click"/>
+            <AppBarButton x:Name="ButtonUndo" ToolTipService.ToolTip="Undo" Label="Undo" Icon="Undo" IsCompact="True" Click="ButtonUndo_Click" IsTabStop="False"/>
+            <AppBarButton x:Name="ButtonRedo" ToolTipService.ToolTip="Redo" Label="Redo" Icon="Redo" IsCompact="True" Click="ButtonRedo_Click" IsTabStop="False"/>
         </StackPanel>
 
         <!-- Back button and page title -->
@@ -146,13 +146,13 @@
                         VerticalAlignment="Top"
                         AutomationProperties.Name="Back"
                         AutomationProperties.AutomationId="BackButton"
-                        AutomationProperties.ItemType="Navigation Button"/>
+                        AutomationProperties.ItemType="Navigation Button" IsTabStop="False"/>
             <TextBlock x:Name="pageTitle" Text="{Binding PuzzleName}" Style="{StaticResource SubheaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,10,20"/>
             <TextBlock x:Name="StatusBar" Text="" Grid.Column="2" VerticalAlignment="Center" FontSize="18" />
             <AppBarButton x:Name="ButtonMenu" Click="ButtonMenu_Click" Margin="0,2,0,0"
                         Grid.Column="3" Icon="More" ToolTipService.ToolTip="Menu"
-                        VerticalAlignment="Top">
+                        VerticalAlignment="Top" IsTabStop="False">
             </AppBarButton>
         </Grid>
 
