@@ -762,6 +762,8 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 		k = VirtualKey::NumberPad1;
 	else if (k == VirtualKey::PageDown)
 		k = VirtualKey::NumberPad3;
+	else if (k == VirtualKey::Delete)
+		k = VirtualKey::Back;
 
 	if (k == VirtualKey::Shift)
 	{
