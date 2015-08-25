@@ -651,6 +651,14 @@ namespace PuzzleModern
 			if (state == ButtonState::UP || state == ButtonState::TAP)
 				midend_process_key(me, x, y, LEFT_RELEASE);
 			break;
+		case ButtonType::MIDDLE:
+			if (state == ButtonState::DOWN || state == ButtonState::TAP)
+				midend_process_key(me, x, y, MIDDLE_BUTTON);
+			if (state == ButtonState::DRAG)
+				midend_process_key(me, x, y, MIDDLE_DRAG);
+			if (state == ButtonState::UP || state == ButtonState::TAP)
+				midend_process_key(me, x, y, MIDDLE_RELEASE);
+			break;
 		case ButtonType::RIGHT:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
 				midend_process_key(me, x, y, RIGHT_BUTTON);

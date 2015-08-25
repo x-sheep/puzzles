@@ -105,7 +105,8 @@ namespace PuzzleModern
 		void pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 		void DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 
-		bool _leftPressed, _rightPressed, _initialPressed, _isFlyoutOpen, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
+		bool _leftPressed, _middlePressed, _rightPressed, _initialPressed, _isFlyoutOpen, _generatingGame;
+		bool _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
 		Windows::Foundation::Point _initialPoint;
 		Windows::System::Threading::ThreadPoolTimer ^RightClickTimer;
 

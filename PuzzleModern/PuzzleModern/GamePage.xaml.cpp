@@ -38,7 +38,7 @@ using namespace Windows::UI::Xaml::Navigation;
 using namespace Windows::UI::Xaml::Printing;
 
 GamePage::GamePage()
-	:fe(nullptr), _leftPressed(false), _rightPressed(false), _ctrlPressed(false), _shiftPressed(false), 
+	:fe(nullptr), _leftPressed(false), _middlePressed(false), _rightPressed(false), _ctrlPressed(false), _shiftPressed(false), 
 	generatingWorkItem(nullptr), _colorBlindKey(VirtualKey::None), _leftAction(ButtonType::LEFT), _rightAction(ButtonType::RIGHT)
 {
 	InitializeComponent();
@@ -833,6 +833,12 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 			_leftPressed = true;
 			e->Handled = true;
 		}
+		if (ptrPt->Properties->IsMiddleButtonPressed)
+		{
+			fe->SendClick(x, y, ButtonType::MIDDLE, ButtonState::DOWN);
+			_middlePressed = true;
+			e->Handled = true;
+		}
 		if (ptrPt->Properties->IsRightButtonPressed)
 		{
 			fe->SendClick(x, y, _rightAction, ButtonState::DOWN);
@@ -889,6 +895,12 @@ void GamePage::pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::X
 		_leftPressed = false;
 		e->Handled = true;
 	}
+	if (_middlePressed)
+	{
+		fe->SendClick(x, y, ButtonType::MIDDLE, ButtonState::UP);
+		_middlePressed = false;
+		e->Handled = true;
+	}
 	if (_rightPressed)
 	{
 		fe->SendClick(x, y, _rightAction, ButtonState::UP);
@@ -935,6 +947,11 @@ void GamePage::DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xa
 	if (_leftPressed)
 	{
 		fe->SendClick(x, y, _leftAction, ButtonState::DRAG);
+		e->Handled = true;
+	}
+	if (_middlePressed)
+	{
+		fe->SendClick(x, y, ButtonType::MIDDLE, ButtonState::DRAG);
 		e->Handled = true;
 	}
 	if (_rightPressed)

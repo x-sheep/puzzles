@@ -24,7 +24,7 @@
  * PocketPC, though, so we enable it by default there.
  */
 #ifdef STYLUS_BASED
-#define USE_DRAGGING
+//#define USE_DRAGGING
 #endif
 
 #define MATMUL(xr,yr,m,x,y) do { \
@@ -2340,7 +2340,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 #else /* USE_DRAGGING */
 
 	action = (button == LEFT_BUTTON ? ROTATE_LEFT :
-		  button == RIGHT_BUTTON ? ROTATE_RIGHT : TOGGLE_LOCK);
+		  button == MIDDLE_BUTTON ? ROTATE_RIGHT : TOGGLE_LOCK);
 
 #endif /* USE_DRAGGING */
 

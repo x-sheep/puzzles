@@ -152,7 +152,7 @@ namespace PuzzleModern
 	};
 
 	public enum class ButtonState { DOWN, DRAG, UP, TAP };
-	public enum class ButtonType { LEFT, RIGHT };
+	public enum class ButtonType { LEFT, MIDDLE, RIGHT };
 
 	public enum class ConfigField { INTEGER, TEXT, BOOLEAN, ENUM, FLOAT };
 
