@@ -1017,7 +1017,7 @@ void GamePage::SaveState(Platform::Object ^sender, PuzzleModern::Common::SaveSta
 
 void GamePage::OnVisibilityChanged(Windows::UI::Core::CoreWindow ^sender, Windows::UI::Core::VisibilityChangedEventArgs ^args)
 {
-	if (_generatingGame)
+	if (_generatingGame || !_isLoaded)
 		return;
 
 	if (!args->Visible)
