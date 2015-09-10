@@ -20,5 +20,6 @@ namespace PuzzleModern
 
 		bool _loaded;
 		void NewGameSwitch_Toggled(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void MapPaletteBox_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::SelectionChangedEventArgs^ e);
 	};
 }

@@ -52,6 +52,10 @@
                               Toggled="ColorblindSwitch_Toggled">
                     Colorblind Mode (supported puzzles only)
                 </ToggleSwitch>
+                <ComboBox x:Name="MapPaletteBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="MapPaletteBox_SelectionChanged" Header="Map - Color palette" SelectedIndex="0">
+                    <ComboBoxItem>Default</ComboBoxItem>
+                    <ComboBoxItem>Vivid</ComboBoxItem>
+                </ComboBox>
             </StackPanel>
         </Grid>
     </Grid>

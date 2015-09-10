@@ -2620,24 +2620,25 @@ static void game_set_size(drawing *dr, game_drawstate *ds,
     ds->bl = blitter_new(dr, TILESIZE+3, TILESIZE+3);
 }
 
-const float map_colours[FOUR][3] = {
-#ifdef VIVID_COLOURS
+const float map_vivid_colours[FOUR][3] = {
     /* Use more vivid colours (e.g. on the Pocket PC) */
     {0.75F, 0.25F, 0.25F},
     {0.3F,  0.7F,  0.3F},
     {0.3F,  0.3F,  0.7F},
     {0.85F, 0.85F, 0.1F},
-#else
+};
+const float map_default_colours[FOUR][3] = {
     {0.7F, 0.5F, 0.4F},
     {0.8F, 0.7F, 0.4F},
     {0.5F, 0.6F, 0.4F},
     {0.55F, 0.45F, 0.35F},
-#endif
 };
 
 static float *game_colours(frontend *fe, int *ncolours)
 {
     float *ret = snewn(3 * NCOLOURS, float);
+	char *env = getenv("MAP_VIVID_COLOURS");
+	char vivid = env && (env[0] == 'Y' || env[0] == 'y');
 
     frontend_default_colour(fe, &ret[COL_BACKGROUND * 3]);
 
@@ -2645,10 +2646,10 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_GRID * 3 + 1] = 0.0F;
     ret[COL_GRID * 3 + 2] = 0.0F;
 
-    memcpy(ret + COL_0 * 3, map_colours[0], 3 * sizeof(float));
-    memcpy(ret + COL_1 * 3, map_colours[1], 3 * sizeof(float));
-    memcpy(ret + COL_2 * 3, map_colours[2], 3 * sizeof(float));
-    memcpy(ret + COL_3 * 3, map_colours[3], 3 * sizeof(float));
+    memcpy(ret + COL_0 * 3, (vivid ? map_vivid_colours : map_default_colours)[0], 3 * sizeof(float));
+    memcpy(ret + COL_1 * 3, (vivid ? map_vivid_colours : map_default_colours)[1], 3 * sizeof(float));
+    memcpy(ret + COL_2 * 3, (vivid ? map_vivid_colours : map_default_colours)[2], 3 * sizeof(float));
+    memcpy(ret + COL_3 * 3, (vivid ? map_vivid_colours : map_default_colours)[3], 3 * sizeof(float));
 
     ret[COL_ERROR * 3 + 0] = 1.0F;
     ret[COL_ERROR * 3 + 1] = 0.0F;
@@ -3099,6 +3100,8 @@ static void game_print(drawing *dr, const game_state *state, int tilesize)
     int x, y, r;
     int *coords, ncoords, coordsize;
 	char buf[2];
+	char *env = getenv("MAP_VIVID_COLOURS");
+	char vivid = env && (env[0] == 'Y' || env[0] == 'y');
 	buf[1] = '\0';
 	
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
@@ -3107,10 +3110,13 @@ static void game_print(drawing *dr, const game_state *state, int tilesize)
     ads.tilesize = tilesize;
 
     ink = print_mono_colour(dr, 0);
-    for (i = 0; i < FOUR; i++)
-	c[i] = print_rgb_mono_colour(dr, map_colours[i][0],
-					map_colours[i][1], map_colours[i][2],
-					1);
+	for (i = 0; i < FOUR; i++)
+	{
+		const float *colour = (vivid ? map_default_colours : map_vivid_colours)[i];
+		c[i] = print_rgb_mono_colour(dr, colour[0],
+			colour[1], colour[2],
+			1);
+	}
 
     coordsize = 0;
     coords = NULL;

@@ -87,6 +87,11 @@ Windows::UI::Xaml::Media::Brush^ Direct2DPuzzleCanvas::GetFirstColor()
 	return ref new SolidColorBrush(firstColor);
 }
 
+void Direct2DPuzzleCanvas::RemoveColors()
+{
+	colors->Clear();
+}
+
 void Direct2DPuzzleCanvas::AddColor(float r, float g, float b)
 {
 	unsigned char rc, gc, bc;

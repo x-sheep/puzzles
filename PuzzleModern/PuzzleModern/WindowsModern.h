@@ -64,6 +64,7 @@ namespace PuzzleModern
 		void Redo();
 		int GameWon();
 		bool HasStatusbar();
+		void ReloadColors();
 
 		VirtualButtonCollection^ GetVirtualButtonBar();
 		void SendClick(int x, int y, ButtonType type, ButtonState state);

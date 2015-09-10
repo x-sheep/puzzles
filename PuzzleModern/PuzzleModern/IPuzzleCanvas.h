@@ -17,6 +17,7 @@ namespace PuzzleModern
 	public interface class IPuzzleCanvas
 	{
 		void AddColor(float r, float g, float b);
+		void RemoveColors();
 		void SetPrintMode(bool printing);
 		void StartDraw();
 		void EndDraw();

@@ -594,4 +594,6 @@ extern const int gamecount;
 extern const game thegame;
 #endif
 
+#include "gluefe.h"
+
 #endif /* PUZZLES_PUZZLES_H */

@@ -31,10 +31,10 @@ GeneralSettingsFlyout::GeneralSettingsFlyout()
 	_loaded = false;
 	if (settings->Values->HasKey("cfg_colorblind"))
 		ColorblindSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_colorblind"));
-	//if (settings->Values->HasKey("cfg_lockappbar"))
-	//	BottomAppbarSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_lockappbar"));
 	if (settings->Values->HasKey("cfg_newgameprompt"))
 		NewGameSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt"));
+	if (settings->Values->HasKey("env_MAP_VIVID_COLOURS") && safe_cast<bool>(settings->Values->Lookup("env_MAP_VIVID_COLOURS")))
+		MapPaletteBox->SelectedIndex = 1;
 
 	_loaded = true;
 }
@@ -55,10 +55,19 @@ void GeneralSettingsFlyout::BottomAppbarSwitch_Toggled(Platform::Object^ sender,
 }
 
 
-void PuzzleModern::GeneralSettingsFlyout::NewGameSwitch_Toggled(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void GeneralSettingsFlyout::NewGameSwitch_Toggled(Platform::Object^ sender, RoutedEventArgs^ e)
 {
 	if (!_loaded) return;
 
 	ApplicationData::Current->RoamingSettings->Values->Insert("cfg_newgameprompt", NewGameSwitch->IsOn);
 	App::Current->NotifySettingChanged(this, "cfg_newgameprompt", NewGameSwitch->IsOn);
+}
+
+
+void GeneralSettingsFlyout::MapPaletteBox_SelectionChanged(Platform::Object^ sender, SelectionChangedEventArgs^ e)
+{
+	if (!_loaded) return;
+
+	ApplicationData::Current->RoamingSettings->Values->Insert("env_MAP_VIVID_COLOURS", MapPaletteBox->SelectedIndex == 1);
+	App::Current->NotifySettingChanged(this, "env_MAP_VIVID_COLOURS", MapPaletteBox->SelectedIndex == 1);
 }

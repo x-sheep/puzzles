@@ -43,6 +43,8 @@ SettingsPage::SettingsPage()
 		NewGameSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt"));
 	if (settings->Values->HasKey("cfg_gridview"))
 		GridViewSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_gridview"));
+	if (settings->Values->HasKey("env_MAP_VIVID_COLOURS") && safe_cast<bool>(settings->Values->Lookup("env_MAP_VIVID_COLOURS")))
+		MapPaletteBox->SelectedIndex = 1;
 
 	_loaded = true;
 }
@@ -142,9 +144,17 @@ void SettingsPage::NewGameSwitch_Toggled(Platform::Object^ sender, Windows::UI::
 }
 
 
-void PuzzleModern::Phone::SettingsPage::GridViewSwitch_Toggled(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void SettingsPage::GridViewSwitch_Toggled(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	if (!_loaded) return;
 
 	ApplicationData::Current->RoamingSettings->Values->Insert("cfg_gridview", GridViewSwitch->IsOn);
+}
+
+
+void SettingsPage::MapPaletteBox_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::SelectionChangedEventArgs^ e)
+{
+	if (!_loaded) return;
+
+	ApplicationData::Current->RoamingSettings->Values->Insert("env_MAP_VIVID_COLOURS", MapPaletteBox->SelectedIndex == 1);
 }

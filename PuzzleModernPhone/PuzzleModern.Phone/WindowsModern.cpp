@@ -363,6 +363,19 @@ void winmodern_check_abort(void)
 	}
 }
 
+char *winmodern_getenv(const char *key)
+{
+	auto settings = Windows::Storage::ApplicationData::Current->RoamingSettings->Values;
+
+	if (!strcmp(key, "MAP_VIVID_COLOURS"))
+	{
+		if(settings->HasKey("env_MAP_VIVID_COLOURS") && safe_cast<bool>(settings->Lookup("env_MAP_VIVID_COLOURS")))
+			return "Y";
+	}
+
+	return NULL;
+}
+
 #ifdef DEBUGGING
 void winmodern_debug(const char *msg)
 {
@@ -372,7 +385,7 @@ void winmodern_debug(const char *msg)
 
 struct frontend_adapter winmodern_adapter = {
 	winmodern_get_random_seed,
-	NULL, /* getenv */
+	winmodern_getenv,
 	NULL, /* frontend_default_colour */
 	winmodern_fatal,
 #ifdef DEBUGGING
@@ -651,6 +664,14 @@ namespace PuzzleModern
 			if (state == ButtonState::UP || state == ButtonState::TAP)
 				midend_process_key(me, x, y, LEFT_RELEASE);
 			break;
+		case ButtonType::MIDDLE:
+			if (state == ButtonState::DOWN || state == ButtonState::TAP)
+				midend_process_key(me, x, y, MIDDLE_BUTTON);
+			if (state == ButtonState::DRAG)
+				midend_process_key(me, x, y, MIDDLE_DRAG);
+			if (state == ButtonState::UP || state == ButtonState::TAP)
+				midend_process_key(me, x, y, MIDDLE_RELEASE);
+			break;
 		case ButtonType::RIGHT:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
 				midend_process_key(me, x, y, RIGHT_BUTTON);
@@ -686,6 +707,19 @@ namespace PuzzleModern
 		}
 	}
 
+	void WindowsModern::ReloadColors()
+	{
+		// Initialize all colours
+		int i, ncolours;
+		float *colours;
+		colours = midend_colours(me, &ncolours);
+		for (i = 0; i < ncolours; i++)
+		{
+			canvas->AddColor(colours[i * 3 + 0], colours[i * 3 + 1], colours[i * 3 + 2]);
+		}
+		sfree(colours);
+	}
+
 	bool WindowsModern::CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleTimer ^itimer)
 	{
 		this->me = NULL;
@@ -714,15 +748,7 @@ namespace PuzzleModern
 		this->me = midend_new(this->fe, g, &winmodern_drawing, this->fe);
 		this->ourgame = g;
 
-		// Initialize all colours
-		int ncolours;
-		float *colours;
-		colours = midend_colours(me, &ncolours);
-		for (i = 0; i < ncolours; i++)
-		{
-			canvas->AddColor(colours[i * 3 + 0], colours[i * 3 + 1], colours[i * 3 + 2]);
-		}
-		sfree(colours);
+		ReloadColors();
 
 		auto settings = ApplicationData::Current->LocalSettings->Values;
 

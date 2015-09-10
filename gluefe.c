@@ -15,7 +15,7 @@ void get_random_seed(void **randseed, int *randseedsize)
 	adapter->get_random_seed(randseed, randseedsize);
 }
 
-char *getenv(char *key)
+char *getenv(const char *key)
 {
 	if (adapter && adapter->getenv)
 		return adapter->getenv(key);

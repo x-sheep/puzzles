@@ -22,6 +22,7 @@ namespace PuzzleModern
 		Windows::UI::Xaml::Media::Brush^ GetFirstColor();
 		
 		virtual void AddColor(float r, float g, float b);
+		virtual void RemoveColors();
 		virtual void SetPrintMode(bool printing);
 
 		virtual void StartDraw();

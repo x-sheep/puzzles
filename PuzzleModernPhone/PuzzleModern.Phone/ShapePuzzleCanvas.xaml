@@ -9,7 +9,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Canvas Background="Gray" x:Name="RootCanvas">
-
+    <Canvas x:Name="RootCanvas">
+        <TextBlock Text="Kek" Foreground="Red"/>
     </Canvas>
 </UserControl>

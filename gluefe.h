@@ -16,7 +16,7 @@ struct frontend {
 
 struct frontend_adapter {
 	void(*get_random_seed)(void **randseed, int *randseedsize);
-	char*(*getenv)(char *key);
+	char*(*getenv)(const char *key);
 	void(*frontend_default_colour)(frontend *fe, float *output);
 	void(*fatal)(const char *msg);
 #ifdef DEBUGGING
@@ -41,7 +41,7 @@ struct blitter {
 };
 
 void get_random_seed(void **randseed, int *randseedsize);
-char *getenv(char *key);
+char *getenv(const char *key);
 void frontend_default_colour(frontend *fe, float *output);
 void fatal(char *fmt, ...);
 void deactivate_timer(frontend *fe);

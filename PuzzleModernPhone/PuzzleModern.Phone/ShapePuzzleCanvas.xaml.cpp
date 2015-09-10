@@ -35,6 +35,11 @@ Windows::UI::Xaml::Media::Brush^ ShapePuzzleCanvas::GetColor(int index)
 	return brushes->GetAt(index);
 }
 
+void ShapePuzzleCanvas::RemoveColors()
+{
+	brushes->Clear();
+}
+
 void ShapePuzzleCanvas::AddColor(float r, float g, float b)
 {
 	Windows::UI::Color color = Windows::UI::Color();

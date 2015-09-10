@@ -1323,6 +1323,12 @@ void GamePage::OnSettingChanged(Platform::Object ^sender, Platform::String ^key,
 {
 	if (key == "cfg_colorblind" && _colorBlindKey != VirtualKey::None && !_generatingGame)
 		fe->SendKey(_colorBlindKey, false);
+	if (key == "env_MAP_VIVID_COLOURS" && _puzzleName == "Map" && _isLoaded)
+	{
+		DrawCanvas->RemoveColors();
+		fe->ReloadColors();
+		ForceRedraw();
+	}
 }
 
 
