@@ -52,10 +52,50 @@
                               Toggled="ColorblindSwitch_Toggled">
                     Colorblind Mode (supported puzzles only)
                 </ToggleSwitch>
-                <ComboBox x:Name="MapPaletteBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="MapPaletteBox_SelectionChanged" Header="Map - Color palette" SelectedIndex="0">
-                    <ComboBoxItem>Default</ComboBoxItem>
-                    <ComboBoxItem>Vivid</ComboBoxItem>
-                </ComboBox>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="128" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <ComboBox Grid.Column="0" x:Name="MapPaletteBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="MapPaletteBox_SelectionChanged" Header="Map - Color palette" SelectedIndex="0">
+                        <ComboBoxItem>Default</ComboBoxItem>
+                        <ComboBoxItem>Vivid</ComboBoxItem>
+                    </ComboBox>
+
+                    <Border x:Name="VividPalettePreview" Visibility="Collapsed" Grid.Column="1" Height="36" Margin="9,28,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#c04040" />
+                            <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#4db34d" />
+                            <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#4d4db3" />
+                            <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#d9d91a" />
+                        </Grid>
+                    </Border>
+
+                    <Border x:Name="DefaultPalettePreview" Grid.Column="1" Height="36" Margin="9,28,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#b38066" />
+                            <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#cdb366" />
+                            <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#809a66" />
+                            <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#8d735a" />
+                        </Grid>
+                    </Border>
+                </Grid>
             </StackPanel>
         </Grid>
     </Grid>

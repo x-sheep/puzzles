@@ -44,7 +44,11 @@ SettingsPage::SettingsPage()
 	if (settings->Values->HasKey("cfg_gridview"))
 		GridViewSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_gridview"));
 	if (settings->Values->HasKey("env_MAP_VIVID_COLOURS") && safe_cast<bool>(settings->Values->Lookup("env_MAP_VIVID_COLOURS")))
+	{
 		MapPaletteBox->SelectedIndex = 1;
+		VividPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Visible;
+		DefaultPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	}
 
 	_loaded = true;
 }
@@ -155,6 +159,17 @@ void SettingsPage::GridViewSwitch_Toggled(Platform::Object^ sender, Windows::UI:
 void SettingsPage::MapPaletteBox_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::SelectionChangedEventArgs^ e)
 {
 	if (!_loaded) return;
+
+	if (MapPaletteBox->SelectedIndex == 1)
+	{
+		VividPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Visible;
+		DefaultPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	}
+	else
+	{
+		VividPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+		DefaultPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Visible;
+	}
 
 	ApplicationData::Current->RoamingSettings->Values->Insert("env_MAP_VIVID_COLOURS", MapPaletteBox->SelectedIndex == 1);
 }
