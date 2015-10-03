@@ -607,7 +607,7 @@ namespace PuzzleModern
 		return midend_wants_statusbar(me) != 0;
 	}
 
-	void WindowsModern::SendKey(VirtualKey key, bool modifier)
+	void WindowsModern::SendKey(VirtualKey key, bool shift, bool control)
 	{
 		int button;
 
@@ -639,8 +639,10 @@ namespace PuzzleModern
 		if (key >= VirtualKey::NumberPad0 && key <= VirtualKey::NumberPad9)
 			button = MOD_NUM_KEYPAD | (int)(key - (VirtualKey::NumberPad0 - VirtualKey::Number0));
 
-		if (modifier)
+		if (shift)
 			button |= MOD_SHFT;
+		if (control)
+			button |= MOD_CTRL;
 
 		midend_process_key(me, 0, 0, button);
 	}

@@ -68,7 +68,7 @@ namespace PuzzleModern
 
 		VirtualButtonCollection^ GetVirtualButtonBar();
 		void SendClick(int x, int y, ButtonType type, ButtonState state);
-		void SendKey(Windows::System::VirtualKey key, bool modifier);
+		void SendKey(Windows::System::VirtualKey key, bool shift, bool control);
 		void SetInputScale(float scale);
 
 	private:

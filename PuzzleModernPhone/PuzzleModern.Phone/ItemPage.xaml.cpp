@@ -325,7 +325,7 @@ void ItemPage::RemoveOverlay()
 	{
 		auto settings = ApplicationData::Current->RoamingSettings;
 		if (settings->Values->HasKey("cfg_colorblind") && safe_cast<bool>(settings->Values->Lookup("cfg_colorblind")))
-			fe->SendKey(buttons->ColorBlindKey->Key, false);
+			fe->SendKey(buttons->ColorBlindKey->Key, false, false);
 	}
 }
 
@@ -746,7 +746,7 @@ void ItemPage::VirtualButtonBar_ButtonPressed(Platform::Object^ sender, PuzzleMo
 	if (_generatingGame)
 		return;
 
-	fe->SendKey(button->Key, false);
+	fe->SendKey(button->Key, false, false);
 
 	UpdateUndoButtons();
 }
@@ -756,7 +756,7 @@ void ItemPage::ToolButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Rou
 	if (_generatingGame)
 		return;
 
-	fe->SendKey(toolKey->Key, false);
+	fe->SendKey(toolKey->Key, false, false);
 
 	UpdateUndoButtons();
 }
@@ -767,7 +767,7 @@ void ItemPage::LeftRightButton_Checked(Platform::Object^ sender, Windows::UI::Xa
 	_rightAction = ButtonType::LEFT;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton1, false);
+		fe->SendKey(VirtualKey::XButton1, false, false);
 }
 
 void ItemPage::LeftRightButton_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -776,7 +776,7 @@ void ItemPage::LeftRightButton_Unchecked(Platform::Object^ sender, Windows::UI::
 	_rightAction = ButtonType::RIGHT;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton2, false);
+		fe->SendKey(VirtualKey::XButton2, false, false);
 }
 
 void ItemPage::LoadGame_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)

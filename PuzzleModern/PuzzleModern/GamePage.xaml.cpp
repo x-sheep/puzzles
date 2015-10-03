@@ -415,7 +415,7 @@ void GamePage::RemoveOverlay()
 	{
 		auto settings = ApplicationData::Current->RoamingSettings;
 		if (settings->Values->HasKey("cfg_colorblind") && safe_cast<bool>(settings->Values->Lookup("cfg_colorblind")))
-			fe->SendKey(_colorBlindKey, false);
+			fe->SendKey(_colorBlindKey, false, false);
 	}
 }
 
@@ -796,17 +796,17 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 			e->Handled = true;
 		}
 	}
-	else if ((k >= VirtualKey::Number0 && k <= VirtualKey::Number9) /* Number keys */
+	if (!e->Handled && ( (k >= VirtualKey::Number0 && k <= VirtualKey::Number9) /* Number keys */
 		|| (k >= VirtualKey::NumberPad0 && k <= VirtualKey::NumberPad9) /* Number pad */
 		|| k == VirtualKey::Enter || k == VirtualKey::Space /* Button one and two */
 		|| (k >= VirtualKey::Left && k <= VirtualKey::Down) /* Directional keys */
 		|| (k >= VirtualKey::A && k <= VirtualKey::Z) /* Letters */
 		|| k == VirtualKey::Delete || k == VirtualKey::Back /* Delete */
-		)
+		) )
 	{
 		/* Only send key down events. Also, do not send the N key to create a new game in this thread. */
 		if (e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown && k != VirtualKey::N && k != _colorBlindKey)
-			fe->SendKey(k, _shiftPressed);
+			fe->SendKey(k, _shiftPressed, _ctrlPressed);
 		e->Handled = true;
 		UpdateUndoButtons();
 	}
@@ -982,7 +982,7 @@ void GamePage::ButtonBar_Click(Platform::Object^ sender, Windows::UI::Xaml::Rout
 	auto button = safe_cast<FrameworkElement^>(sender);
 	auto p = safe_cast<VirtualButton^>(button->DataContext);
 	
-	fe->SendKey(p->Key, false);
+	fe->SendKey(p->Key, false, false);
 
 	UpdateUndoButtons();
 }
@@ -1322,7 +1322,7 @@ void GamePage::BusyCancelButton_Click(Platform::Object^ sender, RoutedEventArgs^
 void GamePage::OnSettingChanged(Platform::Object ^sender, Platform::String ^key, Platform::Object ^value)
 {
 	if (key == "cfg_colorblind" && _colorBlindKey != VirtualKey::None && !_generatingGame)
-		fe->SendKey(_colorBlindKey, false);
+		fe->SendKey(_colorBlindKey, false, false);
 	if (key == "env_MAP_VIVID_COLOURS" && _puzzleName == "Map" && _isLoaded)
 	{
 		DrawCanvas->RemoveColors();
@@ -1338,7 +1338,7 @@ void GamePage::ButtonLeftRight_Checked(Platform::Object^ sender, Windows::UI::Xa
 	_rightAction = ButtonType::LEFT;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton1, false);
+		fe->SendKey(VirtualKey::XButton1, false, false);
 }
 
 
@@ -1348,7 +1348,7 @@ void GamePage::ButtonLeftRight_Unchecked(Platform::Object^ sender, Windows::UI::
 	_rightAction = ButtonType::RIGHT;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton2, false);
+		fe->SendKey(VirtualKey::XButton2, false, false);
 }
 
 
