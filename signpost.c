@@ -623,6 +623,7 @@ static int new_game_fill(game_state *state, random_state *rs,
 
     state->dirs[taili] = 0;
     nfilled = 2;
+    assert(state->n > 1);
 
     while (nfilled < state->n) {
         /* Try and expand _from_ headi; keep going if there's only one
@@ -637,6 +638,8 @@ static int new_game_fill(game_state *state, random_state *rs,
             headi = aidx[j];
             an = cell_adj(state, headi, aidx, adir);
         } while (an == 1);
+
+	if (nfilled == state->n) break;
 
         /* Try and expand _to_ taili; keep going if there's only one
          * place to go to. */
@@ -800,6 +803,9 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     game_state *state = blank_game(params->w, params->h);
     char *ret;
     int headi, taili;
+
+    /* this shouldn't happen (validate_params), but let's play it safe */
+    if (params->w == 1 && params->h == 1) return dupstr("1a");
 
 generate:
     blank_game_into(state);

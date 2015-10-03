@@ -594,6 +594,9 @@ extern const int gamecount;
 extern const game thegame;
 #endif
 
+/* A little bit of help to lazy developers */
+#define DEFAULT_STATUSBAR_TEXT "Use status_bar() to fill this in."
+
 #include "gluefe.h"
 
 #endif /* PUZZLES_PUZZLES_H */
