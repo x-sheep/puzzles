@@ -1205,6 +1205,10 @@ namespace PuzzleModern
 		}
 		if (!strcmp(ourgame->name, "Dominosa"))
 		{
+			int n = min(9, atoi(params));
+			for (i = 0; i <= n; i++)
+				ret->Append(VirtualButton::FromNumber(i));
+
 			collection->ToolButton = VirtualButton::ToggleButton("Mark lines", Windows::UI::Xaml::Controls::Symbol::Highlight);
 		}
 		if (!strcmp(ourgame->name, "Signpost"))
