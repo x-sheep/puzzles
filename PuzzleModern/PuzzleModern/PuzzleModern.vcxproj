@@ -200,136 +200,136 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="Help\blackbox.html">
+    <None Include="..\..\Help\blackbox.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\bridges.html">
+    <None Include="..\..\Help\bridges.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\common.html">
+    <None Include="..\..\Help\common.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\cube.html">
+    <None Include="..\..\Help\cube.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\docindex.html">
+    <None Include="..\..\Help\docindex.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\dominosa.html">
+    <None Include="..\..\Help\dominosa.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\fifteen.html">
+    <None Include="..\..\Help\fifteen.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\filling.html">
+    <None Include="..\..\Help\filling.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\flip.html">
+    <None Include="..\..\Help\flip.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\flood.html">
+    <None Include="..\..\Help\flood.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\galaxies.html">
+    <None Include="..\..\Help\galaxies.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\guess.html">
+    <None Include="..\..\Help\guess.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\index.html">
+    <None Include="..\..\Help\index.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\inertia.html">
+    <None Include="..\..\Help\inertia.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\intro.html">
+    <None Include="..\..\Help\intro.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\keen.html">
+    <None Include="..\..\Help\keen.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\licence.html">
+    <None Include="..\..\Help\licence.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\lightup.html">
+    <None Include="..\..\Help\lightup.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\loopy.html">
+    <None Include="..\..\Help\loopy.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\magnets.html">
+    <None Include="..\..\Help\magnets.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\map.html">
+    <None Include="..\..\Help\map.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\mines.html">
+    <None Include="..\..\Help\mines.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\net.html">
+    <None Include="..\..\Help\net.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\netslide.html">
+    <None Include="..\..\Help\netslide.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\pattern.html">
+    <None Include="..\..\Help\pattern.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\pearl.html">
+    <None Include="..\..\Help\pearl.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\pegs.html">
+    <None Include="..\..\Help\pegs.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\range.html">
+    <None Include="..\..\Help\range.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\rectangles.html">
+    <None Include="..\..\Help\rectangles.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\samegame.html">
+    <None Include="..\..\Help\samegame.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\signpost.html">
+    <None Include="..\..\Help\signpost.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\singles.html">
+    <None Include="..\..\Help\singles.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\sixteen.html">
+    <None Include="..\..\Help\sixteen.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\slant.html">
+    <None Include="..\..\Help\slant.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\solo.html">
+    <None Include="..\..\Help\solo.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\style.css">
+    <None Include="style.css">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\tents.html">
+    <None Include="..\..\Help\tents.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\towers.html">
+    <None Include="..\..\Help\towers.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\tracks.html">
+    <None Include="..\..\Help\tracks.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\twiddle.html">
+    <None Include="..\..\Help\twiddle.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\undead.html">
+    <None Include="..\..\Help\undead.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\unequal.html">
+    <None Include="..\..\Help\unequal.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\unruly.html">
+    <None Include="..\..\Help\unruly.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Help\untangle.html">
+    <None Include="..\..\Help\untangle.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="PuzzleModern_StoreKey.pfx" />

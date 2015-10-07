@@ -105,7 +105,7 @@ void HelpPage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 	else
 		page = "index";
 
-	String^ url = "ms-appx-web:///Help/" + page + ".html";
+	String^ url = "ms-appx-web:///" + page + ".html";
 	HelpView->Navigate(ref new Uri(url));
 }
 

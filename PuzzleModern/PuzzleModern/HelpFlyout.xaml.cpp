@@ -29,7 +29,7 @@ PuzzleModern::HelpFlyout::HelpFlyout(Platform::String ^page)
 
 	InitializeComponent();
 
-	String^ url = "ms-appx-web:///Help/" + page + ".html";
+	String^ url = "ms-appx-web:///" + page + ".html";
 	HelpView->Navigate(ref new Uri(url));
 
 	Width = Window::Current->Bounds.Width < 646 ? 346 : 646;
