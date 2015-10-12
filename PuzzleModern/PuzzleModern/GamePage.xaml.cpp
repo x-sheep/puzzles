@@ -802,6 +802,7 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 		|| (k >= VirtualKey::Left && k <= VirtualKey::Down) /* Directional keys */
 		|| (k >= VirtualKey::A && k <= VirtualKey::Z) /* Letters */
 		|| k == VirtualKey::Delete || k == VirtualKey::Back /* Delete */
+		|| k == VirtualKey::Escape
 		) )
 	{
 		/* Only send key down events. Also, do not send the N key to create a new game in this thread. */

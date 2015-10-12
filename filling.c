@@ -1145,12 +1145,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	return "";
     }
 
-    if (button == '\b' || button == 27) {
+    if (button == 27) {
 	sfree(ui->sel);
 	ui->sel = NULL;
 	ui->keydragging = FALSE;
 	return "";
     }
+	if (button == '\b')
+		button = '0';
 
     if (button < '0' || button > '9') return NULL;
     button -= '0';
