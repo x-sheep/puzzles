@@ -1723,8 +1723,8 @@ static void draw_cell(drawing *draw, game_drawstate *ds, int r, int c,
                         cell.flash || cell.cursor ?
                         COL_LOWLIGHT : COL_BACKGROUND);
 
-    draw_rect_outline(draw, x,     y,     ts + 1, ts + 1, COL_GRID);
-    draw_rect        (draw, x + 1, y + 1, ts - 1, ts - 1, colour);
+    draw_rect(draw, x,     y,     ts + 1, ts + 1, COL_GRID);
+    draw_rect(draw, x + 1, y + 1, ts - 1, ts - 1, colour);
     if (cell.error)
 	draw_rect_outline(draw, x + 1, y + 1, ts - 1, ts - 1, COL_ERROR);
 
