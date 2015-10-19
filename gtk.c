@@ -1205,10 +1205,14 @@ static gint button_event(GtkWidget *widget, GdkEventButton *event,
 	button = RIGHT_BUTTON;
     else if (event->button == 1)
 	button = LEFT_BUTTON;
+    else if (event->button == 8 && event->type == GDK_BUTTON_PRESS)
+        button = 'u';
+    else if (event->button == 9 && event->type == GDK_BUTTON_PRESS)
+        button = 'r';
     else
 	return FALSE;		       /* don't even know what button! */
 
-    if (event->type == GDK_BUTTON_RELEASE)
+    if (event->type == GDK_BUTTON_RELEASE && button >= LEFT_BUTTON)
         button += LEFT_RELEASE - LEFT_BUTTON;
 
     if (!midend_process_key(fe->me, event->x - fe->ox,
@@ -1306,22 +1310,22 @@ static gint configure_area(GtkWidget *widget,
 {
     frontend *fe = (frontend *)data;
     int x, y;
+    int oldw = fe->w, oldpw = fe->pw, oldh = fe->h, oldph = fe->ph;
 
     x = event->width;
     y = event->height;
+    fe->w = x;
+    fe->h = y;
+    midend_size(fe->me, &x, &y, TRUE);
+    fe->pw = x;
+    fe->ph = y;
+    fe->ox = (fe->w - fe->pw) / 2;
+    fe->oy = (fe->h - fe->ph) / 2;
 
-    if (x != fe->w || y != fe->h || !backing_store_ok(fe)) {
+    if (oldw != fe->w || oldpw != fe->pw ||
+        oldh != fe->h || oldph != fe->ph || !backing_store_ok(fe)) {
         if (backing_store_ok(fe))
             teardown_backing_store(fe);
-
-        fe->w = x;
-        fe->h = y;
-        midend_size(fe->me, &x, &y, TRUE);
-        fe->pw = x;
-        fe->ph = y;
-        fe->ox = (fe->w - fe->pw) / 2;
-        fe->oy = (fe->h - fe->ph) / 2;
-
         setup_backing_store(fe);
     }
 
@@ -1372,18 +1376,6 @@ static void window_destroy(GtkWidget *widget, gpointer data)
     gtk_main_quit();
 }
 
-static void msgbox_button_clicked(GtkButton *button, gpointer data)
-{
-    GtkWidget *window = GTK_WIDGET(data);
-    int v, *ip;
-
-    ip = (int *)g_object_get_data(G_OBJECT(window), "user-data");
-    v = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "user-data"));
-    *ip = v;
-
-    gtk_widget_destroy(GTK_WIDGET(data));
-}
-
 static int win_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
     GObject *cancelbutton = G_OBJECT(data);
@@ -1401,6 +1393,47 @@ static int win_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 
 enum { MB_OK, MB_YESNO };
 
+static void align_label(GtkLabel *label, double x, double y)
+{
+#if GTK_CHECK_VERSION(3,16,0)
+    gtk_label_set_xalign(label, x);
+    gtk_label_set_yalign(label, y);
+#else
+    gtk_misc_set_alignment(GTK_MISC(label), x, y);
+#endif
+}
+
+#if GTK_CHECK_VERSION(3,0,0)
+int message_box(GtkWidget *parent, char *title, char *msg, int centre,
+		int type)
+{
+    GtkWidget *window;
+    gint ret;
+
+    window = gtk_message_dialog_new
+        (GTK_WINDOW(parent),
+         (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
+         (type == MB_OK ? GTK_MESSAGE_INFO : GTK_MESSAGE_QUESTION),
+         (type == MB_OK ? GTK_BUTTONS_OK   : GTK_BUTTONS_YES_NO),
+         "%s", msg);
+    gtk_window_set_title(GTK_WINDOW(window), title);
+    ret = gtk_dialog_run(GTK_DIALOG(window));
+    gtk_widget_destroy(window);
+    return (type == MB_OK ? TRUE : (ret == GTK_RESPONSE_YES));
+}
+#else /* GTK_CHECK_VERSION(3,0,0) */
+static void msgbox_button_clicked(GtkButton *button, gpointer data)
+{
+    GtkWidget *window = GTK_WIDGET(data);
+    int v, *ip;
+
+    ip = (int *)g_object_get_data(G_OBJECT(window), "user-data");
+    v = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "user-data"));
+    *ip = v;
+
+    gtk_widget_destroy(GTK_WIDGET(data));
+}
+
 int message_box(GtkWidget *parent, char *title, char *msg, int centre,
 		int type)
 {
@@ -1410,7 +1443,7 @@ int message_box(GtkWidget *parent, char *title, char *msg, int centre,
 
     window = gtk_dialog_new();
     text = gtk_label_new(msg);
-    gtk_misc_set_alignment(GTK_MISC(text), 0.0, 0.0);
+    align_label(GTK_LABEL(text), 0.0, 0.0);
     hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), text, FALSE, FALSE, 20);
     gtk_box_pack_start
@@ -1464,6 +1497,7 @@ int message_box(GtkWidget *parent, char *title, char *msg, int centre,
     gtk_main();
     return (type == MB_YESNO ? i == 1 : TRUE);
 }
+#endif /* GTK_CHECK_VERSION(3,0,0) */
 
 void error_box(GtkWidget *parent, char *msg)
 {
@@ -1540,6 +1574,7 @@ static void droplist_sel(GtkComboBox *combo, gpointer data)
 static int get_config(frontend *fe, int which)
 {
     GtkWidget *w, *table, *cancel;
+    GtkBox *content_box, *button_box;
     char *title;
     config_item *i;
     int y;
@@ -1548,23 +1583,38 @@ static int get_config(frontend *fe, int which)
     fe->cfg_which = which;
     fe->cfgret = FALSE;
 
+#if GTK_CHECK_VERSION(3,0,0)
+    /* GtkDialog isn't quite flexible enough */
+    fe->cfgbox = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    content_box = GTK_BOX(gtk_vbox_new(FALSE, 8));
+    g_object_set(G_OBJECT(content_box), "margin", 8, (const char *)NULL);
+    gtk_widget_show(GTK_WIDGET(content_box));
+    gtk_container_add(GTK_CONTAINER(fe->cfgbox), GTK_WIDGET(content_box));
+    button_box = GTK_BOX(gtk_hbox_new(FALSE, 8));
+    gtk_widget_show(GTK_WIDGET(button_box));
+    gtk_box_pack_end(content_box, GTK_WIDGET(button_box), FALSE, FALSE, 0);
+    {
+        GtkWidget *sep = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+        gtk_widget_show(sep);
+        gtk_box_pack_end(content_box, sep, FALSE, FALSE, 0);
+    }
+#else
     fe->cfgbox = gtk_dialog_new();
+    content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(fe->cfgbox)));
+    button_box = GTK_BOX(gtk_dialog_get_action_area(GTK_DIALOG(fe->cfgbox)));
+#endif
     gtk_window_set_title(GTK_WINDOW(fe->cfgbox), title);
     sfree(title);
 
     w = gtk_button_new_with_our_label(LABEL_CANCEL);
-    gtk_box_pack_end
-        (GTK_BOX(gtk_dialog_get_action_area(GTK_DIALOG(fe->cfgbox))),
-         w, FALSE, FALSE, 0);
+    gtk_box_pack_end(button_box, w, FALSE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(config_cancel_button_clicked), fe);
     cancel = w;
 
     w = gtk_button_new_with_our_label(LABEL_OK);
-    gtk_box_pack_end
-        (GTK_BOX(gtk_dialog_get_action_area(GTK_DIALOG(fe->cfgbox))),
-         w, FALSE, FALSE, 0);
+    gtk_box_pack_end(button_box, w, FALSE, FALSE, 0);
     gtk_widget_show(w);
     gtk_widget_set_can_default(w, TRUE);
     gtk_window_set_default(GTK_WINDOW(fe->cfgbox), w);
@@ -1577,9 +1627,7 @@ static int get_config(frontend *fe, int which)
     table = gtk_table_new(1, 2, FALSE);
 #endif
     y = 0;
-    gtk_box_pack_start
-        (GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(fe->cfgbox))),
-         table, FALSE, FALSE, 0);
+    gtk_box_pack_start(content_box, table, FALSE, FALSE, 0);
     gtk_widget_show(table);
 
     for (i = fe->cfg; i->type != C_END; i++) {
@@ -1594,7 +1642,7 @@ static int get_config(frontend *fe, int which)
 	     */
 
 	    w = gtk_label_new(i->name);
-	    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+	    align_label(GTK_LABEL(w), 0.0, 0.5);
 #if GTK_CHECK_VERSION(3,0,0)
             gtk_grid_attach(GTK_GRID(table), w, 0, y, 1, 1);
 #else
@@ -1650,7 +1698,7 @@ static int get_config(frontend *fe, int which)
 	     */
 
 	    w = gtk_label_new(i->name);
-	    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+	    align_label(GTK_LABEL(w), 0.0, 0.5);
 #if GTK_CHECK_VERSION(3,0,0)
             gtk_grid_attach(GTK_GRID(table), w, 0, y, 1, 1);
 #else
@@ -2050,8 +2098,9 @@ static char *file_selector(frontend *fe, char *title, int save)
 				    NULL);
 
     if (gtk_dialog_run(GTK_DIALOG(filesel)) == GTK_RESPONSE_ACCEPT) {
-        const char *name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(filesel));
+        char *name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(filesel));
         filesel_name = dupstr(name);
+        g_free(name);
     }
 
     gtk_widget_destroy(filesel);
@@ -2101,15 +2150,14 @@ static void menu_save_event(GtkMenuItem *menuitem, gpointer data)
 		    " file \"%.*s\"?",
 		    FILENAME_MAX, name);
 	    if (!message_box(fe->window, "Question", buf, TRUE, MB_YESNO))
-		return;
+                goto free_and_return;
 	}
 
 	fp = fopen(name, "w");
-        sfree(name);
 
         if (!fp) {
             error_box(fe->window, "Unable to open save file");
-            return;
+            goto free_and_return;
         }
 
 	{
@@ -2123,10 +2171,11 @@ static void menu_save_event(GtkMenuItem *menuitem, gpointer data)
 		sprintf(boxmsg, "Error writing save file: %.400s",
 			strerror(errno));
 		error_box(fe->window, boxmsg);
-		return;
+		goto free_and_return;
 	    }
 	}
-
+    free_and_return:
+        sfree(name);
     }
 }
 
@@ -2199,6 +2248,21 @@ static void menu_config_event(GtkMenuItem *menuitem, gpointer data)
 static void menu_about_event(GtkMenuItem *menuitem, gpointer data)
 {
     frontend *fe = (frontend *)data;
+
+#if GTK_CHECK_VERSION(3,0,0)
+    extern char *const *const xpm_icons[];
+    extern const int n_xpm_icons;
+    GdkPixbuf *icon = gdk_pixbuf_new_from_xpm_data
+        ((const gchar **)xpm_icons[n_xpm_icons-1]);
+    gtk_show_about_dialog
+        (GTK_WINDOW(fe->window),
+         "program-name", thegame.name,
+         "version", ver,
+         "comments", "Part of Simon Tatham's Portable Puzzle Collection",
+         "logo", icon,
+         (const gchar *)NULL);
+    g_object_unref(G_OBJECT(icon));
+#else
     char titlebuf[256];
     char textbuf[1024];
 
@@ -2209,6 +2273,7 @@ static void menu_about_event(GtkMenuItem *menuitem, gpointer data)
 	    "%.500s", thegame.name, ver);
 
     message_box(fe->window, titlebuf, textbuf, TRUE, MB_OK);
+#endif
 }
 
 static GtkWidget *add_menu_item_with_key(frontend *fe, GtkContainer *cont,
