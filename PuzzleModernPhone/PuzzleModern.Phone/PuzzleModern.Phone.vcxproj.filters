@@ -379,6 +379,12 @@
     <Image Include="Icons\pattern-small.png">
       <Filter>Icons</Filter>
     </Image>
+	<Image Include="Icons\palisade-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\palisade-small.png">
+      <Filter>Icons</Filter>
+    </Image>
     <Image Include="Icons\pearl-large.png">
       <Filter>Icons</Filter>
     </Image>
@@ -625,6 +631,9 @@
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\obfusc.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+	<ClCompile Include="..\..\palisade.c">
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\pattern.c">

@@ -25,6 +25,7 @@ const struct help_item helpitems[] {
 	{ "Mines", "Find all the mines without treading on any of them." },
 	{ "Net", "Rotate each tile to reassemble the network." },
 	{ "Netslide", "Slide a row at a time to reassemble the network." },
+	{ "Palisade", "Divide the grid into equal-sized areas in accordance with the clues." },
 	{ "Pattern", "Fill in the pattern in the grid, given only the lengths of runs of black squares." },
 	{ "Pearl", "Draw a single closed loop, given clues about corner and straight squares." },
 	{ "Pegs", "Jump pegs over each other to remove all but one." },

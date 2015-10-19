@@ -152,6 +152,9 @@
     <ClCompile Include="..\..\obfusc.c">
       <Filter>Source Code</Filter>
     </ClCompile>
+	<ClCompile Include="..\..\palisade.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\pattern.c">
       <Filter>Source Code</Filter>
     </ClCompile>
@@ -506,6 +509,9 @@
     <Image Include="Icons\netslide-large.png">
       <Filter>Icons</Filter>
     </Image>
+	<Image Include="Icons\palisade-large.png">
+      <Filter>Icons</Filter>
+    </Image>
     <Image Include="Icons\pattern-large.png">
       <Filter>Icons</Filter>
     </Image>
@@ -609,6 +615,9 @@
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\netslide-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+	<Image Include="Icons\palisade-small.png">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\pattern-small.png">

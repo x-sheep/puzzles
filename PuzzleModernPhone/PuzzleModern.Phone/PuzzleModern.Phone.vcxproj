@@ -403,6 +403,8 @@
     <Image Include="Icons\net-small.png" />
     <Image Include="Icons\netslide-large.png" />
     <Image Include="Icons\netslide-small.png" />
+	<Image Include="Icons\palisade-large.png" />
+    <Image Include="Icons\palisade-small.png" />
     <Image Include="Icons\pattern-large.png" />
     <Image Include="Icons\pattern-small.png" />
     <Image Include="Icons\pearl-large.png" />
@@ -603,6 +605,10 @@
       <DependentUpon>ParamsDialog.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="..\..\pattern.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+	<ClCompile Include="..\..\palisade.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
