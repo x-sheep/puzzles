@@ -127,6 +127,9 @@
     <None Include="..\..\Help\netslide.html">
       <Filter>Help</Filter>
     </None>
+	<None Include="..\..\Help\palisade.html">
+      <Filter>Help</Filter>
+    </None>
     <None Include="..\..\Help\pattern.html">
       <Filter>Help</Filter>
     </None>

@@ -272,6 +272,9 @@
     <None Include="..\..\Help\netslide.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
+	<None Include="..\..\Help\palisade.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\Help\pattern.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
