@@ -7,8 +7,8 @@
 
 #include "SelectorPage.g.h"
 #include "Common\NavigationHelper.h"
-#include "PuzzleData.h"
-#include "WindowsModern.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
+#include "..\..\PuzzleCommon\WindowsModern.h"
 
 namespace PuzzleModern
 {

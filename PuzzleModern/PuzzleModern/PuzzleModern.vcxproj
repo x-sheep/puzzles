@@ -123,8 +123,8 @@
     <ClInclude Include="Common\NavigationHelper.h" />
     <ClInclude Include="Common\RelayCommand.h" />
     <ClInclude Include="Common\SuspensionManager.h" />
-    <ClInclude Include="Direct2DPuzzleCanvas.xaml.h">
-      <DependentUpon>Direct2DPuzzleCanvas.xaml</DependentUpon>
+    <ClInclude Include="..\..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.h">
+      <DependentUpon>..\..\PuzzleCommon\Direct2DPuzzleCanvas.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="GeneralSettingsFlyout.xaml.h">
       <DependentUpon>GeneralSettingsFlyout.xaml</DependentUpon>
@@ -132,20 +132,20 @@
     <ClInclude Include="HelpFlyout.xaml.h">
       <DependentUpon>HelpFlyout.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="PulseEffect.xaml.h">
-      <DependentUpon>PulseEffect.xaml</DependentUpon>
+    <ClInclude Include="..\..\PuzzleCommon\PulseEffect.xaml.h">
+      <DependentUpon>..\..\PuzzleCommon\PulseEffect.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="PuzzleHelpData.h" />
-    <ClInclude Include="PuzzleImageSource.h" />
-    <ClInclude Include="ShapePuzzleCanvas.xaml.h">
-      <DependentUpon>ShapePuzzleCanvas.xaml</DependentUpon>
+    <ClInclude Include="..\..\PuzzleCommon\PuzzleHelpData.h" />
+    <ClInclude Include="..\..\PuzzleCommon\PuzzleImageSource.h" />
+    <ClInclude Include="..\..\PuzzleCommon\ShapePuzzleCanvas.xaml.h">
+      <DependentUpon>..\..\PuzzleCommon\ShapePuzzleCanvas.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="GamePage.xaml.h">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="..\..\gluefe.h" />
     <ClInclude Include="..\..\grid.h" />
-    <ClInclude Include="IPuzzleCanvas.h" />
+    <ClInclude Include="..\..\PuzzleCommon\IPuzzleCanvas.h" />
     <ClInclude Include="..\..\latin.h" />
     <ClInclude Include="..\..\loopgen.h" />
     <ClInclude Include="..\..\maxflow.h" />
@@ -156,7 +156,7 @@
     <ClInclude Include="App.xaml.h">
       <DependentUpon>App.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="PuzzleData.h" />
+    <ClInclude Include="..\..\PuzzleCommon\PuzzleData.h" />
     <ClInclude Include="..\..\penrose.h" />
     <ClInclude Include="..\..\puzzles.h" />
     <ClInclude Include="..\..\resource.h" />
@@ -164,7 +164,7 @@
       <DependentUpon>SelectorPage.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="..\..\tree234.h" />
-    <ClInclude Include="WindowsModern.h" />
+    <ClInclude Include="..\..\PuzzleCommon\WindowsModern.h" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -173,7 +173,7 @@
     <Page Include="AboutFlyout.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Direct2DPuzzleCanvas.xaml">
+    <Page Include="..\..\PuzzleCommon\Direct2DPuzzleCanvas.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="GeneralSettingsFlyout.xaml">
@@ -182,8 +182,8 @@
     <Page Include="HelpFlyout.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PulseEffect.xaml" />
-    <Page Include="ShapePuzzleCanvas.xaml">
+    <Page Include="..\..\PuzzleCommon\PulseEffect.xaml" />
+    <Page Include="..\..\PuzzleCommon\ShapePuzzleCanvas.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="GamePage.xaml">
@@ -518,8 +518,8 @@
     <ClCompile Include="..\..\cube.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-    <ClCompile Include="Direct2DPuzzleCanvas.xaml.cpp">
-      <DependentUpon>Direct2DPuzzleCanvas.xaml</DependentUpon>
+    <ClCompile Include="..\..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.cpp">
+      <DependentUpon>..\..\PuzzleCommon\Direct2DPuzzleCanvas.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="..\..\divvy.c">
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -554,12 +554,12 @@
     <ClCompile Include="HelpFlyout.xaml.cpp">
       <DependentUpon>HelpFlyout.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="PulseEffect.xaml.cpp">
-      <DependentUpon>PulseEffect.xaml</DependentUpon>
+    <ClCompile Include="..\..\PuzzleCommon\PulseEffect.xaml.cpp">
+      <DependentUpon>..\..\PuzzleCommon\PulseEffect.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="PuzzleImageSource.cpp" />
-    <ClCompile Include="ShapePuzzleCanvas.xaml.cpp">
-      <DependentUpon>ShapePuzzleCanvas.xaml</DependentUpon>
+    <ClCompile Include="..\..\PuzzleCommon\PuzzleImageSource.cpp" />
+    <ClCompile Include="..\..\PuzzleCommon\ShapePuzzleCanvas.xaml.cpp">
+      <DependentUpon>..\..\PuzzleCommon\ShapePuzzleCanvas.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="GamePage.xaml.cpp">
       <DependentUpon>GamePage.xaml</DependentUpon>
@@ -600,7 +600,7 @@
     <ClCompile Include="ParamsFlyout.xaml.cpp">
       <DependentUpon>ParamsFlyout.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="PuzzleData.cpp" />
+    <ClCompile Include="..\..\PuzzleCommon\PuzzleData.cpp" />
     <ClCompile Include="..\..\malloc.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
@@ -723,7 +723,7 @@
     <ClCompile Include="..\..\untangle.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-    <ClCompile Include="WindowsModern.cpp">
+	<ClCompile Include="..\..\PuzzleCommon\WindowsModern.cpp">
       <CompileAsWinRT>true</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="..\..\gluefe.c">

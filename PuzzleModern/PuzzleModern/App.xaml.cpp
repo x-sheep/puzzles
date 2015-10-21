@@ -8,7 +8,7 @@
 #include "GamePage.xaml.h"
 #include "AboutFlyout.xaml.h"
 #include "GeneralSettingsFlyout.xaml.h"
-#include "WindowsModern.h"
+#include "..\..\PuzzleCommon\WindowsModern.h"
 
 using namespace PuzzleModern;
 

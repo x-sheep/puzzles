@@ -6,8 +6,8 @@
 #include "pch.h"
 #include "SelectorPage.xaml.h"
 #include "GamePage.xaml.h"
-#include "WindowsModern.h"
-#include "PuzzleData.h"
+#include "..\..\PuzzleCommon\WindowsModern.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
 #include "HelpFlyout.xaml.h"
 
 using namespace PuzzleModern;

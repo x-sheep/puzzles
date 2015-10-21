@@ -7,8 +7,8 @@
 #include "GamePage.xaml.h"
 #include "HelpFlyout.xaml.h"
 #include "ParamsFlyout.xaml.h"
-#include "ShapePuzzleCanvas.xaml.h"
-#include "Direct2DPuzzleCanvas.xaml.h"
+#include "..\..\PuzzleCommon\ShapePuzzleCanvas.xaml.h"
+#include "..\..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.h"
 
 using namespace PuzzleModern;
 

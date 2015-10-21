@@ -5,7 +5,7 @@
 
 #include "pch.h"
 #include "ParamsFlyout.xaml.h"
-#include "PuzzleData.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
 
 using namespace PuzzleModern;
 
