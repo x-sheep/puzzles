@@ -4,7 +4,7 @@
 //
 
 #include "pch.h"
-#include "PuzzleData.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
 #include "ItemPage.xaml.h"
 #include "HelpPage.xaml.h"
 #include "ParamsDialog.xaml.h"

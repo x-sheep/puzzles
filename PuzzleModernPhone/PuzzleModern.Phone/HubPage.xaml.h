@@ -6,7 +6,7 @@
 #pragma once
 
 #include "HubPage.g.h"
-#include "PuzzleData.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
 
 namespace PuzzleModern
 {

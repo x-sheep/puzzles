@@ -5,7 +5,7 @@
 
 #include "pch.h"
 #include "ParamsDialog.xaml.h"
-#include "PuzzleData.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
 
 using namespace PuzzleModern;
 using namespace PuzzleModern::Phone;

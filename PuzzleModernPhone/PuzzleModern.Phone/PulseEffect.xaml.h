@@ -1,22 +1,3 @@
-﻿//
-// PulseEffect.xaml.h
-// Declaration of the PulseEffect class
-//
+#include "..\..\PuzzleCommon\PulseEffect.xaml.h"
 
-#pragma once
-
-#include "PulseEffect.g.h"
-
-namespace PuzzleModern
-{
-	[Windows::Foundation::Metadata::WebHostHidden]
-	public ref class PulseEffect sealed
-	{
-	public:
-		PulseEffect();
-		event Windows::Foundation::EventHandler<Platform::Object ^> ^Completed;
-		void Start();
-	private:
-		void ExpandAndDisappearStoryboard_Completed(Platform::Object^ sender, Platform::Object^ e);
-	};
-}
+/* Dummy header file required for the auto-generated XamlTypeInfo.g.cpp, as it doesn't handle parent folders */

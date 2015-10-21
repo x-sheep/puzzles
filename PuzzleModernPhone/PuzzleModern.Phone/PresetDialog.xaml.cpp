@@ -4,7 +4,7 @@
 //
 
 #include "pch.h"
-#include "PuzzleData.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
 #include "PresetDialog.xaml.h"
 
 using namespace PuzzleModern;

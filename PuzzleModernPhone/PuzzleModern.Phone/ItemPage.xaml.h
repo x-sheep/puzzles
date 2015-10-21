@@ -10,8 +10,8 @@
 #include "ParamsDialog.xaml.h"
 #include "PuzzleKeyboard.xaml.h"
 #include "SpecificDialog.xaml.h"
-#include "PuzzleData.h"
-#include "WindowsModern.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
+#include "..\..\PuzzleCommon\WindowsModern.h"
 
 namespace PuzzleModern
 {

@@ -9,8 +9,8 @@
 #include "AboutPage.xaml.h"
 #include "HelpPage.xaml.h"
 #include "SettingsPage.xaml.h"
-#include "WindowsModern.h"
-#include "PuzzleData.h"
+#include "..\..\PuzzleCommon\WindowsModern.h"
+#include "..\..\PuzzleCommon\PuzzleData.h"
 
 using namespace PuzzleModern;
 using namespace PuzzleModern::Phone;
