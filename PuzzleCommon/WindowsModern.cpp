@@ -1215,7 +1215,8 @@ namespace PuzzleModern
 		{
 			collection->ToolButton = VirtualButton::ToggleButton("Invert", Windows::UI::Xaml::Controls::Symbol::Switch);
 		}
-		if (!strcmp(ourgame->name, "Magnets") || !strcmp(ourgame->name, "Map") || !strcmp(ourgame->name, "Train Tracks") || !strcmp(ourgame->name, "Loopy"))
+		if (!strcmp(ourgame->name, "Magnets") || !strcmp(ourgame->name, "Map") || !strcmp(ourgame->name, "Train Tracks") || 
+			!strcmp(ourgame->name, "Loopy") || !strcmp(ourgame->name, "Palisade"))
 		{
 			collection->ToolButton = VirtualButton::Pencil();
 		}
@@ -1223,7 +1224,7 @@ namespace PuzzleModern
 		{
 			collection->ToolButton = VirtualButton::ToggleButton("Flag", Windows::UI::Xaml::Controls::Symbol::Flag);
 		}
-		if (!strcmp(ourgame->name, "Pattern"))
+		if (!strcmp(ourgame->name, "Pattern") || !strcmp(ourgame->name, "Unruly"))
 		{
 			collection->ToolButton = VirtualButton::ToggleButton("Color", Windows::UI::Xaml::Controls::Symbol::Edit);
 		}
