@@ -43,7 +43,13 @@ static char *string(int n, const char *fmt, ...)
 }
 
 struct game_params {
-    int w, h, k;
+#ifdef PORTRAIT_SCREEN
+	int h, w;
+#else
+	int w, h;
+#endif
+		
+	int k;
 };
 
 typedef char clue;

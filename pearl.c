@@ -111,7 +111,11 @@ static char const pearl_diffchars[] = DIFFLIST(ENCODE);
 #define DIFFCONFIG DIFFLIST(CONFIG)
 
 struct game_params {
+#ifdef PORTRAIT_SCREEN
+	int h, w;
+#else
     int w, h;
+#endif
     int difficulty;
     int nosolve;        /* XXX remove me! */
 };
