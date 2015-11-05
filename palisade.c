@@ -943,7 +943,9 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ((state->borders[i] & DISABLED(BORDER(dir))) >> dir >> 2)) {
 
         case MAYBE_LEFT:
+#ifndef STYLUS_BASED
         case ON_LEFT:
+#endif
         case ON_RIGHT:
             return string(80, "F%d,%d,%dF%d,%d,%d",
                           gx, gy, BORDER(dir),
@@ -951,10 +953,19 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         case MAYBE_RIGHT:
         case OFF_LEFT:
+#ifndef STYLUS_BASED
         case OFF_RIGHT:
+#endif
             return string(80, "F%d,%d,%dF%d,%d,%d",
                           gx, gy, DISABLED(BORDER(dir)),
                           hx, hy, DISABLED(BORDER(FLIP(dir))));
+#ifdef STYLUS_BASED
+        case ON_LEFT:
+        case OFF_RIGHT:
+            return string(80, "F%d,%d,%dF%d,%d,%d",
+                gx, gy, BORDER(dir)|DISABLED(BORDER(dir)),
+                hx, hy, BORDER(FLIP(dir))|DISABLED(BORDER(FLIP(dir))));
+#endif
         }
     }
 
