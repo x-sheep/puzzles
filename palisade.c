@@ -71,7 +71,10 @@ struct game_state {
 
 #define DEFAULT_PRESET 0
 static struct game_params presets[] = {
-    {5, 5, 5}, {8, 6, 6}, {10, 8, 8}, {15, 12, 10}
+    {5, 5, 5}, {8, 6, 6}, {10, 8, 8}, 
+#ifndef SMALL_SCREEN
+	{15, 12, 10}
+#endif
     /* I definitely want 5x5n5 since that gives "Five Cells" its name.
      * But how about the others?  By which criteria do I choose? */
 };
