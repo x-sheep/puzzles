@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="1867LennardSprong.PortablePuzzleCollection" Publisher="CN=C7A19714-C98A-463A-9F54-22A0392BAFF5" Version="2015.1014.1706.0" />
+  <Identity Name="1867LennardSprong.PortablePuzzleCollection" Publisher="CN=C7A19714-C98A-463A-9F54-22A0392BAFF5" Version="2015.1111.1117.0" />
   <Properties>
     <DisplayName>Portable Puzzle Collection</DisplayName>
     <PublisherDisplayName>Lennard Sprong</PublisherDisplayName>
