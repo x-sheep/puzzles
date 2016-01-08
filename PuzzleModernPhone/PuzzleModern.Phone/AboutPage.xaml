@@ -41,7 +41,7 @@
                     <!-- Section 1 body -->
                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap">
                     Windows Phone version
-                    <LineBreak/>&#xA9; 2015 Lennard Sprong
+                    <LineBreak/>&#xA9; 2016 Lennard Sprong
                     <LineBreak/>
                     <LineBreak/>Contains icons from ModernUIIcons.com
                     <LineBreak/>
@@ -61,7 +61,7 @@
 
                     <!-- Section 2 body -->
                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap">
-                    This software is copyright 2004-2015 Simon Tatham.
+                    This software is copyright 2004-2016 Simon Tatham.
                     <LineBreak/>
                     <LineBreak/>Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas K&#246;lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou, Bernd Schmidt, Steffen Bauer, Lennard Sprong, Rogier Goossens, Chris Boyle and Phil Tunstall.
                     <LineBreak/>
