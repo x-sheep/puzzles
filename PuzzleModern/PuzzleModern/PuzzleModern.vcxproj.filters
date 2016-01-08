@@ -152,7 +152,7 @@
     <ClCompile Include="..\..\obfusc.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-	<ClCompile Include="..\..\palisade.c">
+    <ClCompile Include="..\..\palisade.c">
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\pattern.c">
@@ -371,7 +371,7 @@
     <None Include="..\..\Help\netslide.html">
       <Filter>Help</Filter>
     </None>
-	<None Include="..\..\Help\palisade.html">
+    <None Include="..\..\Help\palisade.html">
       <Filter>Help</Filter>
     </None>
     <None Include="..\..\Help\pattern.html">
@@ -384,9 +384,6 @@
       <Filter>Help</Filter>
     </None>
     <None Include="..\..\Help\range.html">
-      <Filter>Help</Filter>
-    </None>
-    <None Include="..\..\Help\rectangles.html">
       <Filter>Help</Filter>
     </None>
     <None Include="..\..\Help\samegame.html">
@@ -438,6 +435,9 @@
     <None Include="Package.StoreAssociation.xml" />
     <None Include="PuzzleModern_StoreKey.pfx" />
     <None Include="..\..\Help\tracks.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\..\Help\rect.html">
       <Filter>Help</Filter>
     </None>
   </ItemGroup>
@@ -512,7 +512,7 @@
     <Image Include="Icons\netslide-large.png">
       <Filter>Icons</Filter>
     </Image>
-	<Image Include="Icons\palisade-large.png">
+    <Image Include="Icons\palisade-large.png">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\pattern-large.png">
@@ -620,7 +620,7 @@
     <Image Include="Icons\netslide-small.png">
       <Filter>Icons</Filter>
     </Image>
-	<Image Include="Icons\palisade-small.png">
+    <Image Include="Icons\palisade-small.png">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\pattern-small.png">

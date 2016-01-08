@@ -142,7 +142,7 @@
     <None Include="..\..\Help\range.html">
       <Filter>Help</Filter>
     </None>
-    <None Include="..\..\Help\rectangles.html">
+    <None Include="..\..\Help\rect.html">
       <Filter>Help</Filter>
     </None>
     <None Include="..\..\Help\samegame.html">

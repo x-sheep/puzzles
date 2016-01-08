@@ -272,7 +272,7 @@
     <None Include="..\..\Help\netslide.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-	<None Include="..\..\Help\palisade.html">
+    <None Include="..\..\Help\palisade.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\Help\pattern.html">
@@ -287,7 +287,7 @@
     <None Include="..\..\Help\range.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\Help\rectangles.html">
+    <None Include="..\..\Help\rect.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\Help\samegame.html">
@@ -455,7 +455,7 @@
     <Image Include="Icons\net-small.png" />
     <Image Include="Icons\netslide-large.png" />
     <Image Include="Icons\netslide-small.png" />
-	<Image Include="Icons\palisade-large.png" />
+    <Image Include="Icons\palisade-large.png" />
     <Image Include="Icons\palisade-small.png" />
     <Image Include="Icons\pattern-large.png" />
     <Image Include="Icons\pattern-small.png" />
@@ -634,7 +634,7 @@
     <ClCompile Include="..\..\obfusc.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-	<ClCompile Include="..\..\palisade.c">
+    <ClCompile Include="..\..\palisade.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="..\..\pattern.c">
@@ -723,7 +723,7 @@
     <ClCompile Include="..\..\untangle.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-	<ClCompile Include="..\..\PuzzleCommon\WindowsModern.cpp">
+    <ClCompile Include="..\..\PuzzleCommon\WindowsModern.cpp">
       <CompileAsWinRT>true</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="..\..\gluefe.c">

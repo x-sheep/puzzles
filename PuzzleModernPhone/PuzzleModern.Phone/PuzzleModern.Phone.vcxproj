@@ -279,7 +279,7 @@
     <None Include="..\..\Help\range.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\Help\rectangles.html">
+    <None Include="..\..\Help\rect.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\Help\samegame.html">
