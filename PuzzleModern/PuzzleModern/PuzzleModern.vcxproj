@@ -465,8 +465,8 @@
     <Image Include="Icons\pegs-small.png" />
     <Image Include="Icons\range-large.png" />
     <Image Include="Icons\range-small.png" />
-    <Image Include="Icons\rectangles-small.png" />
-    <Image Include="Icons\rectangles-large.png" />
+    <Image Include="Icons\rect-small.png" />
+    <Image Include="Icons\rect-large.png" />
     <Image Include="Icons\samegame-large.png" />
     <Image Include="Icons\samegame-small.png" />
     <Image Include="Icons\signpost-large.png" />

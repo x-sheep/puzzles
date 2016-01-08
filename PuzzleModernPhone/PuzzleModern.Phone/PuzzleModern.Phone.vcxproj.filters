@@ -127,7 +127,7 @@
     <None Include="..\..\Help\netslide.html">
       <Filter>Help</Filter>
     </None>
-	<None Include="..\..\Help\palisade.html">
+    <None Include="..\..\Help\palisade.html">
       <Filter>Help</Filter>
     </None>
     <None Include="..\..\Help\pattern.html">
@@ -382,7 +382,7 @@
     <Image Include="Icons\pattern-small.png">
       <Filter>Icons</Filter>
     </Image>
-	<Image Include="Icons\palisade-large.png">
+    <Image Include="Icons\palisade-large.png">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\palisade-small.png">
@@ -404,12 +404,6 @@
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\range-small.png">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="Icons\rectangles-large.png">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="Icons\rectangles-small.png">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\samegame-large.png">
@@ -519,6 +513,12 @@
     </Image>
     <Image Include="Assets\Square71x71Logo.scale-100.png">
       <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Icons\rect-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\rect-small.png">
+      <Filter>Icons</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -636,7 +636,7 @@
     <ClCompile Include="..\..\obfusc.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-	<ClCompile Include="..\..\palisade.c">
+    <ClCompile Include="..\..\palisade.c">
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\pattern.c">

@@ -264,7 +264,7 @@
     <None Include="..\..\Help\netslide.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-	<None Include="..\..\Help\palisade.html">
+    <None Include="..\..\Help\palisade.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\Help\pattern.html">
@@ -406,7 +406,7 @@
     <Image Include="Icons\net-small.png" />
     <Image Include="Icons\netslide-large.png" />
     <Image Include="Icons\netslide-small.png" />
-	<Image Include="Icons\palisade-large.png" />
+    <Image Include="Icons\palisade-large.png" />
     <Image Include="Icons\palisade-small.png" />
     <Image Include="Icons\pattern-large.png" />
     <Image Include="Icons\pattern-small.png" />
@@ -416,8 +416,8 @@
     <Image Include="Icons\pegs-small.png" />
     <Image Include="Icons\range-large.png" />
     <Image Include="Icons\range-small.png" />
-    <Image Include="Icons\rectangles-large.png" />
-    <Image Include="Icons\rectangles-small.png" />
+    <Image Include="Icons\rect-large.png" />
+    <Image Include="Icons\rect-small.png" />
     <Image Include="Icons\samegame-large.png" />
     <Image Include="Icons\samegame-small.png" />
     <Image Include="Icons\signpost-large.png" />
@@ -611,7 +611,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-	<ClCompile Include="..\..\palisade.c">
+    <ClCompile Include="..\..\palisade.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>

@@ -563,9 +563,6 @@
     <Image Include="Icons\unruly-large.png">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="Icons\rectangles-large.png">
-      <Filter>Icons</Filter>
-    </Image>
     <Image Include="Icons\blackbox-small.png">
       <Filter>Icons</Filter>
     </Image>
@@ -680,9 +677,6 @@
     <Image Include="Assets\SmallLogo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="Icons\rectangles-small.png">
-      <Filter>Icons</Filter>
-    </Image>
     <Image Include="Icons\untangle-large.png">
       <Filter>Icons</Filter>
     </Image>
@@ -759,6 +753,12 @@
       <Filter>Icons</Filter>
     </Image>
     <Image Include="Icons\tracks-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\rect-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\rect-small.png">
       <Filter>Icons</Filter>
     </Image>
   </ItemGroup>
