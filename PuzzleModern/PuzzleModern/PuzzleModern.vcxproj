@@ -539,6 +539,9 @@
     <ClCompile Include="..\..\filling.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
+	<ClCompile Include="..\..\findloop.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\..\flip.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>

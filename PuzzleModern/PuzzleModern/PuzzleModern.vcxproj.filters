@@ -80,6 +80,9 @@
     <ClCompile Include="..\..\filling.c">
       <Filter>Source Code</Filter>
     </ClCompile>
+	<ClCompile Include="..\..\findloop.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\flip.c">
       <Filter>Source Code</Filter>
     </ClCompile>
