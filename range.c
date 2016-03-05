@@ -100,7 +100,11 @@ struct game_state {
 };
 
 #define DEFAULT_PRESET 0
+#ifdef PORTRAIT_SCREEN
+static struct game_params range_presets[] = {{6, 9}, {8, 12}, {9, 13}, {11, 16}};
+#else
 static struct game_params range_presets[] = {{9, 6}, {12, 8}, {13, 9}, {16, 11}};
+#endif
 /* rationale: I want all four combinations of {odd/even, odd/even}, as
  * they play out differently with respect to two-way symmetry.  I also
  * want them to be generated relatively fast yet still be large enough
