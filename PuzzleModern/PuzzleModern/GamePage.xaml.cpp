@@ -608,6 +608,9 @@ void GamePage::StartTimer()
 	{
 		auto newtime = GetTickCount64();
 		auto delta = newtime - LastTime;
+
+		if (!delta) return;
+
 		LastTime = newtime;
 		Timer(delta / 1000.0f);
 	};
@@ -617,7 +620,7 @@ void GamePage::StartTimer()
 		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::High, handle);
 	};
 	Windows::Foundation::TimeSpan period = TimeSpan();
-	period.Duration = 20 * 10000; // 20 milliseconds
+	period.Duration = 5 * 10000; // 5 milliseconds
 	
 	LastTime = GetTickCount64();
 	PeriodicTimer = Windows::System::Threading::ThreadPoolTimer::CreatePeriodicTimer(ref new Windows::System::Threading::TimerElapsedHandler(timerDelegate), period);
