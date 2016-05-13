@@ -94,7 +94,7 @@
     <PackageCertificateKeyFile>PuzzleModern_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>FF14181437ED783E9223607541A7FF669AD3C47F</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>D7725E29DC36AD1AB304385AADB6346BC99B1DA5</PackageCertificateThumbprint>
     <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -539,7 +539,7 @@
     <ClCompile Include="..\..\filling.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-	<ClCompile Include="..\..\findloop.c">
+    <ClCompile Include="..\..\findloop.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="..\..\flip.c">
