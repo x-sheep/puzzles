@@ -95,7 +95,7 @@
                 </TransitionCollection>
             </Popup.ChildTransitions>
 
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{ThemeResource PhoneBackgroundBrush}" Width="400" Height="200" Margin="0,150,0,0">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{ThemeResource PhoneBackgroundBrush}" Width="{Binding PageWidth}" Height="200" Margin="0,150,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -140,7 +140,7 @@
                     <PaneThemeTransition Edge="Top"/>
                 </TransitionCollection>
             </Popup.ChildTransitions>
-            <Border x:Name="ExportPopupBorder" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{ThemeResource PhoneBackgroundBrush}" Width="400" Height="330">
+            <Border x:Name="ExportPopupBorder" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{ThemeResource PhoneBackgroundBrush}" Width="{Binding PageWidth}" Height="330">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

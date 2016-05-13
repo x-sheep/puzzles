@@ -109,6 +109,7 @@ void ItemPage::NavigationHelper_LoadState(Object^ sender, LoadStateEventArgs^ e)
 	_puzzleNameUpper = App::ToUpper(selectedPuzzle->Name);
 	DefaultViewModel->Insert("PuzzleNameUpper", _puzzleNameUpper);
 	DefaultViewModel->Insert("PageBackground", DrawCanvas->GetFirstColor());
+	DefaultViewModel->Insert("PageWidth", 400);
 
 	if(!fe->HasStatusbar())
 		PuzzleStatusBar->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
@@ -350,6 +351,7 @@ void ItemPage::ResizeGame()
 	if (ow > 20 && oh > 20)
 		fe->Redraw(DrawCanvas, this, this, true);
 	fe->SetInputScale(scale);
+	DefaultViewModel->Insert("PageWidth", this->ActualWidth);
 }
 
 void ItemPage::GameBorder_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
