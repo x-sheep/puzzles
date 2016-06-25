@@ -96,6 +96,11 @@
                         </Grid>
                     </Border>
                 </Grid>
+
+                <ComboBox Grid.Column="0" x:Name="FixedPencilMarksBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="FixedPencilMarksBox_SelectionChanged" Header="Pencil mark style" SelectedIndex="0" Margin="0,10,0,0">
+                    <ComboBoxItem>Sequential</ComboBoxItem>
+                    <ComboBoxItem>Fixed position</ComboBoxItem>
+                </ComboBox>
             </StackPanel>
         </Grid>
     </Grid>

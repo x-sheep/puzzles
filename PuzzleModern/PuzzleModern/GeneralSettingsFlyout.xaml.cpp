@@ -39,6 +39,8 @@ GeneralSettingsFlyout::GeneralSettingsFlyout()
 		VividPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Visible;
 		DefaultPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	}
+	if (settings->Values->HasKey("env_FIXED_PENCIL_MARKS") && safe_cast<bool>(settings->Values->Lookup("env_FIXED_PENCIL_MARKS")))
+		FixedPencilMarksBox->SelectedIndex = 1;
 
 	_loaded = true;
 }
@@ -85,4 +87,13 @@ void GeneralSettingsFlyout::MapPaletteBox_SelectionChanged(Platform::Object^ sen
 
 	ApplicationData::Current->RoamingSettings->Values->Insert("env_MAP_VIVID_COLOURS", MapPaletteBox->SelectedIndex == 1);
 	App::Current->NotifySettingChanged(this, "env_MAP_VIVID_COLOURS", MapPaletteBox->SelectedIndex == 1);
+}
+
+
+void GeneralSettingsFlyout::FixedPencilMarksBox_SelectionChanged(Platform::Object^ sender, SelectionChangedEventArgs^ e)
+{
+	if (!_loaded) return;
+
+	ApplicationData::Current->RoamingSettings->Values->Insert("env_FIXED_PENCIL_MARKS", FixedPencilMarksBox->SelectedIndex == 1);
+	App::Current->NotifySettingChanged(this, "env_FIXED_PENCIL_MARKS", FixedPencilMarksBox->SelectedIndex == 1);
 }

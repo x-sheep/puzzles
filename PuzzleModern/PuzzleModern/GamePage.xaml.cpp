@@ -1333,6 +1333,8 @@ void GamePage::OnSettingChanged(Platform::Object ^sender, Platform::String ^key,
 		fe->ReloadColors();
 		ForceRedraw();
 	}
+	if (key == "env_FIXED_PENCIL_MARKS" && _isLoaded)
+		ForceRedraw();
 }
 
 

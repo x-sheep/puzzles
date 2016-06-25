@@ -24,7 +24,7 @@
         <ToggleSwitch x:Name="NewGameSwitch" HeaderTemplate="{StaticResource LabelTemplate}" Toggled="NewGameSwitch_Toggled" IsOn="True">Show prompt on completing game</ToggleSwitch>
         <ToggleSwitch x:Name="ColorblindSwitch" HeaderTemplate="{StaticResource LabelTemplate}" Toggled="ColorblindSwitch_Toggled">Colorblind Mode (supported puzzles only)</ToggleSwitch>
 
-        <Grid>
+        <Grid Margin="4,0,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="96" />
@@ -68,5 +68,9 @@
             </Border>
         </Grid>
 
+        <ComboBox Grid.Column="0" x:Name="FixedPencilMarksBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="FixedPencilMarksBox_SelectionChanged" Header="Pencil mark style" SelectedIndex="0" Margin="4,10,0,0">
+            <ComboBoxItem>Sequential</ComboBoxItem>
+            <ComboBoxItem>Fixed position</ComboBoxItem>
+        </ComboBox>
     </StackPanel>
 </SettingsFlyout>

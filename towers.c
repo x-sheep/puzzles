@@ -1175,6 +1175,7 @@ struct game_drawstate {
     long *tiles;		       /* (w+2)*(w+2) temp space */
     long *drawn;		       /* (w+2)*(w+2)*4: current drawn data */
     int *errtmp;
+    char fixed_pencil;
 };
 
 static int check_errors(const game_state *state, int *errors)
@@ -1572,6 +1573,8 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     int i;
 
     ds->tilesize = 0;
+    char *env = getenv("FIXED_PENCIL_MARKS");
+    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
     ds->three_d = !getenv("TOWERS_2D");
     ds->started = FALSE;
     ds->tiles = snewn((w+2)*(w+2), long);
@@ -1697,7 +1700,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
             if (tile & (1L << (i + DF_PENCIL_SHIFT)))
 		npencil++;
 	if (npencil) {
-
+	    if (ds->fixed_pencil) npencil = w;
 	    minph = 2;
 
 	    /*
@@ -1757,6 +1760,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
 	     */
 	    for (i = 1, j = 0; i <= w; i++)
 		if (tile & (1L << (i + DF_PENCIL_SHIFT))) {
+		    if (ds->fixed_pencil) j = i - 1;
 		    int dx = j % pw, dy = j / pw;
 
 		    str[1] = '\0';

@@ -373,6 +373,12 @@ char *winmodern_getenv(const char *key)
 			return "Y";
 	}
 
+	if (!strcmp(key, "FIXED_PENCIL_MARKS"))
+	{
+		if (settings->HasKey("env_FIXED_PENCIL_MARKS") && safe_cast<bool>(settings->Lookup("env_FIXED_PENCIL_MARKS")))
+			return "Y";
+	}
+
 	return NULL;
 }
 

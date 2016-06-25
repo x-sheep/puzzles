@@ -1482,6 +1482,7 @@ struct game_drawstate {
     long *tiles;
     long *errors;
     char *minus_sign, *times_sign, *divide_sign;
+    char fixed_pencil;
 };
 
 static int check_errors(const game_state *state, long *errors)
@@ -1811,6 +1812,8 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 
     ds->tilesize = 0;
     ds->started = FALSE;
+    char *env = getenv("FIXED_PENCIL_MARKS");
+    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
     ds->tiles = snewn(a, long);
     for (i = 0; i < a; i++)
 	ds->tiles[i] = -1;
@@ -1932,7 +1935,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
             if (tile & (1L << (i + DF_PENCIL_SHIFT)))
 		npencil++;
 	if (npencil) {
-
+	    if (ds->fixed_pencil) npencil = w;
 	    minph = 2;
 
 	    /*
@@ -2007,6 +2010,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
 	     */
 	    for (i = 1, j = 0; i <= w; i++)
 		if (tile & (1L << (i + DF_PENCIL_SHIFT))) {
+		    if (ds->fixed_pencil) j = i - 1;
 		    int dx = j % pw, dy = j / pw;
 
 		    str[1] = '\0';

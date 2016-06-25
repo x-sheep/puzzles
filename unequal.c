@@ -1376,6 +1376,7 @@ struct game_drawstate {
     digit *nums;                /* copy of nums, o^2 */
     unsigned char *hints;       /* copy of hints, o^3 */
     unsigned int *flags;        /* o^2 */
+    char fixed_pencil;
 
     int hx, hy, hshow, hpencil; /* as for game_ui. */
     int hflash;
@@ -1652,6 +1653,8 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->order = state->order;
     ds->adjacent = state->adjacent;
 
+    char *env = getenv("FIXED_PENCIL_MARKS");
+    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
     ds->nums = snewn(o2, digit);
     ds->hints = snewn(o3, unsigned char);
     ds->flags = snewn(o2, unsigned int);
@@ -1829,7 +1832,7 @@ static void draw_hints(drawing *dr, game_drawstate *ds, int x, int y)
     for (i = nhints = 0; i < ds->order; i++) {
         if (HINT(ds, x, y, i)) nhints++;
     }
-
+    if (ds->fixed_pencil) nhints = ds->order;
     for (hw = 1; hw * hw < nhints; hw++);
     if (hw < 3) hw = 3;
     hh = (nhints + hw - 1) / hw;
@@ -1839,6 +1842,7 @@ static void draw_hints(drawing *dr, game_drawstate *ds, int x, int y)
 
     for (i = j = 0; i < ds->order; i++) {
         if (HINT(ds,x,y,i)) {
+            if (ds->fixed_pencil) j = i;
             int hx = j % hw, hy = j / hw;
 
             str[0] = n2c(i+1, ds->order);

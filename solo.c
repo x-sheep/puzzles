@@ -4513,6 +4513,8 @@ struct game_drawstate {
     digit *grid;
     unsigned char *pencil;
     unsigned char *hl;
+
+    char fixed_pencil;
     /* This is scratch space used within a single call to game_redraw. */
     int nregions, *entered_items;
 };
@@ -4771,6 +4773,8 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 
     ds->started = FALSE;
     ds->cr = cr;
+    char *env = getenv("FIXED_PENCIL_MARKS");
+    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
     ds->xtype = state->xtype;
     ds->grid = snewn(cr*cr, digit);
     memset(ds->grid, cr+2, cr*cr);
@@ -4975,7 +4979,7 @@ static void draw_number(drawing *dr, game_drawstate *ds,
             if (state->pencil[(y*cr+x)*cr+i])
 		npencil++;
 	if (npencil) {
-
+	    if (ds->fixed_pencil) npencil = cr;
 	    minph = 2;
 
 	    /*
@@ -5060,6 +5064,7 @@ static void draw_number(drawing *dr, game_drawstate *ds,
 	     */
 	    for (i = j = 0; i < cr; i++)
 		if (state->pencil[(y*cr+x)*cr+i]) {
+		    if (ds->fixed_pencil) j = i;
 		    int dx = j % pw, dy = j / pw;
 
 		    str[1] = '\0';
