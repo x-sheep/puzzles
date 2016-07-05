@@ -97,10 +97,51 @@
                     </Border>
                 </Grid>
 
-                <ComboBox Grid.Column="0" x:Name="FixedPencilMarksBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="FixedPencilMarksBox_SelectionChanged" Header="Pencil mark style" SelectedIndex="0" Margin="0,10,0,0">
-                    <ComboBoxItem>Sequential</ComboBoxItem>
-                    <ComboBoxItem>Fixed position</ComboBoxItem>
-                </ComboBox>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="128" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" x:Name="FixedPencilMarksBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="FixedPencilMarksBox_SelectionChanged" Header="Pencil mark style" SelectedIndex="0" Margin="0,10,0,0">
+                        <ComboBoxItem>Sequential</ComboBoxItem>
+                        <ComboBoxItem>Fixed position</ComboBoxItem>
+                    </ComboBox>
+                    <Border x:Name="SequentialPencilPreview" Grid.Column="1" Background="#ffe6e6e6" BorderBrush="#FF404040" BorderThickness="2" Width="50" Height="50" VerticalAlignment="Top" Margin="0,26,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">2</TextBlock>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">3</TextBlock>
+                            <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">6</TextBlock>
+                            <TextBlock Grid.Row="1"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">7</TextBlock>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="FixedPencilPreview" Grid.Column="1" Visibility="Collapsed" Background="#ffe6e6e6" BorderBrush="#FF404040" BorderThickness="2" Width="50" Height="50" VerticalAlignment="Top" Margin="0,26,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">2</TextBlock>
+                            <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">3</TextBlock>
+                            <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">6</TextBlock>
+                            <TextBlock Grid.Row="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">7</TextBlock>
+                        </Grid>
+                    </Border>
+                </Grid>
             </StackPanel>
         </Grid>
     </Grid>

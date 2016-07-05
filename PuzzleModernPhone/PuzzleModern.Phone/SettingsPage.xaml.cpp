@@ -50,7 +50,11 @@ SettingsPage::SettingsPage()
 		DefaultPalettePreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	}
 	if (settings->Values->HasKey("env_FIXED_PENCIL_MARKS") && safe_cast<bool>(settings->Values->Lookup("env_FIXED_PENCIL_MARKS")))
+	{
 		FixedPencilMarksBox->SelectedIndex = 1;
+		FixedPencilPreview->Visibility = Windows::UI::Xaml::Visibility::Visible;
+		SequentialPencilPreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	}
 
 	_loaded = true;
 }
@@ -179,6 +183,17 @@ void SettingsPage::MapPaletteBox_SelectionChanged(Platform::Object^ sender, Wind
 void SettingsPage::FixedPencilMarksBox_SelectionChanged(Platform::Object^ sender, SelectionChangedEventArgs^ e)
 {
 	if (!_loaded) return;
+
+	if (FixedPencilMarksBox->SelectedIndex == 1)
+	{
+		FixedPencilPreview->Visibility = Windows::UI::Xaml::Visibility::Visible;
+		SequentialPencilPreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	}
+	else
+	{
+		FixedPencilPreview->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+		SequentialPencilPreview->Visibility = Windows::UI::Xaml::Visibility::Visible;
+	}
 
 	ApplicationData::Current->RoamingSettings->Values->Insert("env_FIXED_PENCIL_MARKS", FixedPencilMarksBox->SelectedIndex == 1);
 }
