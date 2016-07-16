@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "puzzles.h"
-#include "gluefe.h"
 
 /*
  * smalloc should guarantee to return a useful pointer - Halibut

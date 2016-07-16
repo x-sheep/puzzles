@@ -50,7 +50,6 @@
 #include <math.h>
 
 #include "puzzles.h"
-#include "gluefe.h"
 
 #ifdef STANDALONE_SOLVER
 int solver_verbose = FALSE;

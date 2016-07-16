@@ -47,7 +47,6 @@
 #include <math.h>
 
 #include "puzzles.h"
-#include "gluefe.h"
 
 /* nth triangular number */
 #define TRI(n) ( (n) * ((n) + 1) / 2 )

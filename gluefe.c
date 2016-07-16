@@ -5,7 +5,6 @@
 #include <assert.h>
 #include <stdarg.h>
 #include "puzzles.h"
-#include "gluefe.h"
 
 struct frontend_adapter *adapter = NULL;
 

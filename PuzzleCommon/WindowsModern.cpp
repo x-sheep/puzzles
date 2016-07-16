@@ -7,7 +7,6 @@ extern "C" {
 #include <stdio.h>
 
 #include "..\puzzles.h"
-#include "..\gluefe.h"
 }
 #include "IPuzzleCanvas.h"
 #include "PuzzleHelpData.h"

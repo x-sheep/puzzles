@@ -1,8 +1,6 @@
 #ifndef PUZZLES_GLUEFE_H
 #define PUZZLES_GLUEFE_H
 
-#include "puzzles.h"
-
 struct frontend {
 	int npresets;
 	int printw, printh;

@@ -31,7 +31,6 @@
 #include <math.h>
 
 #include "puzzles.h"
-#include "gluefe.h"
 
 enum {
     COL_BACKGROUND,

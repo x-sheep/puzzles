@@ -3,7 +3,6 @@
 
 extern "C" {
 #include "../../puzzles.h"
-#include "../../gluefe.h"
 }
 
 #include "PuzzleData.h"
