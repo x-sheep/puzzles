@@ -157,6 +157,12 @@ void winmodern_draw_circle(void *handle, int cx, int cy, int radius,
 	canvas->DrawCircle(cx, cy, radius, fillcolour, outlinecolour);
 }
 
+float winmodern_draw_scale(void *handle)
+{
+	frontend *fe = (frontend *)handle;
+	return fe->scale;
+}
+
 blitter *winmodern_blitter_new(void *handle, int w, int h)
 {
 	frontend *fe = (frontend *)handle;
@@ -298,6 +304,7 @@ const struct drawing_api winmodern_drawing = {
 	winmodern_draw_line,
 	winmodern_draw_poly,
 	winmodern_draw_circle,
+	winmodern_draw_scale,
 	winmodern_draw_update,
 	winmodern_clip,
 	winmodern_unclip,
@@ -654,13 +661,13 @@ namespace PuzzleModern
 
 	void WindowsModern::SetInputScale(float scale)
 	{
-		_inputScale = scale;
+		fe->scale = scale;
 	}
 
 	void WindowsModern::SendClick(int x, int y, ButtonType type, ButtonState state)
 	{
-		x *= _inputScale;
-		y *= _inputScale;
+		x *= fe->scale;
+		y *= fe->scale;
 		switch (type)
 		{
 		case ButtonType::LEFT:
@@ -691,7 +698,7 @@ namespace PuzzleModern
 	}
 
 	WindowsModern::WindowsModern()
-		: me(NULL), fe(NULL), _inputScale(1)
+		: me(NULL), fe(NULL)
 	{
 		_generating = false;
 	}
@@ -733,6 +740,7 @@ namespace PuzzleModern
 		this->fe = snew(frontend);
 		this->fe->npresets = 0;
 		this->fe->configs = NULL;
+		this->fe->scale = 1.0f;
 		this->canvas = icanvas;
 		this->fe->canvas = (void *)&this->canvas;
 		this->timer = itimer;

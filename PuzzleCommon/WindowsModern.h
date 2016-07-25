@@ -74,7 +74,6 @@ namespace PuzzleModern
 		const game *ourgame;
 		midend *me;
 		frontend *fe;
-		float _inputScale;
 		IPuzzleCanvas ^canvas;
 		IPuzzleStatusBar ^statusbar;
 		IPuzzleTimer ^timer;

@@ -87,6 +87,11 @@ void draw_line(drawing *dr, int x1, int y1, int x2, int y2, int colour)
     dr->api->draw_line(dr->handle, x1, y1, x2, y2, colour);
 }
 
+float draw_scale(drawing *dr)
+{
+	return dr->api->draw_scale(dr->handle);
+}
+
 void draw_thick_line(drawing *dr, float thickness,
 		     float x1, float y1, float x2, float y2, int colour)
 {

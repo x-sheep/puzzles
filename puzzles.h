@@ -192,6 +192,7 @@ void draw_circle(drawing *dr, int cx, int cy, int radius,
                  int fillcolour, int outlinecolour);
 void draw_thick_line(drawing *dr, float thickness,
 		     float x1, float y1, float x2, float y2, int colour);
+float draw_scale(drawing *dr);
 void clip(drawing *dr, int x, int y, int w, int h);
 void unclip(drawing *dr);
 void start_draw(drawing *dr);
@@ -590,6 +591,7 @@ struct drawing_api {
 			 int fillcolour, int outlinecolour);
     void (*draw_circle)(void *handle, int cx, int cy, int radius,
 			int fillcolour, int outlinecolour);
+	float (*draw_scale)(void *handle);
     void (*draw_update)(void *handle, int x, int y, int w, int h);
     void (*clip)(void *handle, int x, int y, int w, int h);
     void (*unclip)(void *handle);

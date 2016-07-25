@@ -6,6 +6,7 @@ struct frontend {
 	int printw, printh;
 	drawing *printdr;
 
+	float scale;
 	config_item *configs;
 	void *canvas;
 	void *statusbar;

@@ -36,8 +36,8 @@
 #include "puzzles.h"
 #include "tree234.h"
 
-#define CIRCLE_RADIUS 6
-#define DRAG_THRESHOLD (CIRCLE_RADIUS * 10)
+#define DEFAULT_RADIUS 6
+#define DRAG_THRESHOLD (radius * 10)
 #define PREFERRED_TILESIZE 64
 
 #define FLASH_CYCLES 1.5
@@ -1084,6 +1084,7 @@ struct game_drawstate {
     long tilesize;
     int bg, dragpoint;
     long *x, *y;
+	float radius;
 };
 
 static char *interpret_move(const game_state *state, game_ui *ui,
@@ -1091,6 +1092,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                             int x, int y, int button)
 {
     int n = state->params.n;
+	float radius = ds->radius;
 
     if (IS_MOUSE_DOWN(button)) {
 	int i, best;
@@ -1209,6 +1211,7 @@ static void game_set_size(drawing *dr, game_drawstate *ds,
                           const game_params *params, int tilesize)
 {
     ds->tilesize = tilesize;
+	ds->radius = draw_scale(dr) * DEFAULT_RADIUS;
 }
 
 static float *game_colours(frontend *fe, int *ncolours)
@@ -1306,6 +1309,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     edge *e;
     int i, j;
     int line, points_moved;
+	float radius = ds->radius;
 
     /*
      * There's no terribly sensible way to do partial redraws of
@@ -1405,8 +1409,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 			      ALIGN_VCENTRE|ALIGN_HCENTRE, c, buf);
 		}
 #else
-		draw_circle(dr, ds->x[i], ds->y[i], CIRCLE_RADIUS,
-                            c, COL_OUTLINE);
+		draw_circle(dr, ds->x[i], ds->y[i], radius, c, COL_OUTLINE);
 #endif
 	    }
 	}
