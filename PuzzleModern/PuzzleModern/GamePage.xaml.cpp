@@ -417,6 +417,15 @@ void GamePage::RemoveOverlay()
 		if (settings->Values->HasKey("cfg_colorblind") && safe_cast<bool>(settings->Values->Lookup("cfg_colorblind")))
 			fe->SendKey(_colorBlindKey, false, false);
 	}
+
+	_undoHotkey = _redoHotkey = true;
+	for each (auto b in buttonbar->Buttons)
+	{
+		if (b->Key == VirtualKey::U)
+			_undoHotkey = false;
+		if (b->Key == VirtualKey::R)
+			_redoHotkey = false;
+	}
 }
 
 void GamePage::SpecificGameID_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -779,21 +788,21 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 		e->Handled = true;
 	}
 
-	if (_ctrlPressed && e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown)
+	if (e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown)
 	{
-		if (k == VirtualKey::Z)
+		if ((_ctrlPressed && k == VirtualKey::Z) || (_undoHotkey && k == VirtualKey::U))
 		{
 			fe->Undo();
 			e->Handled = true;
 			UpdateUndoButtons();
 		}
-		if (k == VirtualKey::Y)
+		if ((_ctrlPressed && k == VirtualKey::Y) || (_redoHotkey && k == VirtualKey::R))
 		{
 			fe->Redo();
 			e->Handled = true;
 			UpdateUndoButtons();
 		}
-		if (k == VirtualKey::N)
+		if (_ctrlPressed && k == VirtualKey::N)
 		{
 			BeginNewGame();
 			e->Handled = true;
@@ -808,8 +817,8 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 		|| k == VirtualKey::Escape
 		) )
 	{
-		/* Only send key down events. Also, do not send the N key to create a new game in this thread. */
-		if (e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown && k != VirtualKey::N && k != _colorBlindKey)
+		/* Only send key down events. */
+		if (e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown && k != _colorBlindKey)
 			fe->SendKey(k, _shiftPressed, _ctrlPressed);
 		e->Handled = true;
 		UpdateUndoButtons();

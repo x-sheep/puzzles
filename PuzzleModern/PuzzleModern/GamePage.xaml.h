@@ -107,6 +107,7 @@ namespace PuzzleModern
 
 		bool _leftPressed, _middlePressed, _rightPressed, _initialPressed, _isFlyoutOpen, _generatingGame;
 		bool _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
+		bool _undoHotkey, _redoHotkey;
 		Windows::Foundation::Point _initialPoint;
 		Windows::System::Threading::ThreadPoolTimer ^RightClickTimer;
 
