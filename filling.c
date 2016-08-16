@@ -2155,7 +2155,7 @@ const struct game thegame = {
     TRUE, FALSE, game_print_size, game_print,
     FALSE,				   /* wants_statusbar */
     FALSE, game_timing_state,
-    REQUIRE_NUMPAD,		       /* flags */
+    0,		       /* flags */
 };
 
 #ifdef STANDALONE_SOLVER /* solver? hah! */

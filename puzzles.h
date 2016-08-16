@@ -77,8 +77,6 @@ enum {
 #define SOLVE_ANIMATES ( 1 << 9 )
 /* Pocket PC: Game requires right mouse button emulation */
 #define REQUIRE_RBUTTON ( 1 << 10 )
-/* Pocket PC: Game requires numeric input */
-#define REQUIRE_NUMPAD ( 1 << 11 )
 /* end of `flags' word definitions */
 
 #ifdef _WIN32_WCE
