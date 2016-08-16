@@ -180,16 +180,17 @@ static void get_surrounds(const game_state *state, int ox, int oy,
 #define DEFAULT_PRESET 0
 
 const struct game_params lightup_presets[] = {
-    { 7, 7, 20, SYMM_ROT4, 0 },
-    { 7, 7, 20, SYMM_ROT4, 1 },
-    { 7, 7, 20, SYMM_ROT4, 2 },
+    { 7, 7, 20, SYMM_ROT2, 0 },
+    { 7, 7, 20, SYMM_ROT2, 1 },
+    { 7, 7, 20, SYMM_ROT2, 2 },
     { 10, 10, 20, SYMM_ROT2, 0 },
     { 10, 10, 20, SYMM_ROT2, 1 },
+    { 10, 10, 20, SYMM_ROT2, 2 },
 #ifdef SLOW_SYSTEM
     { 12, 12, 20, SYMM_ROT2, 0 },
-    { 12, 12, 20, SYMM_ROT2, 1 },
+	{ 12, 12, 20, SYMM_ROT2, 1 },
+	{ 12, 12, 20, SYMM_ROT2, 2 },
 #else
-    { 10, 10, 20, SYMM_ROT2, 2 },
     { 14, 14, 20, SYMM_ROT2, 0 },
     { 14, 14, 20, SYMM_ROT2, 1 },
     { 14, 14, 20, SYMM_ROT2, 2 }
