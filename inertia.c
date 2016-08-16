@@ -2247,5 +2247,5 @@ const struct game thegame = {
     FALSE, FALSE, game_print_size, game_print,
     TRUE,			       /* wants_statusbar */
     FALSE, game_timing_state,
-    0,				       /* flags */
+	DISABLE_RBUTTON,			       /* flags */
 };

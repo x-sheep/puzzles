@@ -838,7 +838,7 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 	 * Tapping and dragging count as left button, while holding counts as right button.
 	 * If this is a right button, we can not yet process the Pressed event.
 	 */
-	if (e->Pointer->PointerDeviceType != Windows::Devices::Input::PointerDeviceType::Touch)
+	if (e->Pointer->PointerDeviceType != Windows::Devices::Input::PointerDeviceType::Touch || fe->IsRightButtonDisabled())
 	{
 		if (ptrPt->Properties->IsLeftButtonPressed)
 		{

@@ -367,7 +367,7 @@ void ItemPage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 		return;
 
 	auto ptrPt = e->GetCurrentPoint(DrawCanvas);
-	if (e->Pointer->PointerDeviceType != Windows::Devices::Input::PointerDeviceType::Touch)
+	if (e->Pointer->PointerDeviceType != Windows::Devices::Input::PointerDeviceType::Touch || fe->IsRightButtonDisabled())
 	{
 		int x = ptrPt->Position.X, y = ptrPt->Position.Y;
 

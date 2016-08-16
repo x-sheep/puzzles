@@ -77,6 +77,8 @@ enum {
 #define SOLVE_ANIMATES ( 1 << 9 )
 /* Pocket PC: Game requires right mouse button emulation */
 #define REQUIRE_RBUTTON ( 1 << 10 )
+/* Flag indicating that no right mouse button emulation should take place */
+#define DISABLE_RBUTTON ( 1 << 11 )
 /* end of `flags' word definitions */
 
 #ifdef _WIN32_WCE

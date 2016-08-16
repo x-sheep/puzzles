@@ -574,6 +574,11 @@ namespace PuzzleModern
 		return nullptr;
 	}
 
+	bool WindowsModern::IsRightButtonDisabled()
+	{
+		return (this->ourgame->flags & DISABLE_RBUTTON) != 0;
+	}
+
 	bool WindowsModern::CanPrint()
 	{
 		return this->ourgame->can_print != 0;
