@@ -830,7 +830,9 @@ void midend_redraw(midend *me)
     assert(me->drawing);
 
     if (me->statepos > 0 && me->drawstate) {
-        start_draw(me->drawing);
+		if (!start_draw(me->drawing))
+			return;
+
         if (me->oldstate && me->anim_time > 0 &&
             me->anim_pos < me->anim_time) {
             assert(me->dir != 0);

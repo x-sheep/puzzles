@@ -189,7 +189,7 @@ namespace PuzzleModern
 	}
 
 	// Begins drawing, allowing updates to content in the specified area.
-	void PuzzleImageSource::BeginDraw(Windows::Foundation::Rect updateRect)
+	bool PuzzleImageSource::BeginDraw(Windows::Foundation::Rect updateRect)
 	{
 		POINT offset;
 		ComPtr<IDXGISurface> surface;
@@ -256,17 +256,18 @@ namespace PuzzleModern
 			m_d2dBufferContext->SetTransform(translation);
 
 			m_d2dContext->BeginDraw();
+			return true;
 		}
 		else if (beginDrawHR == DXGI_ERROR_DEVICE_REMOVED || beginDrawHR == DXGI_ERROR_DEVICE_RESET)
 		{
 			// If the device has been removed or reset, attempt to recreate it and continue drawing.
 			CreateDeviceResources();
-			BeginDraw(updateRect);
+			return BeginDraw(updateRect);
 		}
 		else
 		{
-			// Notify the caller by throwing an exception if any other error was encountered.
-			ThrowIfFailed(beginDrawHR);
+			OutputDebugString(("Skipping BeginDraw " + beginDrawHR.ToString() + "\n")->Data());
+			return false;
 		}
 	}
 

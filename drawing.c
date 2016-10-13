@@ -150,9 +150,9 @@ void unclip(drawing *dr)
     dr->api->unclip(dr->handle);
 }
 
-void start_draw(drawing *dr)
+int start_draw(drawing *dr)
 {
-    dr->api->start_draw(dr->handle);
+    return dr->api->start_draw(dr->handle);
 }
 
 void end_draw(drawing *dr)

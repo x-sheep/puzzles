@@ -222,7 +222,7 @@ void ShapePuzzleCanvas::UpdateArea(int x, int y, int w, int h)
 	// FIXME: Remove all geometry inside the given area...
 }
 
-void ShapePuzzleCanvas::StartDraw()
+bool ShapePuzzleCanvas::StartDraw()
 {
 	Canvas ^drawCanvas = ref new Canvas();
 	drawCanvas->Width = RootCanvas->ActualWidth;
@@ -231,6 +231,7 @@ void ShapePuzzleCanvas::StartDraw()
 	_lineDotted = false;
 
 	currentDrawCanvas = activeCanvas = drawCanvas;
+	return true;
 }
 
 void ShapePuzzleCanvas::EndDraw()

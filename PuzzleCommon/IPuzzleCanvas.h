@@ -19,7 +19,7 @@ namespace PuzzleModern
 		void AddColor(float r, float g, float b);
 		void RemoveColors();
 		void SetPrintMode(bool printing);
-		void StartDraw();
+		bool StartDraw();
 		void EndDraw();
 		void UpdateArea(int x, int y, int w, int h);
 

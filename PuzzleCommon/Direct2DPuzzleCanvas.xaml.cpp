@@ -56,10 +56,12 @@ void Direct2DPuzzleCanvas::CreateSource(int w, int h)
 	DrawImage->Width = w*scale;
 	DrawImage->Height = h*scale;
 
-	img->BeginDraw();
-	img->Clear(firstColor);
-	img->EndDraw();
-	
+	if (img->BeginDraw())
+	{
+		img->Clear(firstColor);
+		img->EndDraw();
+	}
+
 	isDrawing = false;
 }
 
@@ -117,11 +119,11 @@ void Direct2DPuzzleCanvas::SetPrintMode(bool printing)
 		throw ref new NotImplementedException("This canvas does not support printing.");
 }
 
-void Direct2DPuzzleCanvas::StartDraw()
+bool Direct2DPuzzleCanvas::StartDraw()
 {
 	if (!isDrawing)
-		img->BeginDraw();
-	isDrawing = true;
+		isDrawing = img->BeginDraw();
+	return isDrawing;
 }
 
 void Direct2DPuzzleCanvas::EndDraw()

@@ -59,12 +59,12 @@ void winmodern_status_bar(void *handle, char *text)
 	bar->UpdateStatusBar(FromChars(text));
 }
 
-void winmodern_start_draw(void *handle)
+int winmodern_start_draw(void *handle)
 {
 	frontend *fe = (frontend *)handle;
 	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
 
-	canvas->StartDraw();
+	return canvas->StartDraw();
 }
 
 void winmodern_draw_update(void *handle, int x, int y, int w, int h)

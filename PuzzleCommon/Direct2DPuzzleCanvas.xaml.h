@@ -28,7 +28,7 @@ namespace PuzzleModern
 		virtual void RemoveColors();
 		virtual void SetPrintMode(bool printing);
 
-		virtual void StartDraw();
+		virtual bool StartDraw();
 		virtual void EndDraw();
 		virtual void UpdateArea(int x, int y, int w, int h);
 

@@ -53,8 +53,8 @@ namespace PuzzleModern
 	public:
 		PuzzleImageSource();
 
-		void BeginDraw(Windows::Foundation::Rect updateRect);
-		void BeginDraw()    { BeginDraw(Windows::Foundation::Rect(0, 0, (float)m_width, (float)m_height)); }
+		bool BeginDraw(Windows::Foundation::Rect updateRect);
+		bool BeginDraw()    { return BeginDraw(Windows::Foundation::Rect(0, 0, (float)m_width, (float)m_height)); }
 		void EndDraw();
 
 		void Clear(Windows::UI::Color color);

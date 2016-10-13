@@ -195,7 +195,7 @@ void draw_thick_line(drawing *dr, float thickness,
 float draw_scale(drawing *dr);
 void clip(drawing *dr, int x, int y, int w, int h);
 void unclip(drawing *dr);
-void start_draw(drawing *dr);
+int start_draw(drawing *dr);
 void draw_update(drawing *dr, int x, int y, int w, int h);
 void end_draw(drawing *dr);
 char *text_fallback(drawing *dr, const char *const *strings, int nstrings);
@@ -595,7 +595,7 @@ struct drawing_api {
     void (*draw_update)(void *handle, int x, int y, int w, int h);
     void (*clip)(void *handle, int x, int y, int w, int h);
     void (*unclip)(void *handle);
-    void (*start_draw)(void *handle);
+    int (*start_draw)(void *handle);
     void (*end_draw)(void *handle);
     void (*status_bar)(void *handle, char *text);
     blitter *(*blitter_new)(void *handle, int w, int h);
