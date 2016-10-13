@@ -155,5 +155,6 @@ namespace PuzzleModern
 		void ButtonLeftRight_Checked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ButtonLeftRight_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void LabelLeftRight_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e);
+		void SpecificShareGame_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 };
 }

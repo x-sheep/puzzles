@@ -1151,6 +1151,12 @@ void GamePage::SpecificLoadGame_Click(Platform::Object^ sender, Windows::UI::Xam
 }
 
 
+void GamePage::SpecificShareGame_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	DataTransferManager::ShowShareUI();
+}
+
+
 void GamePage::OnDataRequested(DataTransferManager ^sender, DataRequestedEventArgs ^args)
 {
 	if (_generatingGame)

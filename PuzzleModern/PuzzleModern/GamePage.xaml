@@ -222,6 +222,8 @@
                                 <MenuFlyoutItem Text="Load game" Click="SpecificLoadGame_Click"/>
                                 <MenuFlyoutItem Text="Save game" Click="SpecificSaveGame_Click"/>
                                 <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="Share" Click="SpecificShareGame_Click"/>
+                                <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Text="Enter game ID" Click="SpecificGameID_Click"/>
                                 <MenuFlyoutItem Text="Enter random seed" Click="SpecificRandomSeed_Click"/>
                             </MenuFlyout>
