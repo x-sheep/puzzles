@@ -117,10 +117,6 @@ NavigationHelper::NavigationHelper(Page^ page, RelayCommand^ goBack, RelayComman
 				ref new TypedEventHandler<CoreDispatcher^, AcceleratorKeyEventArgs^>(this,
 				&NavigationHelper::CoreDispatcher_AcceleratorKeyActivated);
 
-			_pointerPressedEventToken = Window::Current->CoreWindow->PointerPressed +=
-				ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this,
-				&NavigationHelper::CoreWindow_PointerPressed);
-
 			_navigationShortcutsRegistered = true;
 		}
 	}
@@ -135,7 +131,6 @@ NavigationHelper::NavigationHelper(Page^ page, RelayCommand^ goBack, RelayComman
 		if (_navigationShortcutsRegistered)
 		{
 			Window::Current->CoreWindow->Dispatcher->AcceleratorKeyActivated -= _acceleratorKeyEventToken;
-			Window::Current->CoreWindow->PointerPressed -= _pointerPressedEventToken;
 			_navigationShortcutsRegistered = false;
 		}
 
@@ -283,48 +278,6 @@ NavigationHelper::NavigationHelper(Page^ page, RelayCommand^ goBack, RelayComman
 					// When the next key or Alt+Right are pressed navigate forward
 					e->Handled = true;
 					GoForwardCommand->Execute(this);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Invoked on every mouse click, touch screen tap, or equivalent interaction when this
-		/// page is active and occupies the entire window.  Used to detect browser-style next and
-		/// previous mouse button clicks to navigate between pages.
-		/// </summary>
-		/// <param name="sender">Instance that triggered the event.</param>
-		/// <param name="e">Event data describing the conditions that led to the event.</param>
-		void NavigationHelper::CoreWindow_PointerPressed(CoreWindow^ sender, PointerEventArgs^ e)
-		{
-			auto properties = e->CurrentPoint->Properties;
-
-			// Ignore button chords with the left, right, and middle buttons
-			if (properties->IsLeftButtonPressed ||
-				properties->IsRightButtonPressed ||
-				properties->IsMiddleButtonPressed)
-			{
-				return;
-			}
-
-			// If back or foward are pressed (but not both) navigate appropriately
-			bool backPressed = properties->IsXButton1Pressed;
-			bool forwardPressed = properties->IsXButton2Pressed;
-			if (backPressed ^ forwardPressed)
-			{
-				e->Handled = true;
-				if (backPressed)
-				{
-					if (GoBackCommand->CanExecute(this))
-					{
-						GoBackCommand->Execute(this);
-					}
-				}
-				else
-				{
-					if (GoForwardCommand->CanExecute(this))
-					{
-						GoForwardCommand->Execute(this);
-					}
 				}
 			}
 		}

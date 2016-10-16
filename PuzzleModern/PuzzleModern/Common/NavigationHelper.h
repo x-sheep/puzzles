@@ -174,11 +174,8 @@ namespace PuzzleModern
 
 			bool _navigationShortcutsRegistered;
 			Windows::Foundation::EventRegistrationToken _acceleratorKeyEventToken;
-			Windows::Foundation::EventRegistrationToken _pointerPressedEventToken;
 			void CoreDispatcher_AcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher^ sender,
 				Windows::UI::Core::AcceleratorKeyEventArgs^ e);
-			void CoreWindow_PointerPressed(Windows::UI::Core::CoreWindow^ sender,
-				Windows::UI::Core::PointerEventArgs^ e);
 
 			Platform::String^ _pageKey;
 			Windows::Foundation::EventRegistrationToken _loadedEventToken;

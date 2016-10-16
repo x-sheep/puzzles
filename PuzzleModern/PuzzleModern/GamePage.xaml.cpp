@@ -894,6 +894,24 @@ void GamePage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 	}
 }
 
+void GamePage::pageRoot_PointerPressed(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e)
+{
+	if (_generatingGame)
+		return;
+
+	auto ptrPt = e->GetCurrentPoint(nullptr);
+	if (ptrPt->Properties->IsXButton1Pressed)
+	{
+		e->Handled = true;
+		fe->Undo();
+	}
+	else if (ptrPt->Properties->IsXButton2Pressed)
+	{
+		e->Handled = true;
+		fe->Redo();
+	}
+}
+
 void GamePage::pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e)
 {
 	if (_generatingGame)

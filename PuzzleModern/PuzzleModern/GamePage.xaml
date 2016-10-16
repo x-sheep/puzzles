@@ -10,6 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     SizeChanged="pageRoot_SizeChanged"
     mc:Ignorable="d"
+    PointerPressed="pageRoot_PointerPressed"
     PointerReleased="pageRoot_PointerReleased"
     >
 
