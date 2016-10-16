@@ -110,8 +110,13 @@ static const struct game_params slant_presets[] = {
     {5, 5, DIFF_HARD},
     {8, 8, DIFF_EASY},
     {8, 8, DIFF_HARD},
+#ifdef PORTRAIT_SCREEN
+    {10, 12, DIFF_EASY},
+    {10, 12, DIFF_HARD},
+#else
     {12, 10, DIFF_EASY},
     {12, 10, DIFF_HARD},
+#endif
 };
 
 static int game_fetch_preset(int i, char **name, game_params **params)
