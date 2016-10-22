@@ -1395,3 +1395,9 @@ void GamePage::LabelLeftRight_Tapped(Platform::Object^ sender, Windows::UI::Xaml
 {
 	ButtonLeftRight->IsChecked = (_leftAction == ButtonType::LEFT);
 }
+
+
+void GamePage::ButtonSettings_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	SettingsPane::Show();
+}

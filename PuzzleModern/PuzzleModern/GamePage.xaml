@@ -212,8 +212,9 @@
         <AppBar Background="#333">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="5*"/>
-                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="LeftPanel" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
                     <AppBarButton x:Name="ButtonNew" Icon="Add" Label="New" Click="ButtonNew_Click"/>
@@ -234,8 +235,9 @@
                     <AppBarButton x:Name="ButtonRestart" Icon="RepeatAll" Label="Restart" Click="ButtonRestart_Click"/>
                     <AppBarButton x:Name="ButtonSolve" Icon="Directions" Label="Solve" Click="ButtonSolve_Click"/>
                 </StackPanel>
-                <StackPanel x:Name="RightPanel" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                    <AppBarButton x:Name="ButtonHelp" Label="Help" Icon="Help" Click="ButtonHelp_Click"/>
+                <StackPanel x:Name="RightPanel" Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
+                    <AppBarButton x:Name="ButtonSettings" Label="Settings" Icon="Setting" Click="ButtonSettings_Click"/>
+                    <AppBarButton x:Name="ButtonHelp" Label="Help" Icon="Help" Click="ButtonHelp_Click" Visibility="{Binding LargePageElementVisible}"/>
                 </StackPanel>
             </Grid>
         </AppBar>
