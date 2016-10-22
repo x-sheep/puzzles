@@ -1234,7 +1234,7 @@ namespace PuzzleModern
 			collection->ToolButton = VirtualButton::ToggleButton("Invert", Windows::UI::Xaml::Controls::Symbol::Switch);
 		}
 		if (!strcmp(ourgame->name, "Magnets") || !strcmp(ourgame->name, "Map") || !strcmp(ourgame->name, "Train Tracks") || 
-			!strcmp(ourgame->name, "Loopy") || !strcmp(ourgame->name, "Palisade"))
+			!strcmp(ourgame->name, "Loopy") || !strcmp(ourgame->name, "Palisade") || !strcmp(ourgame->name, "Light Up"))
 		{
 			collection->ToolButton = VirtualButton::Pencil();
 		}
