@@ -77,8 +77,8 @@ namespace PuzzleModern
 			void BusyOverlayDisappearingAnimation_Completed(Platform::Object^ sender, Platform::Object^ e);
 			void DoubleAnimation_Completed(Platform::Object^ sender, Platform::Object^ e);
 
-			void AddOverlay();
-			void RemoveOverlay();
+			void OnGenerationStart();
+			void OnGenerationEnd();
 			void BeginLoadGame(Windows::Storage::StorageFile ^file, bool firstLaunch);
 			void BeginResumeGame();
 			void BeginNewGame();

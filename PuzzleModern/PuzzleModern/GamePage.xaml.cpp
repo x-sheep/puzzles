@@ -42,10 +42,10 @@ GamePage::GamePage()
 	generatingWorkItem(nullptr), _colorBlindKey(VirtualKey::None), _leftAction(ButtonType::LEFT), _rightAction(ButtonType::RIGHT)
 {
 	InitializeComponent();
-	_forceRedrawEventToken = DrawCanvas->NeedsRedraw += ref new ForceRedrawDelegate(this, &GamePage::ForceRedraw);
-	SetValue(_defaultViewModelProperty, ref new Map<String^, Object^>(std::less<String^>()));
+
 	auto navigationHelper = ref new Common::NavigationHelper(this);
 	SetValue(_navigationHelperProperty, navigationHelper);
+	SetValue(_defaultViewModelProperty, ref new Map<String^, Object^>(std::less<String^>()));
 
 	navigationHelper->LoadState += ref new Common::LoadStateEventHandler(this, &GamePage::LoadState);
 	navigationHelper->SaveState += ref new Common::SaveStateEventHandler(this, &GamePage::SaveState);
@@ -53,6 +53,7 @@ GamePage::GamePage()
 	this->Loaded += ref new Windows::UI::Xaml::RoutedEventHandler(this, &GamePage::OnLoaded);
 	this->Unloaded += ref new Windows::UI::Xaml::RoutedEventHandler(this, &GamePage::OnUnloaded);
 
+	_forceRedrawEventToken = DrawCanvas->NeedsRedraw += ref new ForceRedrawDelegate(this, &GamePage::ForceRedraw);
 	_suspendingEventToken = Application::Current->Suspending += ref new SuspendingEventHandler(this, &GamePage::OnSuspending);
 	_resumingEventToken = Application::Current->Resuming += ref new EventHandler<Platform::Object ^>(this, &GamePage::OnResuming);
 	_settingChangedEventToken = App::Current->SettingChanged += ref new SettingsChangedEventHandler(this, &GamePage::OnSettingChanged);
@@ -62,13 +63,12 @@ DependencyProperty^ GamePage::_defaultViewModelProperty =
 	DependencyProperty::Register("DefaultViewModel",
 		TypeName(IObservableMap<String^,Object^>::typeid), TypeName(GamePage::typeid), nullptr);
 
-/// <summary>
-/// used as a trivial view model.
-/// </summary>
 IObservableMap<String^, Object^>^ GamePage::DefaultViewModel::get()
 {
 	return safe_cast<IObservableMap<String^, Object^>^>(GetValue(_defaultViewModelProperty));
 }
+
+#pragma region Navigation support
 
 DependencyProperty^ GamePage::_navigationHelperProperty =
 	DependencyProperty::Register("NavigationHelper",
@@ -82,8 +82,6 @@ Common::NavigationHelper^ GamePage::NavigationHelper::get()
 {
 	return safe_cast<Common::NavigationHelper^>(GetValue(_navigationHelperProperty));
 }
-
-#pragma region Navigation support
 
 /// The methods provided in this section are simply used to allow
 /// NavigationHelper to respond to the page's navigation methods.
@@ -183,7 +181,7 @@ void GamePage::BeginLoadGame(Windows::Storage::StorageFile ^file, bool makeNew)
 		return;
 
 	BusyLabel->Text = "Loading game";
-	AddOverlay();
+	OnGenerationStart();
 
 	create_task(fe->LoadGameFromFile(file)).then([=](Platform::String ^err)
 	{
@@ -191,14 +189,14 @@ void GamePage::BeginLoadGame(Windows::Storage::StorageFile ^file, bool makeNew)
 			_generatingGame = false;
 			_isLoaded = true; 
 			if (!err)
-				RemoveOverlay();
+				OnGenerationEnd();
 			else
 			{
 				(ref new Windows::UI::Popups::MessageDialog(App::AddPeriods(err), "Could not load game"))->ShowAsync();
 				if (makeNew)
 					BeginNewGame();
 				else
-					RemoveOverlay();
+					OnGenerationEnd();
 			}
 		}));
 	});
@@ -210,7 +208,7 @@ void GamePage::BeginResumeGame()
 		return;
 
 	BusyLabel->Text = "Loading game";
-	AddOverlay();
+	OnGenerationStart();
 	BusyCancelButton->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 
 	create_task(fe->LoadGameFromStorage(_puzzleName)).then([this](task<bool> task)
@@ -231,7 +229,7 @@ void GamePage::BeginResumeGame()
 			if (loaded)
 			{
 				_isLoaded = true;
-				RemoveOverlay();
+				OnGenerationEnd();
 			}
 			else
 				BeginNewGame();
@@ -245,7 +243,7 @@ void GamePage::BeginNewGame()
 		return;
 
 	BusyLabel->Text = "Creating puzzle";
-	AddOverlay();
+	OnGenerationStart();
 	if (fe->GetCurrentPreset() == -1)
 		BusyCancelButton->Visibility = Windows::UI::Xaml::Visibility::Visible;
 	else
@@ -262,7 +260,7 @@ void GamePage::BeginNewGame()
 		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([=]{
 			_isLoaded = true; 
 			if (success)
-				RemoveOverlay();
+				OnGenerationEnd();
 			else
 				NavigationHelper->GoBack();
 		}));
@@ -363,7 +361,7 @@ void GamePage::DoubleAnimation_Completed(Platform::Object^ sender, Platform::Obj
 	_finishedOverlayAnimation = true;
 }
 
-void GamePage::AddOverlay()
+void GamePage::OnGenerationStart()
 {
 	_generatingGame = true;
 	BusyOverlay->Visibility = Windows::UI::Xaml::Visibility::Visible;
@@ -374,7 +372,7 @@ void GamePage::AddOverlay()
 	BusyOverlayAppearingStoryboard->Begin();
 }
 
-void GamePage::RemoveOverlay()
+void GamePage::OnGenerationEnd()
 {
 	auto buttonbar = fe->GetVirtualButtonBar();
 	if (buttonbar->ColorBlindKey)
@@ -1156,12 +1154,12 @@ void GamePage::SpecificLoadGame_Click(Platform::Object^ sender, Windows::UI::Xam
 			return;
 
 		BusyLabel->Text = "Loading game";
-		AddOverlay();
+		OnGenerationStart();
 		create_task(fe->LoadGameFromFile(file)).then([this, file](Platform::String ^msg)
 		{
 			if (!msg)
 				_finishedOverlayAnimation = true;
-			RemoveOverlay();
+			OnGenerationEnd();
 			if (msg)
 				(ref new Windows::UI::Popups::MessageDialog(App::AddPeriods(msg), "Could not load game"))->ShowAsync();
 		});

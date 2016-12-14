@@ -82,8 +82,8 @@ namespace PuzzleModern
 		void OpenHelpFlyout(bool independent);
 		void BeginNewGame();
 		void BeginResumeGame();
-		void AddOverlay();
-		void RemoveOverlay();
+		void OnGenerationStart();
+		void OnGenerationEnd();
 		void HighlightPreset(int index);
 
 		static Windows::UI::Xaml::DependencyProperty^ _defaultViewModelProperty;

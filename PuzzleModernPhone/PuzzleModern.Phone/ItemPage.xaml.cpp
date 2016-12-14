@@ -163,7 +163,7 @@ void ItemPage::BeginLoadGame(Windows::Storage::StorageFile ^file, bool firstLaun
 		return;
 
 	BusyLabel->Text = "Loading game";
-	AddOverlay();
+	OnGenerationStart();
 
 	create_task(fe->LoadGameFromFile(file)).then([=](Platform::String ^err)
 	{
@@ -181,7 +181,7 @@ void ItemPage::BeginLoadGame(Windows::Storage::StorageFile ^file, bool firstLaun
 						BeginNewGame();
 				}
 			}
-			RemoveOverlay();
+			OnGenerationEnd();
 		}));
 	});
 }
@@ -192,7 +192,7 @@ void ItemPage::BeginResumeGame()
 		return;
 
 	BusyLabel->Text = "Loading game";
-	AddOverlay();
+	OnGenerationStart();
 
 	create_task(fe->LoadGameFromStorage(_puzzleName)).then([this](task<bool> task)
 	{
@@ -213,7 +213,7 @@ void ItemPage::BeginResumeGame()
 			if (loaded)
 			{
 				_wonGame = fe->GameWon() == 1;
-				RemoveOverlay();
+				OnGenerationEnd();
 			}
 			else
 				BeginNewGame();
@@ -227,7 +227,7 @@ void ItemPage::BeginNewGame()
 		return;
 
 	BusyLabel->Text = "Creating puzzle";
-	AddOverlay();
+	OnGenerationStart();
 
 	auto workItemDelegate = [this](IAsyncAction^ workItem)
 	{
@@ -241,7 +241,7 @@ void ItemPage::BeginNewGame()
 		{
 			_isLoaded = true;
 			if (success)
-				RemoveOverlay();
+				OnGenerationEnd();
 		}));
 	};
 
@@ -260,7 +260,7 @@ void ItemPage::DoubleAnimation_Completed(Platform::Object^ sender, Platform::Obj
 	_finishedOverlayAnimation = true;
 }
 
-void ItemPage::AddOverlay()
+void ItemPage::OnGenerationStart()
 {
 	_generatingGame = true;
 	BusyOverlay->Visibility = Windows::UI::Xaml::Visibility::Visible;
@@ -272,7 +272,7 @@ void ItemPage::AddOverlay()
 	BusyOverlayAppearingStoryboard->Begin();
 }
 
-void ItemPage::RemoveOverlay()
+void ItemPage::OnGenerationEnd()
 {
 	_generatingGame = false;
 	auto buttons = fe->GetVirtualButtonBar();
