@@ -41,7 +41,7 @@
                     <!-- Section 1 body -->
                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap">
                     Windows Phone version
-                    <LineBreak/>&#xA9; 2016 Lennard Sprong
+                    <LineBreak/>&#xA9; 2017 Lennard Sprong
                     <LineBreak/>
                     <LineBreak/>Contains icons from ModernUIIcons.com
                     <LineBreak/>

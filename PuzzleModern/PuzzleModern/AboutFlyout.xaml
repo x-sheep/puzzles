@@ -27,7 +27,7 @@
             <!-- Section 1 body -->
             <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap">
                 Windows Store version
-                <LineBreak/>&#xA9; 2016 Lennard Sprong
+                <LineBreak/>&#xA9; 2017 Lennard Sprong
                 <LineBreak/>
                 <LineBreak/>Based on Simon Tatham's Portable Puzzle Collection
             </TextBlock>
