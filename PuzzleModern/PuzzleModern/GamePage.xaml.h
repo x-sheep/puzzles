@@ -158,5 +158,6 @@ namespace PuzzleModern
 		void LabelLeftRight_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e);
 		void SpecificShareGame_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ButtonSettings_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void BottomAppBar_Closed(Platform::Object^ sender, Platform::Object^ e);
 };
 }

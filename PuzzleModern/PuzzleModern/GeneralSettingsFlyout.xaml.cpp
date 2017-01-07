@@ -33,6 +33,8 @@ GeneralSettingsFlyout::GeneralSettingsFlyout()
 		ColorblindSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_colorblind"));
 	if (settings->Values->HasKey("cfg_newgameprompt"))
 		NewGameSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt"));
+	if (settings->Values->HasKey("cfg_show_appbar"))
+		BottomAppbarSwitch->IsOn = safe_cast<bool>(settings->Values->Lookup("cfg_show_appbar"));
 	if (settings->Values->HasKey("env_MAP_VIVID_COLOURS") && safe_cast<bool>(settings->Values->Lookup("env_MAP_VIVID_COLOURS")))
 	{
 		MapPaletteBox->SelectedIndex = 1;
@@ -62,6 +64,9 @@ void GeneralSettingsFlyout::ColorblindSwitch_Toggled(Platform::Object^ sender, R
 void GeneralSettingsFlyout::BottomAppbarSwitch_Toggled(Platform::Object^ sender, RoutedEventArgs^ e)
 {
 	if (!_loaded) return;
+
+	ApplicationData::Current->RoamingSettings->Values->Insert("cfg_show_appbar", BottomAppbarSwitch->IsOn);
+	App::Current->NotifySettingChanged(this, "cfg_show_appbar", BottomAppbarSwitch->IsOn);
 }
 
 

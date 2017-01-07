@@ -143,6 +143,15 @@ void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 	currentPuzzle = fe->GetCurrentPuzzle();
 	DefaultViewModel->Insert("PuzzleName", currentPuzzle->Name);
 	DefaultViewModel->Insert("PageBackground", DrawCanvas->GetFirstColor());
+
+	auto settings = ApplicationData::Current->RoamingSettings;
+	if (!settings->Values->HasKey("cfg_show_appbar") || safe_cast<bool>(settings->Values->Lookup("cfg_show_appbar")))
+	{
+		BottomAppBar->IsSticky = true;
+		BottomAppBar->IsOpen = true;
+		MainGrid->Margin = Thickness(0, 0, 0, 90);
+	}
+
 	ResizeWindow(this->ActualWidth, this->ActualHeight);
 
 	if (!fe->CanSolve())
@@ -431,6 +440,7 @@ void GamePage::SpecificGameID_Click(Platform::Object^ sender, Windows::UI::Xaml:
 	if (_generatingGame)
 		return;
 
+	_isFlyoutOpen = true;
 	BottomAppBar->IsOpen = false;
 	TopAppBar->IsOpen = false;
 
@@ -438,7 +448,6 @@ void GamePage::SpecificGameID_Click(Platform::Object^ sender, Windows::UI::Xaml:
 	PromptPopupHeader->Text = "Game ID";
 	PromptPopup->IsOpen = true;
 	PromptPopupBackground->Visibility = Windows::UI::Xaml::Visibility::Visible;
-	_isFlyoutOpen = true;
 }
 
 void GamePage::SpecificRandomSeed_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -446,13 +455,14 @@ void GamePage::SpecificRandomSeed_Click(Platform::Object^ sender, Windows::UI::X
 	if (_generatingGame)
 		return;
 
+	_isFlyoutOpen = true;
 	BottomAppBar->IsOpen = false;
 	TopAppBar->IsOpen = false;
 	
 	PromptPopupText->Text = fe->GetRandomSeed();
 	PromptPopupHeader->Text = "Random seed";
 	PromptPopup->IsOpen = true;
-	PromptPopupBackground->Visibility = Windows::UI::Xaml::Visibility::Visible; _isFlyoutOpen = true;
+	PromptPopupBackground->Visibility = Windows::UI::Xaml::Visibility::Visible;
 }
 
 void GamePage::PromptPopup_Closed(Platform::Object^ sender, Platform::Object^ e)
@@ -460,6 +470,7 @@ void GamePage::PromptPopup_Closed(Platform::Object^ sender, Platform::Object^ e)
 	_isFlyoutOpen = false;
 	PromptPopupBackground->Visibility = Windows::UI::Xaml::Visibility::Collapsed; 
 	PromptPopupErrorLabel->Text = "";
+	BottomAppBar->IsOpen = BottomAppBar->IsSticky;
 }
 
 
@@ -469,7 +480,7 @@ void GamePage::ButtonNew_Click(Platform::Object^ sender, Windows::UI::Xaml::Rout
 		return;
 	fe->Redraw(DrawCanvas, this, this, true);
 	BeginNewGame();
-	BottomAppBar->IsOpen = false;
+	BottomAppBar->IsOpen = BottomAppBar->IsSticky;
 	TopAppBar->IsOpen = false;
 }
 
@@ -477,7 +488,7 @@ void GamePage::ButtonRestart_Click(Platform::Object^ sender, Windows::UI::Xaml::
 {
 	if (_generatingGame)
 		return;
-	BottomAppBar->IsOpen = false;
+	BottomAppBar->IsOpen = BottomAppBar->IsSticky;
 	TopAppBar->IsOpen = false;
 
 	fe->RestartGame();
@@ -490,7 +501,7 @@ void GamePage::ButtonSolve_Click(Platform::Object^ sender, Windows::UI::Xaml::Ro
 	if (_generatingGame)
 		return;
 
-	BottomAppBar->IsOpen = false;
+	BottomAppBar->IsOpen = BottomAppBar->IsSticky;
 	TopAppBar->IsOpen = false;
 
 	String ^msg = fe->Solve();
@@ -512,7 +523,7 @@ void GamePage::OpenHelpFlyout(bool independent)
 
 void GamePage::ButtonHelp_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	BottomAppBar->IsOpen = false;
+	BottomAppBar->IsOpen = BottomAppBar->IsSticky;
 	TopAppBar->IsOpen = false;
 
 	OpenHelpFlyout(true);
@@ -542,7 +553,7 @@ void GamePage::OpenParamsFlyout(bool independent)
 	if (_generatingGame)
 		return;
 
-	BottomAppBar->IsOpen = false;
+	BottomAppBar->IsOpen = BottomAppBar->IsSticky;
 	auto cfgs = fe->GetConfiguration();
 
 	auto flyout = ref new ParamsFlyout(cfgs);
@@ -1028,7 +1039,7 @@ void GamePage::OnNewConfiguration(ParamsFlyout ^sender, Windows::Foundation::Col
 	{
 		BeginNewGame();
 		sender->Hide();
-		BottomAppBar->IsOpen = false;
+		BottomAppBar->IsOpen = BottomAppBar->IsSticky;
 		TopAppBar->IsOpen = false;
 		_isFlyoutOpen = false;
 	}
@@ -1358,6 +1369,13 @@ void GamePage::OnSettingChanged(Platform::Object ^sender, Platform::String ^key,
 {
 	if (key == "cfg_colorblind" && _colorBlindKey != VirtualKey::None && !_generatingGame)
 		fe->SendKey(_colorBlindKey, false, false);
+	if (key=="cfg_show_appbar")
+	{
+		bool show = safe_cast<bool>(value);
+		BottomAppBar->IsSticky = show;
+		BottomAppBar->IsOpen = show;
+		MainGrid->Margin = Thickness(0, 0, 0, show ? 90 : 0);
+	}
 	if (key == "env_MAP_VIVID_COLOURS" && _puzzleName == "Map" && _isLoaded)
 	{
 		DrawCanvas->RemoveColors();
@@ -1398,4 +1416,11 @@ void GamePage::LabelLeftRight_Tapped(Platform::Object^ sender, Windows::UI::Xaml
 void GamePage::ButtonSettings_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	SettingsPane::Show();
+}
+
+
+void PuzzleModern::GamePage::BottomAppBar_Closed(Platform::Object^ sender, Platform::Object^ e)
+{
+	if (BottomAppBar->IsSticky && !_isFlyoutOpen)
+		BottomAppBar->IsOpen = true;
 }
