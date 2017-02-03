@@ -1680,6 +1680,7 @@ struct game_drawstate {
     int hx, hy, hshow, hpencil; /* as for game_ui. */
     int hflash;
     int ascii;
+    char fixed_pencil;
 
 	int counts_y1, counts_y2,
 		counts_ghost_x1, counts_ghost_x2,
@@ -2169,6 +2170,9 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->h = state->common->params.h;
     ds->ascii = FALSE;
     
+    char *env = getenv("FIXED_PENCIL_MARKS");
+    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
+    
     ds->count_errors[0] = FALSE;
     ds->count_errors[1] = FALSE;
     ds->count_errors[2] = FALSE;
@@ -2523,8 +2527,12 @@ static void draw_pencils(drawing *dr, game_drawstate *ds,
     dy = BORDER+(y* ds->tilesize)+(TILESIZE/4)+TILESIZE;
 
     for (i = 0, j = 1; j < 8; j *= 2)
+    {
         if (pencil & j)
             monsters[i++] = j;
+        else if(ds->fixed_pencil)
+            monsters[i++] = 0;
+    }
     while (i < 4)
         monsters[i++] = 0;
 
