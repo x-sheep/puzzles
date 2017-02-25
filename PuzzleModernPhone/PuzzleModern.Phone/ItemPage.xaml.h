@@ -98,8 +98,8 @@ namespace PuzzleModern
 			void RandomSeed_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 
 			void DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
-			void DrawCanvas_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
-			void DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
+			void pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
+			void pageRoot_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 
 			bool _leftPressed, _rightPressed, _initialPressed, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
 			Windows::Foundation::Point _initialPoint;

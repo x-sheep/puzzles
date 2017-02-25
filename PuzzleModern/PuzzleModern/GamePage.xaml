@@ -11,7 +11,10 @@
     SizeChanged="pageRoot_SizeChanged"
     mc:Ignorable="d"
     PointerPressed="pageRoot_PointerPressed"
+    PointerMoved="pageRoot_PointerMoved"
     PointerReleased="pageRoot_PointerReleased"
+    PointerCanceled="pageRoot_PointerReleased"
+    PointerCaptureLost="pageRoot_PointerReleased" 
     >
 
     <Page.Resources>
@@ -79,9 +82,6 @@
                                   IsRightTapEnabled="True"
                                   RightTapped="DrawCanvas_RightTapped"
                                   PointerPressed="DrawCanvas_PointerPressed"
-                                  PointerMoved="DrawCanvas_PointerMoved"
-                                  PointerCanceled="pageRoot_PointerReleased"
-                                  PointerCaptureLost="pageRoot_PointerReleased" 
                                   />
             </Border>
             <Border x:Name="BusyOverlay" Background="{Binding PageBackground}">

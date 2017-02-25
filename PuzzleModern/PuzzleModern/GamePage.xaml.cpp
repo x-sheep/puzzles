@@ -965,7 +965,7 @@ void GamePage::pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::X
 
 #define LEFT_DISTANCE 10
 
-void GamePage::DrawCanvas_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e)
+void GamePage::pageRoot_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e)
 {
 	if (_generatingGame)
 		return;

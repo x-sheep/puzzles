@@ -6,7 +6,10 @@
     xmlns:phone="using:Microsoft.Phone.Shell"
     DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    PointerReleased="DrawCanvas_PointerReleased">
+    PointerMoved="pageRoot_PointerMoved"
+    PointerCanceled="pageRoot_PointerReleased"
+    PointerCaptureLost="pageRoot_PointerReleased" 
+    PointerReleased="pageRoot_PointerReleased">
 
     <Page.Resources>
         <Storyboard x:Name="BusyOverlayAppearingStoryboard">
@@ -58,10 +61,7 @@
         <Grid Margin="0,14,0,0" Grid.Row="1">
             <Border x:Name="GameBorder" Background="{Binding PageBackground}" SizeChanged="GameBorder_SizeChanged">
                 <local:Direct2DPuzzleCanvas x:Name="DrawCanvas"
-                                            PointerPressed="DrawCanvas_PointerPressed"
-                                            PointerMoved="DrawCanvas_PointerMoved"
-                                            PointerCanceled="DrawCanvas_PointerReleased"
-                                            PointerCaptureLost="DrawCanvas_PointerReleased" />
+                                            PointerPressed="DrawCanvas_PointerPressed" />
             </Border>
             <Border x:Name="BusyOverlay" Background="{Binding PageBackground}" IsHitTestVisible="False">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
