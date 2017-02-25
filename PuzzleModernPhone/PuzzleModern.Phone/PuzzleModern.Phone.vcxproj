@@ -69,6 +69,7 @@
   <PropertyGroup Label="UserMacros">
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>arm</AppxBundlePlatforms>
+    <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -497,7 +498,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-	<ClCompile Include="..\..\findloop.c">
+    <ClCompile Include="..\..\findloop.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
