@@ -782,6 +782,22 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 		_ctrlPressed = e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown;
 		e->Handled = true;
 	}
+	if (k == VirtualKey::Escape && e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown)
+	{
+		if (PromptPopup->IsOpen)
+			PromptPopup->IsOpen = false;
+		else if (_isFlyoutOpen)
+			return;
+		else if (TopAppBar->IsOpen)
+		{
+			BottomAppBar->IsOpen = BottomAppBar->IsSticky;
+			TopAppBar->IsOpen = false;
+		}
+		else
+			NavigationHelper->GoBack();
+		
+		e->Handled = true;
+	}
 
 	if (_generatingGame || _isFlyoutOpen)
 		return;
@@ -1419,7 +1435,7 @@ void GamePage::ButtonSettings_Click(Platform::Object^ sender, Windows::UI::Xaml:
 }
 
 
-void PuzzleModern::GamePage::BottomAppBar_Closed(Platform::Object^ sender, Platform::Object^ e)
+void GamePage::BottomAppBar_Closed(Platform::Object^ sender, Platform::Object^ e)
 {
 	if (BottomAppBar->IsSticky && !_isFlyoutOpen)
 		BottomAppBar->IsOpen = true;
