@@ -770,10 +770,21 @@ void GamePage::OnCommandsRequested(SettingsPane^ settingsPane, SettingsPaneComma
 
 void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^sender, Windows::UI::Core::AcceleratorKeyEventArgs ^e)
 {
+	auto k = e->VirtualKey;
+	
+	if (k == VirtualKey::Shift)
+	{
+		_shiftPressed = e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown;
+		e->Handled = true;
+	}
+	if (k == VirtualKey::Control)
+	{
+		_ctrlPressed = e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown;
+		e->Handled = true;
+	}
+
 	if (_generatingGame || _isFlyoutOpen)
 		return;
-	
-	auto k = e->VirtualKey;
 	
 	if (k == VirtualKey::Home)
 		k = VirtualKey::NumberPad7;
@@ -785,17 +796,6 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 		k = VirtualKey::NumberPad3;
 	else if (k == VirtualKey::Delete)
 		k = VirtualKey::Back;
-
-	if (k == VirtualKey::Shift)
-	{
-		_shiftPressed = e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown;
-		e->Handled = true;
-	}
-	if (k == VirtualKey::Control)
-	{
-		_ctrlPressed = e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown;
-		e->Handled = true;
-	}
 
 	if (e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown)
 	{
