@@ -1154,7 +1154,7 @@ namespace PuzzleModern
 
 			ret->Append(VirtualButton::Backspace());
 
-			collection->ToolButton = VirtualButton::Pencil();
+			collection->ToggleButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Filling"))
 		{
@@ -1169,7 +1169,6 @@ namespace PuzzleModern
 			button = ref new VirtualButton();
 			button->Name = "Labels";
 			button->Key = VirtualKey::L;
-			button->Type = VirtualButtonType::COLORBLIND;
 			collection->ColorBlindKey = button;
 		}
 		if (!strcmp(ourgame->name, "Net"))
@@ -1177,9 +1176,10 @@ namespace PuzzleModern
 			button = ref new VirtualButton();
 			button->Name = "Jumble";
 			button->Key = VirtualKey::J;
-			button->Type = VirtualButtonType::TOOL;
 			button->Icon = ref new Windows::UI::Xaml::Controls::SymbolIcon(Windows::UI::Xaml::Controls::Symbol::Shuffle);
+#if !SMALL_SCREEN
 			ret->Append(button);
+#endif
 			collection->ToolButton = button;
 		}
 		if (!strcmp(ourgame->name, "Solo"))
@@ -1196,7 +1196,7 @@ namespace PuzzleModern
 				ret->Append(VirtualButton::FromNumber(i));
 
 			ret->Append(VirtualButton::Backspace());
-			collection->ToolButton = VirtualButton::Pencil();
+			collection->ToggleButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Keen") || !strcmp(ourgame->name, "Towers"))
 		{
@@ -1204,7 +1204,7 @@ namespace PuzzleModern
 			for (i = 1; i <= n; i++)
 				ret->Append(VirtualButton::FromNumber(i));
 			ret->Append(VirtualButton::Backspace());
-			collection->ToolButton = VirtualButton::Pencil();
+			collection->ToggleButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Unequal"))
 		{
@@ -1219,7 +1219,7 @@ namespace PuzzleModern
 			for (i = s; i <= n; i++)
 				ret->Append(VirtualButton::FromNumber(i));
 			ret->Append(VirtualButton::Backspace());
-			collection->ToolButton = VirtualButton::Pencil();
+			collection->ToggleButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Dominosa"))
 		{
@@ -1227,26 +1227,26 @@ namespace PuzzleModern
 			for (i = 0; i <= n; i++)
 				ret->Append(VirtualButton::FromNumber(i));
 
-			collection->ToolButton = VirtualButton::ToggleButton("Mark lines", Windows::UI::Xaml::Controls::Symbol::Highlight);
+			collection->ToggleButton = VirtualButton::ToggleButton("Mark lines", Windows::UI::Xaml::Controls::Symbol::Highlight);
 		}
 		if (!strcmp(ourgame->name, "Signpost"))
 		{
-			collection->ToolButton = VirtualButton::ToggleButton("Invert", Windows::UI::Xaml::Controls::Symbol::Switch);
+			collection->ToggleButton = VirtualButton::ToggleButton("Invert", Windows::UI::Xaml::Controls::Symbol::Switch);
 		}
 		if (!strcmp(ourgame->name, "Magnets") || !strcmp(ourgame->name, "Map") || !strcmp(ourgame->name, "Train Tracks") ||
 			!strcmp(ourgame->name, "Loopy") || !strcmp(ourgame->name, "Palisade") || !strcmp(ourgame->name, "Light Up") ||
 			!strcmp(ourgame->name, "Pearl") || !strcmp(ourgame->name, "Singles") || !strcmp(ourgame->name, "Range") ||
 			!strcmp(ourgame->name, "Bridges") || !strcmp(ourgame->name, "Black Box"))
 		{
-			collection->ToolButton = VirtualButton::Pencil();
+			collection->ToggleButton = VirtualButton::Pencil();
 		}
 		if (!strcmp(ourgame->name, "Mines"))
 		{
-			collection->ToolButton = VirtualButton::ToggleButton("Flag", Windows::UI::Xaml::Controls::Symbol::Flag);
+			collection->ToggleButton = VirtualButton::ToggleButton("Flag", Windows::UI::Xaml::Controls::Symbol::Flag);
 		}
 		if (!strcmp(ourgame->name, "Pattern") || !strcmp(ourgame->name, "Unruly"))
 		{
-			collection->ToolButton = VirtualButton::ToggleButton("Color", Windows::UI::Xaml::Controls::Symbol::Edit);
+			collection->ToggleButton = VirtualButton::ToggleButton("Color", Windows::UI::Xaml::Controls::Symbol::Edit);
 		}
 
 		sfree(params);

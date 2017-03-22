@@ -199,11 +199,6 @@ namespace PuzzleModern
 		Windows::Foundation::Collections::IVector<Platform::String^> ^_strings;
 	};
 
-	public enum class VirtualButtonType
-	{
-		INPUT, TOOL, COLORBLIND, TOGGLE_MOUSE
-	};
-
 	[Windows::UI::Xaml::Data::Bindable]
 	public ref class VirtualButton sealed
 	{
@@ -229,12 +224,6 @@ namespace PuzzleModern
 			void set(Windows::UI::Xaml::Controls::IconElement ^value){ _icon = value; }
 		}
 
-		property VirtualButtonType Type
-		{
-			VirtualButtonType get(){ return _type; }
-			void set(VirtualButtonType value){ _type = value; }
-		}
-
 		static VirtualButton ^Backspace()
 		{
 			auto button = ref new VirtualButton();
@@ -247,7 +236,6 @@ namespace PuzzleModern
 		{
 			auto button = ref new VirtualButton();
 			button->Name = name;
-			button->Type = VirtualButtonType::TOGGLE_MOUSE;
 			button->Icon = ref new Windows::UI::Xaml::Controls::SymbolIcon(icon);
 			return button;
 		}
@@ -259,7 +247,6 @@ namespace PuzzleModern
 
 	private:
 		Platform::String ^_label;
-		VirtualButtonType _type;
 		Windows::System::VirtualKey _key;
 		Windows::UI::Xaml::Controls::IconElement ^_icon;
 	};
@@ -302,24 +289,28 @@ namespace PuzzleModern
 			}
 		}
 
+		property VirtualButton^ ToggleButton
+		{
+			VirtualButton^ get()
+			{
+				return _toggleButton;
+			}
+			void set(VirtualButton ^val)
+			{
+				_toggleButton = val;
+			}
+		}
+
 		property bool HasInputButtons
 		{
 			bool get() {
-				if (!_buttons)
-					return false;
-
-				for each(auto b in _buttons)
-				{
-					if (b->Type == VirtualButtonType::INPUT)
-						return true;
-				}
-				return false;
+				return _buttons && _buttons->Size > 0;
 			}
 		}
 
 	private:
 		Windows::Foundation::Collections::IVector<VirtualButton^>^ _buttons;
-		VirtualButton ^_colorBlind, ^_toolButton;
+		VirtualButton ^_colorBlind, ^_toggleButton, ^_toolButton;
 	};
 
 	public ref class GameLaunchParameters sealed

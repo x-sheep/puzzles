@@ -43,12 +43,7 @@ void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 	if (!_buttons)
 		return;
 
-	total = 0;
-	for each (auto b in _buttons->Buttons)
-	{
-		if (b->Type == VirtualButtonType::INPUT)
-			total++;
-	}
+	total = _buttons->Buttons->Size;
 
 	for (i = 0; i < total; i++)
 	{ 
@@ -74,9 +69,6 @@ void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 	x = 0;
 	for each (auto b in _buttons->Buttons)
 	{
-		if (b->Type != VirtualButtonType::INPUT)
-			continue;
-
 		auto rect = ref new Rectangle();
 		rect->Fill = _background;
 		rect->Stroke = _foreground;

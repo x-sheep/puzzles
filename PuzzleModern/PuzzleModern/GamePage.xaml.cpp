@@ -389,10 +389,10 @@ void GamePage::OnGenerationEnd()
 
 	VirtualButtonBar->DataContext = buttonbar;
 
-	if (buttonbar->ToolButton && buttonbar->ToolButton->Type == VirtualButtonType::TOGGLE_MOUSE)
+	if (buttonbar->ToggleButton)
 	{
-		LabelLeftRight->Text = buttonbar->ToolButton->Name;
-		ButtonLeftRight->Icon = buttonbar->ToolButton->Icon;
+		LabelLeftRight->Text = buttonbar->ToggleButton->Name;
+		ButtonLeftRight->Icon = buttonbar->ToggleButton->Icon;
 		LeftRightGrid->Visibility = Windows::UI::Xaml::Visibility::Visible;
 	}
 	else

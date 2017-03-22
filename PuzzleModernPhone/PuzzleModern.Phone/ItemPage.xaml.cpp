@@ -281,18 +281,18 @@ void ItemPage::OnGenerationEnd()
 	else
 		VirtualButtonBar->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 
-	if (buttons->ToolButton && buttons->ToolButton->Type == VirtualButtonType::TOOL)
+	if (buttons->ToolButton)
 	{
 		toolKey = buttons->ToolButton;
 		ToolButton->Visibility = Windows::UI::Xaml::Visibility::Visible;
 		ToolButton->Label = App::ToLower(toolKey->Name);
 		ToolButton->Icon = toolKey->Icon;
 	}
-	else if (buttons->ToolButton && buttons->ToolButton->Type == VirtualButtonType::TOGGLE_MOUSE)
+	else if (buttons->ToggleButton)
 	{
 		LeftRightButton->Visibility = Windows::UI::Xaml::Visibility::Visible;
-		LeftRightButton->Label = App::ToLower(buttons->ToolButton->Name);
-		LeftRightButton->Icon = buttons->ToolButton->Icon;
+		LeftRightButton->Label = App::ToLower(buttons->ToggleButton->Name);
+		LeftRightButton->Icon = buttons->ToggleButton->Icon;
 	}
 
 	_wonGame = fe->GameWon() == 1;

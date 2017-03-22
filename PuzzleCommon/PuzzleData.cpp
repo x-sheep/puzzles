@@ -48,7 +48,7 @@ namespace PuzzleModern
 		_toolButton = nullptr;
 	}
 
-	VirtualButton::VirtualButton() : _type(VirtualButtonType::INPUT), _icon(nullptr)
+	VirtualButton::VirtualButton() : _icon(nullptr)
 	{
 	}
 
