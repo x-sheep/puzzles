@@ -586,6 +586,9 @@ void ItemPage::TypeButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Rou
 
 void ItemPage::LoadSaveButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
+	if (_generatingGame)
+		return;
+	
 	ExportPopup->IsOpen = true;
 }
 
@@ -797,9 +800,6 @@ void ItemPage::LoadGame_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Inpu
 
 void ItemPage::SaveGame_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)
 {
-	if (_generatingGame)
-		return;
-
 	create_task([=]{
 		return fe->SaveGameToStorage(_puzzleName);
 	}).then([=](bool saved){
@@ -824,9 +824,6 @@ void ItemPage::SaveGame_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Inpu
 
 void ItemPage::ShareGame_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)
 {
-	if (_generatingGame)
-		return;
-
 	DataTransferManager::ShowShareUI();
 }
 
