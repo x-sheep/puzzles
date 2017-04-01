@@ -17,7 +17,7 @@ a:link, a:visited
 
 a:hover
 {
-    text-decoration: transparent;
+    text-decoration: none;
     color: #ce8b10;
 }
 
