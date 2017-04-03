@@ -50,7 +50,7 @@
 
                 </StackPanel>
 
-                <HyperlinkButton NavigateUri="http://puzzles.codeplex.com/" Margin="0,0,0,25" Padding="0,4,0,5" Foreground="{ThemeResource PhoneAccentBrush}">puzzles.codeplex.com</HyperlinkButton>
+                <HyperlinkButton NavigateUri="https://x-sheep.github.io/puzzles/" Margin="0,0,0,25" Padding="0,4,0,5" Foreground="{ThemeResource PhoneAccentBrush}">x-sheep.github.io/puzzles</HyperlinkButton>
                 <!-- Content Section 2-->
                 <StackPanel>
 

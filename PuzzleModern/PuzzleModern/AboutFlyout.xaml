@@ -32,7 +32,7 @@
                 <LineBreak/>Based on Simon Tatham's Portable Puzzle Collection
             </TextBlock>
 
-            <HyperlinkButton NavigateUri="http://puzzles.codeplex.com/" Padding="0">puzzles.codeplex.com</HyperlinkButton>
+            <HyperlinkButton NavigateUri="https://x-sheep.github.io/puzzles/" Padding="0">x-sheep.github.io/puzzles</HyperlinkButton>
         </StackPanel>
 
         
