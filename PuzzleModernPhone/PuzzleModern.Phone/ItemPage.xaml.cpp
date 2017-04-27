@@ -29,7 +29,7 @@ using namespace Windows::UI::Xaml::Navigation;
 
 // The Hub Application template is documented at http://go.microsoft.com/fwlink/?LinkID=391641
 
-ItemPage::ItemPage() : _leftAction(ButtonType::LEFT), _rightAction(ButtonType::RIGHT)
+ItemPage::ItemPage()
 {
 	InitializeComponent();
 
@@ -275,24 +275,29 @@ void ItemPage::OnGenerationStart()
 void ItemPage::OnGenerationEnd()
 {
 	_generatingGame = false;
-	auto buttons = fe->GetVirtualButtonBar();
-	if (buttons->HasInputButtons)
-		VirtualButtonBar->Buttons = buttons;
+	_controls = fe->GetVirtualButtonBar();
+
+	if (_controls->HasInputButtons)
+		VirtualButtonBar->Buttons = _controls;
 	else
 		VirtualButtonBar->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 
-	if (buttons->ToolButton)
+	bool isSwitched = LeftRightButton->IsChecked->Value;
+	_touchAction = isSwitched ? _controls->HoldAction: _controls->TouchAction;
+	_holdAction = isSwitched ? _controls->TouchAction: _controls->HoldAction;
+
+	if (_controls->ToolButton)
 	{
-		toolKey = buttons->ToolButton;
+		toolKey = _controls->ToolButton;
 		ToolButton->Visibility = Windows::UI::Xaml::Visibility::Visible;
 		ToolButton->Label = App::ToLower(toolKey->Name);
 		ToolButton->Icon = toolKey->Icon;
 	}
-	else if (buttons->ToggleButton)
+	else if (_controls->ToggleButton)
 	{
 		LeftRightButton->Visibility = Windows::UI::Xaml::Visibility::Visible;
-		LeftRightButton->Label = App::ToLower(buttons->ToggleButton->Name);
-		LeftRightButton->Icon = buttons->ToggleButton->Icon;
+		LeftRightButton->Label = App::ToLower(_controls->ToggleButton->Name);
+		LeftRightButton->Icon = _controls->ToggleButton->Icon;
 	}
 
 	_wonGame = fe->GameWon() == 1;
@@ -322,11 +327,11 @@ void ItemPage::OnGenerationEnd()
 		TypeButton->Label = "type: " + presetItem->Name;
 	}
 
-	if (buttons->ColorBlindKey)
+	if (_controls->ColorBlindKey != VirtualKey::None)
 	{
 		auto settings = ApplicationData::Current->RoamingSettings;
 		if (settings->Values->HasKey("cfg_colorblind") && safe_cast<bool>(settings->Values->Lookup("cfg_colorblind")))
-			fe->SendKey(buttons->ColorBlindKey->Key, false, false);
+			fe->SendKey(_controls->ColorBlindKey, false, false);
 	}
 }
 
@@ -373,14 +378,14 @@ void ItemPage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 
 		if (ptrPt->Properties->IsLeftButtonPressed)
 		{
-			fe->SendClick(x, y, _leftAction, ButtonState::DOWN);
-			_leftPressed = true;
+			fe->SendClick(x, y, _touchAction, ButtonState::DOWN);
+			_touchPressed = true;
 			e->Handled = true;
 		}
 		if (ptrPt->Properties->IsRightButtonPressed)
 		{
-			fe->SendClick(x, y, _rightAction, ButtonState::DOWN);
-			_rightPressed = true;
+			fe->SendClick(x, y, _holdAction, ButtonState::DOWN);
+			_holdPressed = true;
 			e->Handled = true;
 		}
 	}
@@ -401,8 +406,8 @@ void ItemPage::DrawCanvas_PointerPressed(Platform::Object^ sender, Windows::UI::
 			{
 				float x = _initialPoint.X, y = _initialPoint.Y;
 				_initialPressed = false;
-				fe->SendClick(x, y,_rightAction, ButtonState::DOWN);
-				_rightPressed = true;
+				fe->SendClick(x, y,_holdAction, ButtonState::DOWN);
+				_holdPressed = true;
 				DrawCanvas->Pulsate(x, y);
 			}
 		};
@@ -428,22 +433,22 @@ void ItemPage::pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::X
 	auto ptrPt = e->GetCurrentPoint(DrawCanvas);
 	int x = ptrPt->Position.X, y = ptrPt->Position.Y;
 
-	if (_leftPressed)
+	if (_touchPressed)
 	{
-		fe->SendClick(x, y, _leftAction, ButtonState::UP);
-		_leftPressed = false;
+		fe->SendClick(x, y, _touchAction, ButtonState::UP);
+		_touchPressed = false;
 		e->Handled = true;
 	}
-	if (_rightPressed)
+	if (_holdPressed)
 	{
-		fe->SendClick(x, y, _rightAction, ButtonState::UP);
-		_rightPressed = false;
+		fe->SendClick(x, y, _holdAction, ButtonState::UP);
+		_holdPressed = false;
 		e->Handled = true;
 	}
 	if (_initialPressed)
 	{
-		fe->SendClick(_initialPoint.X, _initialPoint.Y, _leftAction, ButtonState::DOWN);
-		fe->SendClick(x, y, _leftAction, ButtonState::UP);
+		fe->SendClick(_initialPoint.X, _initialPoint.Y, _touchAction, ButtonState::DOWN);
+		fe->SendClick(x, y, _touchAction, ButtonState::UP);
 		_initialPressed = false;
 		e->Handled = true;
 	}
@@ -474,18 +479,18 @@ void ItemPage::pageRoot_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml
 		if ((xdiff*xdiff) + (ydiff*ydiff) > LEFT_DISTANCE*LEFT_DISTANCE)
 		{
 			_initialPressed = false;
-			fe->SendClick(_initialPoint.X, _initialPoint.Y, _leftAction, ButtonState::DOWN);
-			_leftPressed = true;
+			fe->SendClick(_initialPoint.X, _initialPoint.Y, _touchAction, ButtonState::DOWN);
+			_touchPressed = true;
 		}
 	}
-	if (_leftPressed)
+	if (_touchPressed)
 	{
-		fe->SendClick(x, y, _leftAction, ButtonState::DRAG);
+		fe->SendClick(x, y, _touchAction, ButtonState::DRAG);
 		e->Handled = true;
 	}
-	if (_rightPressed)
+	if (_holdPressed)
 	{
-		fe->SendClick(x, y, _rightAction, ButtonState::DRAG);
+		fe->SendClick(x, y, _holdAction, ButtonState::DRAG);
 		e->Handled = true;
 	}
 }
@@ -770,8 +775,8 @@ void ItemPage::ToolButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Rou
 
 void ItemPage::LeftRightButton_Checked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	_leftAction = ButtonType::RIGHT;
-	_rightAction = ButtonType::LEFT;
+	_touchAction = _controls->HoldAction;
+	_holdAction = _controls->TouchAction;
 
 	if (!_generatingGame)
 		fe->SendKey(VirtualKey::XButton1, false, false);
@@ -779,8 +784,8 @@ void ItemPage::LeftRightButton_Checked(Platform::Object^ sender, Windows::UI::Xa
 
 void ItemPage::LeftRightButton_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	_leftAction = ButtonType::LEFT;
-	_rightAction = ButtonType::RIGHT;
+	_touchAction = _controls->TouchAction;
+	_holdAction = _controls->HoldAction;
 
 	if (!_generatingGame)
 		fe->SendKey(VirtualKey::XButton2, false, false);

@@ -265,40 +265,22 @@ namespace PuzzleModern
 			}
 		}
 
-		property VirtualButton^ ColorBlindKey
+		property Windows::System::VirtualKey ColorBlindKey
 		{
-			VirtualButton^ get()
-			{
-				return _colorBlind;
-			}
-			void set(VirtualButton ^val)
-			{
-				_colorBlind = val;
-			}
+			Windows::System::VirtualKey get() { return _colorBlind; }
+			void set(Windows::System::VirtualKey val) { _colorBlind = val; }
 		}
 
 		property VirtualButton^ ToolButton
 		{
-			VirtualButton^ get()
-			{
-				return _toolButton;
-			}
-			void set(VirtualButton ^val)
-			{
-				_toolButton = val;
-			}
+			VirtualButton^ get() { return _toolButton; }
+			void set(VirtualButton ^val) { _toolButton = val; }
 		}
 
 		property VirtualButton^ ToggleButton
 		{
-			VirtualButton^ get()
-			{
-				return _toggleButton;
-			}
-			void set(VirtualButton ^val)
-			{
-				_toggleButton = val;
-			}
+			VirtualButton^ get() { return _toggleButton; }
+			void set(VirtualButton ^val) { _toggleButton = val; }
 		}
 
 		property bool HasInputButtons
@@ -308,9 +290,37 @@ namespace PuzzleModern
 			}
 		}
 
+		property ButtonType LeftAction
+		{
+			ButtonType get() { return _leftAction; }
+			void set(ButtonType val) { _leftAction = val; }
+		}
+		property ButtonType MiddleAction
+		{
+			ButtonType get() { return _middleAction; }
+			void set(ButtonType val) { _middleAction = val; }
+		}
+		property ButtonType RightAction
+		{
+			ButtonType get() { return _rightAction; }
+			void set(ButtonType val) { _rightAction = val; }
+		}
+		property ButtonType TouchAction
+		{
+			ButtonType get() { return _touchAction; }
+			void set(ButtonType val) { _touchAction = val; }
+		}
+		property ButtonType HoldAction
+		{
+			ButtonType get() { return _holdAction; }
+			void set(ButtonType val) { _holdAction = val; }
+		}
+
 	private:
 		Windows::Foundation::Collections::IVector<VirtualButton^>^ _buttons;
-		VirtualButton ^_colorBlind, ^_toggleButton, ^_toolButton;
+		VirtualButton ^_toggleButton, ^_toolButton;
+		Windows::System::VirtualKey _colorBlind;
+		ButtonType _leftAction, _middleAction, _rightAction, _touchAction, _holdAction;
 	};
 
 	public ref class GameLaunchParameters sealed

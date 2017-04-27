@@ -67,6 +67,7 @@ namespace PuzzleModern
 
 			PresetList ^presets;
 			VirtualButton ^toolKey;
+			VirtualButtonCollection ^_controls;
 
 			void OpenPresetsDialog();
 			void OpenCustomDialog();
@@ -101,13 +102,13 @@ namespace PuzzleModern
 			void pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 			void pageRoot_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 
-			bool _leftPressed, _rightPressed, _initialPressed, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
+			bool _touchPressed, _holdPressed, _initialPressed, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
 			Windows::Foundation::Point _initialPoint;
 			Windows::System::Threading::ThreadPoolTimer ^RightClickTimer;
 			
 			Windows::Foundation::IAsyncAction^ generatingWorkItem;
 
-			ButtonType _leftAction, _rightAction;
+			ButtonType _touchAction, _holdAction;
 
 			static Windows::UI::Xaml::DependencyProperty^ _defaultViewModelProperty;
 			static Windows::UI::Xaml::DependencyProperty^ _navigationHelperProperty;

@@ -1166,10 +1166,7 @@ namespace PuzzleModern
 		if (!strcmp(ourgame->name, "Guess") || !strcmp(ourgame->name, "Map") || 
 			!strcmp(ourgame->name, "Same Game") || !strcmp(ourgame->name, "Flood"))
 		{
-			button = ref new VirtualButton();
-			button->Name = "Labels";
-			button->Key = VirtualKey::L;
-			collection->ColorBlindKey = button;
+			collection->ColorBlindKey = VirtualKey::L;
 		}
 		if (!strcmp(ourgame->name, "Net"))
 		{
@@ -1181,6 +1178,9 @@ namespace PuzzleModern
 			ret->Append(button);
 #endif
 			collection->ToolButton = button;
+
+			collection->RightAction = ButtonType::MIDDLE;
+			collection->MiddleAction = ButtonType::RIGHT;
 		}
 		if (!strcmp(ourgame->name, "Solo"))
 		{

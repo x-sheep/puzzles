@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "PuzzleData.h"
 
+using namespace Windows::System;
 using namespace Windows::Data::Json;
 using namespace Windows::Foundation::Collections;
 using namespace Platform::Collections;
@@ -44,8 +45,13 @@ namespace PuzzleModern
 	VirtualButtonCollection::VirtualButtonCollection()
 	{
 		_buttons = ref new Vector<VirtualButton^>();
-		_colorBlind = nullptr;
+		_colorBlind = VirtualKey::None;
 		_toolButton = nullptr;
+		_touchAction = ButtonType::LEFT;
+		_middleAction = ButtonType::MIDDLE;
+		_holdAction = ButtonType::RIGHT;
+		_touchAction = ButtonType::LEFT;
+		_holdAction = ButtonType::RIGHT;
 	}
 
 	VirtualButton::VirtualButton() : _icon(nullptr)
@@ -59,14 +65,14 @@ namespace PuzzleModern
 		if (c < 10)
 		{
 			ret->Name = c.ToString();
-			ret->Key = Windows::System::VirtualKey(c + (int)Windows::System::VirtualKey::Number0);
+			ret->Key = VirtualKey(c + (int)VirtualKey::Number0);
 		}
 		else
 		{
 			c -= 10;
 			wchar_t ch = (wchar_t)(c + L'A');
 			ret->Name = ref new Platform::String(&ch, 1);
-			ret->Key = Windows::System::VirtualKey(c + (int)Windows::System::VirtualKey::A);
+			ret->Key = VirtualKey(c + (int)VirtualKey::A);
 		}
 		return ret;
 	}

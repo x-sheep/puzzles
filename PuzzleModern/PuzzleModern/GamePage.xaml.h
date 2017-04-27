@@ -71,7 +71,7 @@ namespace PuzzleModern
 		Windows::Foundation::EventRegistrationToken _shareEventToken;
 		Windows::Foundation::EventRegistrationToken _printEventToken;
 
-		Windows::System::VirtualKey _colorBlindKey;
+		VirtualButtonCollection ^_controls;
 
 		void LoadState(Platform::Object^ sender, Common::LoadStateEventArgs^ e);
 
@@ -106,7 +106,7 @@ namespace PuzzleModern
 		void pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 		void pageRoot_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 
-		bool _leftPressed, _middlePressed, _rightPressed, _initialPressed, _isFlyoutOpen, _generatingGame;
+		bool _leftPressed, _middlePressed, _rightPressed, _initialPressed, _touchPressed, _holdPressed, _isFlyoutOpen, _generatingGame;
 		bool _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
 		bool _undoHotkey, _redoHotkey;
 		Windows::Foundation::Point _initialPoint;
@@ -114,7 +114,7 @@ namespace PuzzleModern
 
 		Windows::Foundation::IAsyncAction^ generatingWorkItem;
 
-		ButtonType _leftAction, _rightAction;
+		ButtonType _leftAction, _middleAction, _rightAction, _touchAction, _holdAction;
 
 		void DrawCanvas_RightTapped(Platform::Object^ sender, Windows::UI::Xaml::Input::RightTappedRoutedEventArgs^ e);
 		void ButtonUndo_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
