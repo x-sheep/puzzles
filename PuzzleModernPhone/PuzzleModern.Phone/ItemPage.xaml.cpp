@@ -316,7 +316,7 @@ void ItemPage::OnGenerationEnd()
 	BusyIndicator->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	BusyLabel->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	
-	auto preset = fe->GetCurrentPreset();
+	auto preset = fe->GetCurrentPresetIndex();
 	if (preset == -1)
 	{
 		TypeButton->Label = "type: Custom";
@@ -583,7 +583,7 @@ void ItemPage::TypeButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Rou
 
 	CompletePopup->IsOpen = false;
 
-	if (fe->GetCurrentPreset() == -1)
+	if (fe->GetCurrentPresetIndex() == -1)
 		OpenCustomDialog();
 	else
 		OpenPresetsDialog();
@@ -640,7 +640,7 @@ void ItemPage::OpenPresetsDialog()
 	if (_generatingGame)
 		return;
 
-	presets->Current = fe->GetCurrentPreset();
+	presets = fe->GetPresetList(false);
 	auto dialog = ref new PresetDialog(presets);
 	dialog->PresetClicked += ref new PuzzleModern::Phone::PresetClickedEventHandler(this, &PuzzleModern::Phone::ItemPage::OnNewPreset);
 	dialog->CustomClicked += ref new PuzzleModern::Phone::CustomClickedEventHandler(this, &PuzzleModern::Phone::ItemPage::OpenCustomDialog);

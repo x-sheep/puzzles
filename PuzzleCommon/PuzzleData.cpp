@@ -24,7 +24,7 @@ namespace PuzzleModern
 
 	PresetList::PresetList()
 	{
-		_items = ref new Vector<Platform::Object^>();
+		_items = ref new Vector<Preset^>();
 		Custom = false;
 	}
 

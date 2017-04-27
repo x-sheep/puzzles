@@ -493,57 +493,74 @@ namespace PuzzleModern
 		return FromConstGame(ourgame);
 	}
 
+	static void populate_preset_menu(frontend *fe,
+		struct preset_menu *menu, PresetList ^list)
+	{
+		int i;
+		for (i = 0; i < menu->n_entries; i++)
+		{
+			struct preset_menu_entry *entry = &menu->entries[i];
+
+			if (entry->params)
+			{
+				auto p = ref new Preset();
+				p->Index = entry->id;
+				p->Name = FromChars(entry->title);
+				list->AddPreset(p);
+			}
+			else
+				populate_preset_menu(fe, entry->submenu, list);
+		}
+	}
+
 	PresetList^ WindowsModern::GetPresetList(bool includeCustom)
 	{
-		PresetList ^ret = ref new PresetList();
-		Preset ^p;
-		int i;
-		fe->npresets = midend_num_presets(this->me);
-
-		char *name = NULL;
-		game_params *params = NULL;
-
-		for (i = 0; i < fe->npresets; i++)
+		if (!presets)
 		{
-			midend_fetch_preset(this->me, i, &name, &params);
+			presets = ref new PresetList();
 
-			p = ref new Preset();
-			p->Index = i;
-			p->Name = FromChars(name);
-			ret->AddPreset(p);
-		}
+			int i;
+			int totalItems = 0;
+			if (!fe->preset_menu)
+				fe->preset_menu = midend_get_presets(this->me, &totalItems);
 
-		if (this->ourgame->can_configure)
-		{
-			ret->Custom = true;
-			if (includeCustom)
+			populate_preset_menu(fe, fe->preset_menu, presets);
+
+			if (this->ourgame->can_configure)
 			{
-				p = ref new Preset();
-				p->Index = -1;
-				p->Name = "Custom...";
-				ret->AddPreset(p);
+				presets->Custom = true;
+				if (includeCustom)
+				{
+					auto p = ref new Preset();
+					p->Index = -1;
+					p->Name = "Custom...";
+					presets->AddPreset(p);
+				}
 			}
 		}
 
 		int n = midend_which_preset(me);
-		ret->Current = n >= 0 ? n : -1;
+		presets->Current = n >= 0 ? n : -1;
 
-		return ret;
+		return presets;
 	}
 
-	int WindowsModern::GetCurrentPreset()
+	int WindowsModern::GetCurrentPresetIndex()
 	{
-		return midend_which_preset(me);
+		int id = midend_which_preset(me);
+
+		int i, s = presets->Items->Size;
+		for (i = 0; i < s; i++)
+		{
+			if (presets->Items->GetAt(i)->Index == id)
+				return i;
+		}
+		return -1;
 	}
 
 	void WindowsModern::SetPreset(int i)
 	{
-		if (i < 0 || i >= this->fe->npresets)
-			throw ref new Platform::InvalidArgumentException("Preset index is out of bounds");
-
-		char *name = NULL;
-		game_params *params = NULL;
-		midend_fetch_preset(this->me, i, &name, &params);
+		game_params *params = preset_menu_lookup_by_id(fe->preset_menu, i);
 		midend_set_params(this->me, params);
 	}
 
@@ -743,7 +760,7 @@ namespace PuzzleModern
 	{
 		this->me = NULL;
 		this->fe = snew(frontend);
-		this->fe->npresets = 0;
+		this->fe->preset_menu = NULL;
 		this->fe->configs = NULL;
 		this->fe->scale = 1.0f;
 		this->canvas = icanvas;

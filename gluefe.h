@@ -2,7 +2,7 @@
 #define PUZZLES_GLUEFE_H
 
 struct frontend {
-	int npresets;
+	struct preset_menu *preset_menu;
 	int printw, printh;
 	drawing *printdr;
 

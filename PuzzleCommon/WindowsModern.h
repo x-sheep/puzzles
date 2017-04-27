@@ -32,7 +32,7 @@ namespace PuzzleModern
 		void NewGame(Windows::Foundation::IAsyncAction^ workItem);
 
 		PresetList^ GetPresetList(bool includeCustom);
-		int GetCurrentPreset();
+		int GetCurrentPresetIndex();
 		Windows::Foundation::Collections::IVector<ConfigItem^>^ GetConfiguration();
 		Platform::String^ SetConfiguration(Windows::Foundation::Collections::IVector<ConfigItem^>^ input);
 
@@ -78,6 +78,7 @@ namespace PuzzleModern
 		IPuzzleCanvas ^canvas;
 		IPuzzleStatusBar ^statusbar;
 		IPuzzleTimer ^timer;
+		PresetList^ presets;
 		std::atomic_bool _generating;
 		static Puzzle^ FromConstGame(const game *g);
 		static char *ToChars(Platform::String ^input);

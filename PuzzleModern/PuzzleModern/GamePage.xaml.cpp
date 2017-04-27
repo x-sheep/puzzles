@@ -251,7 +251,7 @@ void GamePage::BeginNewGame()
 
 	BusyLabel->Text = "Creating puzzle";
 	OnGenerationStart();
-	if (fe->GetCurrentPreset() == -1)
+	if (fe->GetCurrentPresetIndex() == -1)
 		BusyCancelButton->Visibility = Windows::UI::Xaml::Visibility::Visible;
 	else
 		BusyCancelButton->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
@@ -403,7 +403,7 @@ void GamePage::OnGenerationEnd()
 
 	_wonGame = fe->GameWon() == 1;
 	UpdateUndoButtons();
-	HighlightPreset(fe->GetCurrentPreset());
+	HighlightPreset(fe->GetCurrentPresetIndex());
 	ResizeWindow(this->ActualWidth, this->ActualHeight);
 	ResizeGame();
 
@@ -731,7 +731,7 @@ void GamePage::OnLoaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEvent
 void GamePage::OnParamsFlyoutUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e)
 {
 	if (!_generatingGame)
-		HighlightPreset(fe->GetCurrentPreset());
+		HighlightPreset(fe->GetCurrentPresetIndex());
 	_isFlyoutOpen = false;
 }
 
@@ -1119,7 +1119,7 @@ void GamePage::PromptPopupButtonOK_Click(Platform::Object^ sender, Windows::UI::
 	else
 	{
 		PromptPopup->IsOpen = false;
-		HighlightPreset(fe->GetCurrentPreset());
+		HighlightPreset(fe->GetCurrentPresetIndex());
 		BeginNewGame();
 	}
 }
@@ -1144,7 +1144,7 @@ void GamePage::PresetGridView_LayoutUpdated(Platform::Object^ sender, Platform::
 		return;
 
 	if(fe && !_isFlyoutOpen)
-		HighlightPreset(fe->GetCurrentPreset());
+		HighlightPreset(fe->GetCurrentPresetIndex());
 }
 
 

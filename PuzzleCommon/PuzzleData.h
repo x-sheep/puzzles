@@ -123,9 +123,9 @@ namespace PuzzleModern
 	public:
 		PresetList();
 
-		property Windows::Foundation::Collections::IObservableVector<Platform::Object^>^ Items
+		property Windows::Foundation::Collections::IObservableVector<Preset^>^ Items
 		{
-			Windows::Foundation::Collections::IObservableVector<Platform::Object^>^ get()
+			Windows::Foundation::Collections::IObservableVector<Preset^>^ get()
 			{
 				return _items;
 			}
@@ -148,7 +148,7 @@ namespace PuzzleModern
 	private:
 		int _current;
 		bool _custom;
-		Windows::Foundation::Collections::IObservableVector<Platform::Object^>^ _items;
+		Windows::Foundation::Collections::IObservableVector<Preset^>^ _items;
 	};
 
 	public enum class ButtonState { DOWN, DRAG, UP, TAP };
