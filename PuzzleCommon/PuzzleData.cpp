@@ -47,9 +47,9 @@ namespace PuzzleModern
 		_buttons = ref new Vector<VirtualButton^>();
 		_colorBlind = VirtualKey::None;
 		_toolButton = nullptr;
-		_touchAction = ButtonType::LEFT;
+		_leftAction = ButtonType::LEFT;
 		_middleAction = ButtonType::MIDDLE;
-		_holdAction = ButtonType::RIGHT;
+		_rightAction = ButtonType::RIGHT;
 		_touchAction = ButtonType::LEFT;
 		_holdAction = ButtonType::RIGHT;
 	}
