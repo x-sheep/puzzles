@@ -206,7 +206,12 @@ static int const solver_diffs[] = { SOLVERLIST(SOLVER_DIFF) };
 static const int NUM_SOLVERS = sizeof(solver_diffs)/sizeof(*solver_diffs);
 
 struct game_params {
-    int w, h;
+#if PORTRAIT_SCREEN
+    int h, w;
+#else
+	int w, h;
+#endif
+
     int diff;
     int type;
 };
