@@ -80,7 +80,7 @@
     <ClCompile Include="..\..\filling.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-	<ClCompile Include="..\..\findloop.c">
+    <ClCompile Include="..\..\findloop.c">
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\flip.c">
@@ -431,12 +431,9 @@
     <None Include="..\..\Help\untangle.html">
       <Filter>Help</Filter>
     </None>
-    <None Include="PuzzleModern_TemporaryKey.pfx" />
     <None Include="..\..\Help\flood.html">
       <Filter>Help</Filter>
     </None>
-    <None Include="Package.StoreAssociation.xml" />
-    <None Include="PuzzleModern_StoreKey.pfx" />
     <None Include="..\..\Help\tracks.html">
       <Filter>Help</Filter>
     </None>

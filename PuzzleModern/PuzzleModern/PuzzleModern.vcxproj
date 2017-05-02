@@ -94,7 +94,7 @@
     <PackageCertificateKeyFile>PuzzleModern_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>D7725E29DC36AD1AB304385AADB6346BC99B1DA5</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>3A3C4252CA5531B16EEBDFA60DD7AD1FE36DF847</PackageCertificateThumbprint>
     <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -335,8 +335,6 @@
     <None Include="..\..\Help\untangle.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="PuzzleModern_StoreKey.pfx" />
-    <None Include="PuzzleModern_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Logo.scale-100.png">
@@ -735,9 +733,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Common\ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

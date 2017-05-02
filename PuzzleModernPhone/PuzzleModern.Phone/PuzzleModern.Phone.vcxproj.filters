@@ -193,7 +193,6 @@
     <None Include="..\..\Help\tracks.html">
       <Filter>Help</Filter>
     </None>
-    <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\NavigationHelper.h">
