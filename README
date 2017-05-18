@@ -3,7 +3,7 @@ of Simon Tatham's Portable Puzzle Collection, hosted at
 <https://github.com/x-sheep/puzzles>.
 
 This source code was forked from the original source available at
-<http://www.chiark.greenend.org.uk/~sgtatham/puzzles/>. Note that this fork 
+<https://www.chiark.greenend.org.uk/~sgtatham/puzzles/>. Note that this fork 
 has several modifications which cause the original makefiles to no longer work.
 
 Visual Studio 2013 or higher with the Windows 8.1 SDK is required to compile

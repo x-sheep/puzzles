@@ -73,7 +73,7 @@
                     </TextBlock>
                 </StackPanel>
 
-                <HyperlinkButton NavigateUri="http://www.chiark.greenend.org.uk/~sgtatham/puzzles/" Padding="0,4,0,5" Foreground="{ThemeResource PhoneAccentBrush}">Original project website</HyperlinkButton>
+                <HyperlinkButton NavigateUri="https://www.chiark.greenend.org.uk/~sgtatham/puzzles/" Padding="0,4,0,5" Foreground="{ThemeResource PhoneAccentBrush}">Original project website</HyperlinkButton>
             </StackPanel>
         </ScrollViewer>
     </Grid>
