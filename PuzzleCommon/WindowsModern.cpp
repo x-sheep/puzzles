@@ -494,7 +494,7 @@ namespace PuzzleModern
 	}
 
 	static void populate_preset_menu(frontend *fe,
-		struct preset_menu *menu, PresetList ^list)
+		struct preset_menu *menu, PresetList ^list, int maximumDepth)
 	{
 		int i;
 		for (i = 0; i < menu->n_entries; i++)
@@ -508,23 +508,45 @@ namespace PuzzleModern
 				p->Name = FromChars(entry->title);
 				list->AddPreset(p);
 			}
+			else if (maximumDepth != 1)
+			{
+				auto p = ref new Preset();
+				p->Index = entry->id;
+				p->Name = FromChars(entry->title);
+				list->AddPreset(p);
+				p->SubMenu = ref new PresetList();
+				populate_preset_menu(fe, entry->submenu, p->SubMenu, maximumDepth - 1);
+			}
 			else
-				populate_preset_menu(fe, entry->submenu, list);
+				populate_preset_menu(fe, entry->submenu, list, 1);
 		}
 	}
 
-	PresetList^ WindowsModern::GetPresetList(bool includeCustom)
+	static bool check_preset_menu(PresetList ^list, int id)
+	{
+		bool result = false;
+		for each(auto item in list->Items)
+		{
+			if (item->SubMenu)
+				item->Checked = check_preset_menu(item->SubMenu, id);
+			else
+				item->Checked = item->Index == id;
+			result |= item->Checked;
+		}
+		return result;
+	}
+
+	PresetList^ WindowsModern::GetPresetList(bool includeCustom, int maximumDepth)
 	{
 		if (!presets)
 		{
 			presets = ref new PresetList();
 
-			int i;
 			int totalItems = 0;
 			if (!fe->preset_menu)
 				fe->preset_menu = midend_get_presets(this->me, &totalItems);
 
-			populate_preset_menu(fe, fe->preset_menu, presets);
+			populate_preset_menu(fe, fe->preset_menu, presets, maximumDepth);
 
 			if (this->ourgame->can_configure)
 			{
@@ -539,23 +561,27 @@ namespace PuzzleModern
 			}
 		}
 
-		int n = midend_which_preset(me);
-		presets->Current = n >= 0 ? n : -1;
+		int presetId = midend_which_preset(me);
+		check_preset_menu(presets, presetId);
 
 		return presets;
 	}
 
-	int WindowsModern::GetCurrentPresetIndex()
+	bool WindowsModern::IsCustomGame()
 	{
-		int id = midend_which_preset(me);
+		return midend_which_preset(me) == -1;
+	}
 
-		int i, s = presets->Items->Size;
-		for (i = 0; i < s; i++)
+	Platform::String ^WindowsModern::GetCurrentPresetName(PresetList ^list)
+	{
+		for each(auto item in list->Items)
 		{
-			if (presets->Items->GetAt(i)->Index == id)
-				return i;
+			if (item->Checked && item->SubMenu)
+				return GetCurrentPresetName(item->SubMenu);
+			else if(item->Checked)
+				return item->Name;
 		}
-		return -1;
+		return "Custom";
 	}
 
 	void WindowsModern::SetPreset(int i)

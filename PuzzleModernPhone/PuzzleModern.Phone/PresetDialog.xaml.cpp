@@ -51,8 +51,8 @@ void PuzzleModern::Phone::PresetDialog::TextBlock_Loaded(Platform::Object^ sende
 {
 	auto tb = safe_cast<TextBlock^>(sender);
 	auto preset = safe_cast<Preset^>(tb->DataContext);
-
-	if (_list->Current == preset->Index)
+	
+	if (preset->Checked)
 	{
 		tb->Foreground = safe_cast<Brush^>(Application::Current->Resources->Lookup("PhoneAccentBrush"));
 	}

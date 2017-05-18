@@ -155,7 +155,7 @@ void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 	if (!fe->CanSolve())
 		ButtonSolve->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 
-	PresetList ^presets = fe->GetPresetList(true);
+	PresetList ^presets = fe->GetPresetList(true, 2);
 
 	PresetGridView->DataContext = presets->Items;
 
@@ -251,7 +251,7 @@ void GamePage::BeginNewGame()
 
 	BusyLabel->Text = "Creating puzzle";
 	OnGenerationStart();
-	if (fe->GetCurrentPresetIndex() == -1)
+	if (fe->IsCustomGame())
 		BusyCancelButton->Visibility = Windows::UI::Xaml::Visibility::Visible;
 	else
 		BusyCancelButton->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
@@ -335,27 +335,27 @@ void GamePage::UpdateUndoButtons()
 	}
 }
 
+void GamePage::HighlightCurrentPreset()
+{
+	HighlightPreset(-2);
+}
+
 void GamePage::HighlightPreset(int index)
 {
-	GridViewItem^ container;
 	if (index == -1)
 		index = PresetGridView->Items->Size - 1;
-	int previous = PresetGridView->SelectedIndex;
-	
-	auto oldContainerObj = PresetGridView->ContainerFromIndex(previous);
-	if (oldContainerObj && oldContainerObj->GetType()->FullName == "Windows.UI.Xaml.Controls.GridViewItem")
-	{
-		container = safe_cast<GridViewItem^>(oldContainerObj);
-		container->Background = nullptr;
-	}
 
-	auto containerObj = PresetGridView->ContainerFromIndex(index);
-	if (containerObj && containerObj->GetType()->FullName == "Windows.UI.Xaml.Controls.GridViewItem")
+	for (int i = 0; i < PresetGridView->Items->Size; i++)
 	{
-		container = safe_cast<GridViewItem^>(containerObj);
-		container->Background = ref new SolidColorBrush(Windows::UI::Colors::Green);
+		auto containerObj = PresetGridView->ContainerFromIndex(i);
+		if (!containerObj) continue;
+
+		auto preset = safe_cast<Preset^>(PresetGridView->Items->GetAt(i));
+		auto container = safe_cast<GridViewItem^>(containerObj);
+
+		bool checked = i == index || (index == -2 && preset->Checked);
+		container->Background = checked ? ref new SolidColorBrush(Windows::UI::Colors::Green) : nullptr;
 	}
-	PresetGridView->SelectedIndex = index;
 }
 
 void GamePage::BusyOverlayDisappearingAnimation_Completed(Platform::Object^ sender, Platform::Object^ e)
@@ -403,7 +403,8 @@ void GamePage::OnGenerationEnd()
 
 	_wonGame = fe->GameWon() == 1;
 	UpdateUndoButtons();
-	HighlightPreset(fe->GetCurrentPresetIndex());
+	fe->GetPresetList(true, 2);
+	HighlightCurrentPreset();
 	ResizeWindow(this->ActualWidth, this->ActualHeight);
 	ResizeGame();
 
@@ -589,11 +590,51 @@ void GamePage::PresetGridView_ItemClick(Platform::Object^ sender, Windows::UI::X
 	{
 		OpenParamsFlyout(true);
 	}
+	else if (p->SubMenu)
+	{
+		auto menu = ref new MenuFlyout();
+		for each(auto sub in p->SubMenu->Items)
+		{
+			auto item = ref new MenuFlyoutItem();
+			
+			item->FontFamily = ref new Windows::UI::Xaml::Media::FontFamily("Segoe UI Symbol");
+			wchar_t mark = sub->Checked ? 0xe0a3 : 0xe070;
+			item->Text = ref new Platform::String(&mark, 1) + "         " + sub->Name;
+
+			item->Tag = sub->Index;
+			item->Click += ref new Windows::UI::Xaml::RoutedEventHandler(this, &PuzzleModern::GamePage::PresetMenuFlyout_Click);
+			menu->Items->Append(item);
+		}
+		menu->Placement = FlyoutPlacementMode::Bottom;
+
+		auto container = safe_cast<GridViewItem^>(PresetGridView->ContainerFromItem(p));
+		menu->Closed += ref new Windows::Foundation::EventHandler<Platform::Object ^>(this, &PuzzleModern::GamePage::PresetMenuFlyout_OnClosed);
+		menu->ShowAt(container);
+		_isFlyoutOpen = true;
+		HighlightPreset(PresetGridView->IndexFromContainer(container));
+	}
 	else
 	{
 		fe->SetPreset(p->Index);
 		BeginNewGame();
 	}
+}
+
+void GamePage::PresetMenuFlyout_Click(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e)
+{
+	if (_generatingGame)
+		return;
+
+	auto item = safe_cast<MenuFlyoutItem^>(sender);
+	auto box = safe_cast<Platform::IBox<int>^>(item->Tag);
+
+	fe->SetPreset(box->Value);
+	BeginNewGame();
+}
+
+void GamePage::PresetMenuFlyout_OnClosed(Platform::Object ^sender, Platform::Object ^args)
+{
+	_isFlyoutOpen = false;
 }
 
 void GamePage::ResizeGame()
@@ -731,7 +772,7 @@ void GamePage::OnLoaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEvent
 void GamePage::OnParamsFlyoutUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e)
 {
 	if (!_generatingGame)
-		HighlightPreset(fe->GetCurrentPresetIndex());
+		HighlightCurrentPreset();
 	_isFlyoutOpen = false;
 }
 
@@ -1119,7 +1160,7 @@ void GamePage::PromptPopupButtonOK_Click(Platform::Object^ sender, Windows::UI::
 	else
 	{
 		PromptPopup->IsOpen = false;
-		HighlightPreset(fe->GetCurrentPresetIndex());
+		HighlightCurrentPreset();
 		BeginNewGame();
 	}
 }
@@ -1144,7 +1185,7 @@ void GamePage::PresetGridView_LayoutUpdated(Platform::Object^ sender, Platform::
 		return;
 
 	if(fe && !_isFlyoutOpen)
-		HighlightPreset(fe->GetCurrentPresetIndex());
+		HighlightCurrentPreset();
 }
 
 

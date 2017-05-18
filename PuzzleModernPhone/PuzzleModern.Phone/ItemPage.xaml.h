@@ -65,7 +65,6 @@ namespace PuzzleModern
 
 			void GameBorder_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e);
 
-			PresetList ^presets;
 			VirtualButton ^toolKey;
 			VirtualButtonCollection ^_controls;
 

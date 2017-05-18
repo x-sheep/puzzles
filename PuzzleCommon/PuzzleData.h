@@ -92,6 +92,8 @@ namespace PuzzleModern
 		Windows::Foundation::Collections::IObservableVector<Platform::Object^>^ _items;
 	};
 
+	ref class PresetList;
+
 	[Windows::UI::Xaml::Data::Bindable]
 	public ref class Preset sealed
 	{
@@ -112,9 +114,23 @@ namespace PuzzleModern
 			}
 		}
 
+		property PresetList ^SubMenu
+		{
+			PresetList ^get() { return _subMenu; }
+			void set(PresetList ^val) { _subMenu = val; }
+		}
+
+		property bool Checked
+		{
+			bool get() { return _checked; }
+			void set(bool val) { _checked = val; }
+		}
+
 	private:
 		Platform::String^ _name;
 		int _index;
+		bool _checked;
+		PresetList ^_subMenu;
 	};
 
 	[Windows::UI::Xaml::Data::Bindable]
@@ -131,12 +147,6 @@ namespace PuzzleModern
 			}
 		}
 
-		property int Current
-		{
-			int get() { return _current; }
-			void set(int value) { _current = value; }
-		}
-
 		property bool Custom
 		{
 			bool get() { return _custom; }
@@ -146,7 +156,6 @@ namespace PuzzleModern
 		void AddPreset(Preset^ p);
 
 	private:
-		int _current;
 		bool _custom;
 		Windows::Foundation::Collections::IObservableVector<Preset^>^ _items;
 	};

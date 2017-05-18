@@ -84,6 +84,7 @@ namespace PuzzleModern
 		void BeginResumeGame();
 		void OnGenerationStart();
 		void OnGenerationEnd();
+		void HighlightCurrentPreset();
 		void HighlightPreset(int index);
 
 		static Windows::UI::Xaml::DependencyProperty^ _defaultViewModelProperty;
@@ -122,7 +123,9 @@ namespace PuzzleModern
 		void ButtonBar_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void OnNewConfiguration(PuzzleModern::ParamsFlyout ^sender, Windows::Foundation::Collections::IVector<PuzzleModern::ConfigItem ^> ^newConfig);
 		void OnParamsFlyoutUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e);
-		void PresetGridView_ItemClick(Platform::Object^ sender, Windows::UI::Xaml::Controls::ItemClickEventArgs^ e);
+		void PresetGridView_ItemClick(Platform::Object^ sender, Windows::UI::Xaml::Controls::ItemClickEventArgs^ e);		
+		void PresetMenuFlyout_Click(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e);
+		void PresetMenuFlyout_OnClosed(Platform::Object ^sender, Platform::Object ^args);
 		void BusyOverlayDisappearingAnimation_Completed(Platform::Object^ sender, Platform::Object^ e);
 		void DoubleAnimation_Completed(Platform::Object^ sender, Platform::Object^ e);
 		void SaveState(Platform::Object ^sender, PuzzleModern::Common::SaveStateEventArgs ^e);
@@ -158,6 +161,6 @@ namespace PuzzleModern
 		void LabelLeftRight_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e);
 		void SpecificShareGame_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ButtonSettings_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-		void BottomAppBar_Closed(Platform::Object^ sender, Platform::Object^ e);
+		void BottomAppBar_Closed(Platform::Object^ sender, Platform::Object^ e);		
 };
 }
