@@ -383,6 +383,11 @@ void pos2c(int w, int h, int pos, int *cx, int *cy);
 void draw_text_outline(drawing *dr, int x, int y, int fonttype,
                        int fontsize, int align,
                        int text_colour, int outline_colour, char *text);
+
+/* Copies text left-justified with spaces. Length of string must be
+ * less than buffer size. */
+void copy_left_justified(char *buf, size_t sz, const char *str);
+
 /*
  * dsf.c
  */
