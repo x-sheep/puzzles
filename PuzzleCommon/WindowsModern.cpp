@@ -782,7 +782,7 @@ namespace PuzzleModern
 		sfree(colours);
 	}
 
-	bool WindowsModern::CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleTimer ^itimer)
+	bool WindowsModern::CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer)
 	{
 		this->me = NULL;
 		this->fe = snew(frontend);
@@ -791,6 +791,8 @@ namespace PuzzleModern
 		this->fe->scale = 1.0f;
 		this->canvas = icanvas;
 		this->fe->canvas = (void *)&this->canvas;
+		this->statusbar = ibar;
+		this->fe->statusbar = (void *)&this->statusbar;
 		this->timer = itimer;
 		this->fe->timer = (void *)&this->timer;
 		

@@ -21,7 +21,7 @@ namespace PuzzleModern
 	class WindowsModern sealed {
 	public:
 		WindowsModern();
-		bool CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleTimer ^itimer);
+		bool CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer);
 		~WindowsModern();
 
 		void Destroy();

@@ -136,7 +136,7 @@ void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 {
 	_puzzleName = safe_cast<String^>(e->NavigationParameter);
 	fe = new WindowsModern();
-	_hasGame = fe->CreateForGame(_puzzleName, DrawCanvas, this);
+	_hasGame = fe->CreateForGame(_puzzleName, DrawCanvas, this, this);
 
 	currentPuzzle = fe->GetCurrentPuzzle();
 	DefaultViewModel->Insert("PuzzleName", currentPuzzle->Name);
