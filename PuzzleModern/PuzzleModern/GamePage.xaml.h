@@ -57,7 +57,7 @@ namespace PuzzleModern
 	private:
 		PuzzleModern::Puzzle ^currentPuzzle;
 		Platform::String ^_puzzleName;
-		WindowsModern* fe;
+		std::shared_ptr<WindowsModern> fe;
 		unsigned long long LastTime;
 		Windows::System::Threading::ThreadPoolTimer ^PeriodicTimer;
 
