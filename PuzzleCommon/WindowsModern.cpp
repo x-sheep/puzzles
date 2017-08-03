@@ -754,6 +754,15 @@ namespace PuzzleModern
 	WindowsModern::~WindowsModern()
 	{
 		OutputDebugString(L"DESTROYING...\n");
+		if (fe)
+		{
+			fe->canvas = NULL;
+			fe->statusbar = NULL;
+			fe->timer = NULL;
+		}
+		this->canvas = nullptr;
+		this->statusbar = nullptr;
+		this->timer = nullptr;
 		if (!_generating)
 		{
 			Destroy();
@@ -1156,10 +1165,6 @@ namespace PuzzleModern
 				sfree(fe);
 				fe = NULL;
 			}
-			this->ourgame = NULL;
-			this->canvas = nullptr;
-			this->statusbar = nullptr;
-			this->timer = nullptr;
 		}
 		catch (...){}
 	}

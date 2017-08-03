@@ -24,8 +24,6 @@ namespace PuzzleModern
 		bool CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer);
 		~WindowsModern();
 
-		void Destroy();
-
 		static PuzzleList^ GetPuzzleList();
 		Puzzle^ GetCurrentPuzzle();
 		void SetPreset(int i);
@@ -83,5 +81,7 @@ namespace PuzzleModern
 		std::atomic_bool _generating;
 		static Puzzle^ FromConstGame(const game *g);
 		static char *ToChars(Platform::String ^input);
+	
+		void Destroy();
 	};
 }
