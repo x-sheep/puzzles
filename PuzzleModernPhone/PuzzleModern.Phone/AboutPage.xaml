@@ -56,7 +56,7 @@
 
                     <!-- Section 2 header -->
                     <TextBlock Style="{StaticResource TitleTextBlockStyle}">
-                    Original License
+                    License
                     </TextBlock>
 
                     <!-- Section 2 body -->
