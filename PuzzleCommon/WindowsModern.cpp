@@ -475,6 +475,8 @@ namespace PuzzleModern
 		Puzzle ^p;
 		int i;
 
+		auto settings = ApplicationData::Current->RoamingSettings->Values;
+
 		for (i = 0; i < gamecount; i++)
 		{
 			const game* g = gamelist[i];
@@ -483,6 +485,19 @@ namespace PuzzleModern
 			p->Synopsis = helpitems[i].synopsis;
 
 			ret->AddPuzzle(p);
+
+			bool isFav = false;
+			if (settings->HasKey("fav_" + p->Name))
+				isFav = safe_cast<bool>(settings->Lookup("fav_" + p->Name));
+			else /* Default list of favourites */
+				isFav = p->Name == "Light Up" ||
+				p->Name == "Net" ||
+				p->Name == "Solo" ||
+				p->Name == "Unruly" ||
+				p->Name == "Untangle";
+
+			if (isFav)
+				ret->AddFavourite(p);
 		}
 
 		return ret;

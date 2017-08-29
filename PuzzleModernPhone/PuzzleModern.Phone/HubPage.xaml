@@ -11,14 +11,11 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="HubSectionHeaderTemplate">
-            <TextBlock Margin="0,0,0,-9.5" Text="{Binding}"/>
+        <DataTemplate x:Key="PivotSectionHeaderTemplate">
+            <TextBlock FontSize="20" Text="{Binding}" Margin="10,10,0,-16" FontFamily="Segoe WP" FontWeight="Bold"/>
         </DataTemplate>
-        <DataTemplate x:Key="HubHeaderTemplate">
-            <TextBlock Margin="0,20,0,0" Text="{Binding}" FontSize="56" Foreground="#008000"/>
-        </DataTemplate>
-        <DataTemplate x:Key="HubSectionNoHeaderTemplate">
-            <Border Height="1" Margin="0" Padding="0"/>
+        <DataTemplate x:Key="PivotTitleTemplate">
+            <TextBlock Text="{Binding}" FontSize="52" Foreground="#008000" FontWeight="Light" Margin="0,-20,0,0"/>
         </DataTemplate>
     </Page.Resources>
 
@@ -36,55 +33,75 @@
     </Page.BottomAppBar>
 
     <Grid x:Name="LayoutRoot">
-        <Hub x:Name="Hub" x:Uid="Hub" Header="portable puzzles" HeaderTemplate="{ThemeResource HubHeaderTemplate}">
-            <HubSection x:Name="AllPuzzlesSection" x:Uid="AllPuzzlesSection" DataContext="{Binding Items}" HeaderTemplate="{ThemeResource HubSectionNoHeaderTemplate}">
-                <DataTemplate>
-                    <Grid>
+        <Pivot x:Name="Hub" x:Uid="Hub" Title="portable puzzles" TitleTemplate="{StaticResource PivotTitleTemplate}" HeaderTemplate="{StaticResource PivotSectionHeaderTemplate}">
+            <PivotItem x:Name="AllPuzzlesSection" x:Uid="AllPuzzlesSection" Header="ALL PUZZLES" DataContext="{Binding Items}">
+                <Grid>
 
-                        <GridView
-                            x:Name="AllPuzzlesGridView"
-                            ItemsSource="{Binding}"
-                            Loaded="AllPuzzlesGridView_Loaded"
-                            >
-                            <GridView.ItemTemplate>
-                                <DataTemplate>
-                                    <GridViewItem Holding="ListViewItem_Holding" Tapped="ListViewItem_Tapped" Margin="0,0,15,20">
-                                        <StackPanel Orientation="Vertical">
-                                            <Border BorderBrush="#dcdad5" Background="#dcdad5" BorderThickness="5">
-                                                <Image Height="55" Width="55" Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
-                                            </Border>
-                                            <TextBlock Text="{Binding Name}" FontSize="13" HorizontalAlignment="Center" />
+                    <GridView
+                        x:Name="AllPuzzlesGridView"
+                        ItemsSource="{Binding}"
+                        >
+                        <GridView.ItemTemplate>
+                            <DataTemplate>
+                                <GridViewItem Holding="ListViewItem_Holding" Tapped="ListViewItem_Tapped" Margin="0,0,15,20">
+                                    <StackPanel Orientation="Vertical">
+                                        <Border BorderBrush="#dcdad5" Background="#dcdad5" BorderThickness="5">
+                                            <Image Height="55" Width="55" Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding Name}" FontSize="13" HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </GridViewItem>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                    </GridView>
+
+                    <ListView
+                        x:Name="AllPuzzlesListView"
+                        ItemsSource="{Binding}"
+                        >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ListViewItem Holding="ListViewItem_Holding" Tapped="ListViewItem_Tapped" Width="720">
+                                    <StackPanel Margin="0,0,0,20" Orientation="Horizontal">
+                                        <Border BorderBrush="#dcdad5" Background="#dcdad5" Margin="0,0,20,0" BorderThickness="5">
+                                            <Image Height="55" Width="55" Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
+                                        </Border>
+                                        <StackPanel Margin="0,0,0,0" Orientation="Vertical">
+                                            <TextBlock Text="{Binding Name}" Style="{ThemeResource ListViewItemTextBlockStyle}" FontSize="28" />
+                                            <TextBlock Text="{Binding Synopsis}" FontSize="13" TextWrapping="WrapWholeWords" Width="240" Height="36" />
                                         </StackPanel>
-                                    </GridViewItem>
-                                </DataTemplate>
-                            </GridView.ItemTemplate>
-                        </GridView>
+                                    </StackPanel>
+                                </ListViewItem>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
 
-                        <ListView
-                            x:Name="AllPuzzlesListView"
-                            ItemsSource="{Binding}"
-                            Loaded="AllPuzzlesListView_Loaded"
-                            >
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <ListViewItem Holding="ListViewItem_Holding" Tapped="ListViewItem_Tapped" Width="720">
-                                        <StackPanel Margin="0,0,0,20" Orientation="Horizontal">
-                                            <Border BorderBrush="#dcdad5" Background="#dcdad5" Margin="0,0,20,0" BorderThickness="5">
-                                                <Image Height="55" Width="55" Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
-                                            </Border>
-                                            <StackPanel Margin="0,0,0,0" Orientation="Vertical">
-                                                <TextBlock Text="{Binding Name}" Style="{ThemeResource ListViewItemTextBlockStyle}" FontSize="28" />
-                                                <TextBlock Text="{Binding Synopsis}" FontSize="13" TextWrapping="WrapWholeWords" Width="240" Height="36" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </ListViewItem>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-
-                    </Grid>
-                </DataTemplate>
-            </HubSection>
-        </Hub>
+                </Grid>
+            </PivotItem>
+            <PivotItem x:Name="FavouritesSection" x:Uid="FavouritesSection" DataContext="{Binding Favourites}" Header="FAVOURITES">
+                <Grid>
+                    <GridView
+                        x:Name="FavouritesPuzzlesGridView"
+                        ItemsSource="{Binding}"
+                        >
+                        <GridView.ItemTemplate>
+                            <DataTemplate>
+                                <GridViewItem Holding="ListViewItem_Holding" Tapped="ListViewItem_Tapped" Margin="0,0,20,20">
+                                    <StackPanel Orientation="Vertical">
+                                        <Border BorderBrush="#dcdad5" Background="#dcdad5" BorderThickness="5">
+                                            <Image Height="70" Width="70" Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding Name}" FontSize="14" HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </GridViewItem>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                        <GridView.Footer>
+                            <TextBlock x:Name="FavouritesFooter" Text="Touch and hold a puzzle icon to add it to your favourites." Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="WrapWholeWords" Margin="0,0,0,20" />
+                        </GridView.Footer>
+                    </GridView>
+                </Grid>
+            </PivotItem>
+        </Pivot>
     </Grid>
 </Page>

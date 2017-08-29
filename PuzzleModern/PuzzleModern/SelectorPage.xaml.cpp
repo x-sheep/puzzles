@@ -34,10 +34,13 @@ using namespace Windows::UI::Xaml::Navigation;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
+static const Windows::UI::Xaml::Visibility Visible = Windows::UI::Xaml::Visibility::Visible;
+static const Windows::UI::Xaml::Visibility Collapsed = Windows::UI::Xaml::Visibility::Collapsed;
+
 SelectorPage::SelectorPage()
 {
 	InitializeComponent();
-	SetValue(_defaultViewModelProperty, ref new Map<String^,Object^>(std::less<String^>()));
+	SetValue(_defaultViewModelProperty, ref new Map<String^, Object^>(std::less<String^>()));
 	auto navigationHelper = ref new Common::NavigationHelper(this);
 	SetValue(_navigationHelperProperty, navigationHelper);
 	navigationHelper->LoadState += ref new Common::LoadStateEventHandler(this, &SelectorPage::LoadState);
@@ -45,12 +48,23 @@ SelectorPage::SelectorPage()
 	this->Loaded += ref new Windows::UI::Xaml::RoutedEventHandler(this, &SelectorPage::OnLoaded);
 	this->Unloaded += ref new Windows::UI::Xaml::RoutedEventHandler(this, &SelectorPage::OnUnloaded);
 
-	DefaultViewModel->Insert("Items", WindowsModern::GetPuzzleList()->Items);
+	_puzzles = WindowsModern::GetPuzzleList();
+	DefaultViewModel->Insert("Items", _puzzles->Items);
+	DefaultViewModel->Insert("Favourites", _puzzles->Favourites);
 
-	itemGridView->SelectedItem = nullptr;
-	
-	DefaultViewModel->Insert("PinVisible", Windows::UI::Xaml::Visibility::Collapsed);
-	DefaultViewModel->Insert("UnpinVisible", Windows::UI::Xaml::Visibility::Collapsed);
+	DefaultViewModel->Insert("PinVisible", Collapsed);
+	DefaultViewModel->Insert("UnpinVisible", Collapsed);
+	DefaultViewModel->Insert("FavVisible", Collapsed);
+	DefaultViewModel->Insert("UnfavVisible", Collapsed);
+
+	auto roamingSettings = ApplicationData::Current->RoamingSettings->Values;
+	bool zoomedOut = roamingSettings->HasKey("feature_zoom_out") && safe_cast<bool>(roamingSettings->Lookup("feature_zoom_out"));
+	DefaultViewModel->Insert("ZoomInVisible", zoomedOut ? Visible : Collapsed);
+	DefaultViewModel->Insert("ZoomOutVisible", !zoomedOut ? Visible : Collapsed);
+
+	auto localSettings = ApplicationData::Current->LocalSettings->Values;
+	bool hideFavouritesFooter = localSettings->HasKey("feature_favourites") && safe_cast<bool>(localSettings->Lookup("feature_favourites"));
+	DefaultViewModel->Insert("FavFooterVisible", hideFavouritesFooter ? Collapsed : Visible);
 }
 
 void SelectorPage::OnLoaded(Platform::Object ^sender, RoutedEventArgs ^e)
@@ -62,6 +76,8 @@ void SelectorPage::OnLoaded(Platform::Object ^sender, RoutedEventArgs ^e)
 
 	_commandsRequestedEventRegistrationToken = SettingsPane::GetForCurrentView()->CommandsRequested +=
 		ref new TypedEventHandler<SettingsPane^, SettingsPaneCommandsRequestedEventArgs^>(this, &SelectorPage::OnCommandsRequested);
+
+	DefaultViewModel->Insert("FavouritesSectionVisibility", _puzzles->Favourites->Size > 0 ? Visible : Collapsed);
 }
 
 void SelectorPage::OnUnloaded(Platform::Object ^sender, RoutedEventArgs ^e)
@@ -166,9 +182,13 @@ Rect SelectorPage::GetElementRect(FrameworkElement^ element)
 
 void SelectorPage::ButtonPin_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (itemGridView->SelectedIndex == -1)
+	Puzzle ^item;
+	if (itemGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
+	else if (favouritesGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(favouritesGridView->SelectedItem);
+	else
 		return;
-	auto item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
 
 	String ^id = item->HelpName;
 	String ^args = item->Name;
@@ -185,6 +205,7 @@ void SelectorPage::ButtonPin_Click(Platform::Object^ sender, Windows::UI::Xaml::
 		if (isCreated)
 		{
 			itemGridView->SelectedIndex = -1;
+			favouritesGridView->SelectedIndex = -1;
 			BottomAppBar->IsOpen = false; 
 		}
 	});
@@ -193,9 +214,14 @@ void SelectorPage::ButtonPin_Click(Platform::Object^ sender, Windows::UI::Xaml::
 
 void SelectorPage::ButtonUnpin_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (itemGridView->SelectedIndex == -1)
+	Puzzle ^item;
+	if (itemGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
+	else if (favouritesGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(favouritesGridView->SelectedItem);
+	else
 		return;
-	auto item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
+
 	String ^id = item->HelpName;
 
 	if (!SecondaryTile::Exists(id))
@@ -211,68 +237,138 @@ void SelectorPage::ButtonUnpin_Click(Platform::Object^ sender, Windows::UI::Xaml
 		if (isDeleted)
 		{
 			itemGridView->SelectedIndex = -1;
+			favouritesGridView->SelectedIndex = -1;
 			BottomAppBar->IsOpen = false;
 		}
 	});
 }
 
 
+void SelectorPage::ButtonFav_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	Puzzle ^item;
+	if (itemGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
+	else if (favouritesGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(favouritesGridView->SelectedItem);
+	else
+		return;
+
+	ApplicationData::Current->LocalSettings->Values->Insert("feature_favourites", true); 
+	ApplicationData::Current->RoamingSettings->Values->Insert("fav_" + item->Name, true);
+	_puzzles->AddFavourite(item);
+
+	DefaultViewModel->Insert("FavVisible", Collapsed);
+	DefaultViewModel->Insert("UnfavVisible", Visible);
+	DefaultViewModel->Insert("FavFooterVisible", Collapsed);
+	DefaultViewModel->Insert("FavouritesSectionVisibility", Visible);
+}
+
+
+void SelectorPage::ButtonUnfav_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	Puzzle ^item;
+	if (itemGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
+	else if (favouritesGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(favouritesGridView->SelectedItem);
+	else
+		return;
+
+	ApplicationData::Current->LocalSettings->Values->Insert("feature_favourites", true);
+	ApplicationData::Current->RoamingSettings->Values->Insert("fav_" + item->Name, false);
+	_puzzles->RemoveFavourite(item);
+
+	DefaultViewModel->Insert("FavVisible", Visible);
+	DefaultViewModel->Insert("UnfavVisible", Collapsed);
+	DefaultViewModel->Insert("FavFooterVisible", Collapsed);
+	DefaultViewModel->Insert("FavouritesSectionVisibility", _puzzles->Favourites->Size > 0 ? Visible : Collapsed);
+}
+
+
 void SelectorPage::itemGridView_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::SelectionChangedEventArgs^ e)
 {
-	if (itemGridView->SelectedIndex == -1)
+	if (_suppressEvent || !itemGridView || !favouritesGridView)
+		return;
+
+	if (itemGridView->SelectedIndex == -1 && favouritesGridView->SelectedIndex == -1)
 	{
-		DefaultViewModel->Insert("PinVisible", Windows::UI::Xaml::Visibility::Collapsed);
-		DefaultViewModel->Insert("UnpinVisible", Windows::UI::Xaml::Visibility::Collapsed);
+		DefaultViewModel->Insert("PinVisible", Collapsed);
+		DefaultViewModel->Insert("UnpinVisible", Collapsed);
+		DefaultViewModel->Insert("FavVisible", Collapsed);
+		DefaultViewModel->Insert("UnfavVisible", Collapsed);
 		BottomAppBar->IsOpen = false;
 	}
-	else
+	
+	_suppressEvent = true;
+	auto gridView = safe_cast<GridView^>(sender);
+	Puzzle^ item = nullptr;
+	if (gridView == itemGridView)
+		favouritesGridView->SelectedIndex = -1;
+	else if (gridView == favouritesGridView)
+		itemGridView->SelectedIndex = -1;
+	_suppressEvent = false;
+
+	if(itemGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
+	else if (favouritesGridView->SelectedItem)
+		item = safe_cast<Puzzle^>(favouritesGridView->SelectedItem);
+
+	if(item)
 	{
-		auto item = safe_cast<Puzzle^>(itemGridView->SelectedItem);
-		bool exists = SecondaryTile::Exists(item->HelpName);
-		if (exists)
+		if (SecondaryTile::Exists(item->HelpName))
 		{
-			DefaultViewModel->Insert("PinVisible", Windows::UI::Xaml::Visibility::Collapsed);
-			DefaultViewModel->Insert("UnpinVisible", Windows::UI::Xaml::Visibility::Visible);
+			DefaultViewModel->Insert("PinVisible", Collapsed);
+			DefaultViewModel->Insert("UnpinVisible", Visible);
 		}
 		else
 		{
-			DefaultViewModel->Insert("PinVisible", Windows::UI::Xaml::Visibility::Visible);
-			DefaultViewModel->Insert("UnpinVisible", Windows::UI::Xaml::Visibility::Collapsed);
+			DefaultViewModel->Insert("PinVisible", Visible);
+			DefaultViewModel->Insert("UnpinVisible", Collapsed);
 		}
+
+		if (_puzzles->IsFavourite(item))
+		{
+			DefaultViewModel->Insert("FavVisible", Collapsed);
+			DefaultViewModel->Insert("UnfavVisible", Visible);
+		}
+		else
+		{
+			DefaultViewModel->Insert("FavVisible", Visible);
+			DefaultViewModel->Insert("UnfavVisible", Collapsed);
+		}
+
 		BottomAppBar->IsOpen = true;
 	}
 }
 
 
-void SelectorPage::itemSemanticZoom_ViewChangeStarted(Platform::Object^ sender, Windows::UI::Xaml::Controls::SemanticZoomViewChangedEventArgs^ e)
-{
-	if (!e->IsSourceZoomedInView)
-	{
-		e->DestinationItem->Item = e->SourceItem->Item;
-	}
-}
-
-
-#define ZOOMED_WIDTH 640
+#define ZOOMED_WIDTH 700
 void SelectorPage::pageRoot_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
 {
-	/*
-	 * Make the zoomed out view the only view available when on a small window.
-	 * When the user has already zoomed out, we cannot actually move the views of the Semantic Zoom around, 
-	 * as this will leave the user with no active view. Instead, the switch will not take place when the user has zoomed and resizes the window.
-	 */
-	if (e->NewSize.Width < ZOOMED_WIDTH && itemSemanticZoom->IsZoomedInViewActive && itemSemanticZoom->ZoomedInView == itemGridView)
+	auto settings = ApplicationData::Current->RoamingSettings;
+	bool zoomedOut = settings->Values->HasKey("feature_zoom_out") && safe_cast<bool>(settings->Values->Lookup("feature_zoom_out"));
+	if (e->NewSize.Width < ZOOMED_WIDTH)
 	{
-		itemSemanticZoom->CanChangeViews = false;
-		itemSemanticZoom->ZoomedOutView = nullptr;
-		itemSemanticZoom->ZoomedInView = zoomedItemGridView;
+		DefaultViewModel->Insert("ZoomOutVisible", Collapsed);
+		DefaultViewModel->Insert("ZoomInVisible", Collapsed);
 	}
-	/* Reverse the previous switch when there is enough space available */
-	else if (e->NewSize.Width >= ZOOMED_WIDTH && itemSemanticZoom->ZoomedInView == zoomedItemGridView)
+	else
 	{
-		itemSemanticZoom->CanChangeViews = true;
-		itemSemanticZoom->ZoomedInView = itemGridView;
-		itemSemanticZoom->ZoomedOutView = zoomedItemGridView;
+		DefaultViewModel->Insert("ZoomInVisible", zoomedOut ? Visible : Collapsed);
+		DefaultViewModel->Insert("ZoomOutVisible", !zoomedOut ? Visible : Collapsed);
+	}
+
+	if (itemGridView)
+	{
+		if ((e->NewSize.Width < ZOOMED_WIDTH || zoomedOut) && itemGridView->ItemTemplate != SmallPuzzleTemplate)
+		{
+			itemGridView->ItemTemplate = SmallPuzzleTemplate;
+		}
+		else if (e->NewSize.Width >= ZOOMED_WIDTH && !zoomedOut && itemGridView->ItemTemplate != NormalPuzzleTemplate)
+		{
+			itemGridView->ItemTemplate = NormalPuzzleTemplate;
+		}
 	}
 }
 
@@ -322,4 +418,38 @@ void SelectorPage::OnCommandsRequested(SettingsPane^ settingsPane, SettingsPaneC
 void SelectorPage::OnSettingsCommand(IUICommand^ command)
 {
 	(ref new HelpFlyout(nullptr))->Show();
+}
+
+void SelectorPage::itemGridView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	itemGridView = safe_cast<GridView^>(sender);
+	itemGridView->SelectedItem = nullptr;
+
+	auto settings = ApplicationData::Current->RoamingSettings;
+	bool zoomedOut = settings->Values->HasKey("feature_zoom_out") && safe_cast<bool>(settings->Values->Lookup("feature_zoom_out"));
+	itemGridView->ItemTemplate = zoomedOut ? SmallPuzzleTemplate : NormalPuzzleTemplate;
+}
+
+void SelectorPage::favouritesGridView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	favouritesGridView = safe_cast<GridView^>(sender);
+	favouritesGridView->SelectedItem = nullptr;
+}
+
+
+void SelectorPage::ButtonZoomOut_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	ApplicationData::Current->RoamingSettings->Values->Insert("feature_zoom_out", true);
+	itemGridView->ItemTemplate = SmallPuzzleTemplate;
+	DefaultViewModel->Insert("ZoomInVisible", Visible);
+	DefaultViewModel->Insert("ZoomOutVisible", Collapsed);
+}
+
+
+void SelectorPage::ButtonZoomIn_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	ApplicationData::Current->RoamingSettings->Values->Insert("feature_zoom_out", false);
+	itemGridView->ItemTemplate = NormalPuzzleTemplate;
+	DefaultViewModel->Insert("ZoomInVisible", Collapsed);
+	DefaultViewModel->Insert("ZoomOutVisible", Visible);
 }

@@ -51,10 +51,9 @@ namespace PuzzleModern
 			void SettingsButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 			void SwitchView();
 
-			Control ^AllPuzzlesGridView, ^AllPuzzlesListView;
-			void AllPuzzlesGridView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-			void AllPuzzlesListView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 			void LoadGameButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+
+			PuzzleModern::PuzzleList ^_puzzles;
 		};
 	}
 }

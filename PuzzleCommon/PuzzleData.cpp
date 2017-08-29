@@ -10,12 +10,39 @@ namespace PuzzleModern
 {
 	PuzzleList::PuzzleList()
 	{
-		_items = ref new Vector<Platform::Object^>();
+		_items = ref new Vector<Puzzle^>();
+		_favourites = ref new Vector<Puzzle^>();
 	}
 
 	void PuzzleList::AddPuzzle(Puzzle^ p)
 	{
 		_items->Append(p);
+	}
+
+	void PuzzleList::AddFavourite(Puzzle^ p)
+	{
+		for (unsigned int i = 0; i < _favourites->Size; i++)
+		{
+			if (_favourites->GetAt(i)->Name > p->Name)
+			{
+				_favourites->InsertAt(i, p);
+				return;
+			}
+		}
+		_favourites->Append(p);
+	}
+
+	void PuzzleList::RemoveFavourite(Puzzle^ p)
+	{
+		unsigned int idx = 0;
+		if (_favourites->IndexOf(p, &idx))
+			_favourites->RemoveAt(idx);
+	}
+
+	bool PuzzleList::IsFavourite(Puzzle ^p)
+	{
+		unsigned int idx = 0;
+		return _favourites->IndexOf(p, &idx);
 	}
 
 	Puzzle::Puzzle()

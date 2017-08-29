@@ -78,18 +78,30 @@ namespace PuzzleModern
 	public:
 		PuzzleList();
 
-		property Windows::Foundation::Collections::IObservableVector<Platform::Object^>^ Items
+		property Windows::Foundation::Collections::IObservableVector<Puzzle^>^ Items
 		{
-			Windows::Foundation::Collections::IObservableVector<Platform::Object^>^ get()
+			Windows::Foundation::Collections::IObservableVector<Puzzle^>^ get()
 			{
 				return _items;
 			}
 		}
 
+		property Windows::Foundation::Collections::IObservableVector<Puzzle^>^ Favourites
+		{
+			Windows::Foundation::Collections::IObservableVector<Puzzle^>^ get()
+			{
+				return _favourites;
+			}
+		}
+
 		void AddPuzzle(Puzzle^ p);
 
+		void AddFavourite(Puzzle^ p);
+		void RemoveFavourite(Puzzle^ p);
+		bool IsFavourite(Puzzle ^p);
+
 	private:
-		Windows::Foundation::Collections::IObservableVector<Platform::Object^>^ _items;
+		Windows::Foundation::Collections::IObservableVector<Puzzle^> ^_items, ^_favourites;
 	};
 
 	ref class PresetList;

@@ -48,7 +48,12 @@ HubPage::HubPage()
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
 
-	DefaultViewModel->Insert("Items", WindowsModern::GetPuzzleList()->Items);
+	_puzzles = WindowsModern::GetPuzzleList();
+	DefaultViewModel->Insert("Items", _puzzles->Items);
+	DefaultViewModel->Insert("Favourites", _puzzles->Favourites);
+
+	if (_puzzles->Favourites->Size != 0 && ApplicationData::Current->LocalSettings->Values->HasKey("feature_favourites"))
+		FavouritesFooter->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 DependencyProperty^ HubPage::_defaultViewModelProperty = DependencyProperty::Register(
@@ -76,11 +81,17 @@ NavigationHelper^ HubPage::NavigationHelper::get()
 void HubPage::OnNavigatedTo(NavigationEventArgs^ e)
 {
 	NavigationHelper->OnNavigatedTo(e);
+	SwitchView();
+	
+	auto settings = ApplicationData::Current->LocalSettings->Values;
+	if (settings->HasKey("feature_hubpage"))
+		Hub->SelectedIndex = safe_cast<int>(settings->Lookup("feature_hubpage"));
 }
 
 void HubPage::OnNavigatedFrom(NavigationEventArgs^ e)
 {
 	NavigationHelper->OnNavigatedFrom(e);
+	ApplicationData::Current->LocalSettings->Values->Insert("feature_hubpage", Hub->SelectedIndex);
 }
 
 /// <summary>
@@ -128,22 +139,45 @@ void HubPage::ListViewItem_Holding(Platform::Object^ sender, Windows::UI::Xaml::
 
 	auto element = safe_cast<ContentControl^>(sender);
 	auto item = safe_cast<Puzzle^>(element->DataContext);
-	bool exists = SecondaryTile::Exists(item->HelpName);
 	auto menu = ref new Windows::UI::Popups::PopupMenu();
 
-	menu->Commands->Append(ref new UICommand(!exists ? "Pin to Start" : "Unpin from Start"));
+	auto settings = ApplicationData::Current->RoamingSettings->Values;
+	bool isFav = _puzzles->IsFavourite(item);
+	auto favCommand = ref new UICommand(!isFav ? "Add to favourites" : "Remove from favourites");
+	menu->Commands->Append(favCommand);
+
+	bool pinExists = SecondaryTile::Exists(item->HelpName);
+	auto pinCommand = ref new UICommand(!pinExists ? "Pin to Start" : "Unpin from Start");
+	menu->Commands->Append(pinCommand);
 	
 	GeneralTransform^ buttonTransform = element->TransformToVisual(nullptr);
 	const Point pointOrig(0, 0);
 	const Point pointTransformed = buttonTransform->TransformPoint(pointOrig);
 	const Rect rect(pointTransformed.X, pointTransformed.Y, safe_cast<float>(element->ActualWidth), safe_cast<float>(element->ActualHeight));
 
-	create_task(menu->ShowForSelectionAsync(rect)).then([this, item, exists](IUICommand^ command)
+	create_task(menu->ShowForSelectionAsync(rect)).then([=](IUICommand^ command)
 	{
-		if (command)
+		if (command == favCommand)
+		{
+			ApplicationData::Current->LocalSettings->Values->Insert("feature_favourites", true);
+			settings->Insert("fav_" + item->Name, !isFav);
+			if (isFav)
+				_puzzles->RemoveFavourite(item);
+			else
+			{
+				_puzzles->AddFavourite(item);
+				this->Hub->SelectedIndex = 1;
+			}
+
+			if(_puzzles->Favourites->Size == 0)
+				FavouritesFooter->Visibility = Windows::UI::Xaml::Visibility::Visible;
+			else
+				FavouritesFooter->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+		}
+		else if (command == pinCommand)
 		{
 			String ^id = item->HelpName;
-			if (!exists)
+			if (!pinExists)
 			{
 				String ^args = item->Name;
 				Uri ^imageUri = item->ImageUri;
@@ -202,20 +236,6 @@ void HubPage::SwitchView()
 		AllPuzzlesListView->Visibility = Windows::UI::Xaml::Visibility::Visible;
 	}
 }
-
-void HubPage::AllPuzzlesGridView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-	AllPuzzlesGridView = safe_cast<Control^>(sender);
-	SwitchView();
-}
-
-
-void HubPage::AllPuzzlesListView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-	AllPuzzlesListView = safe_cast<Control^>(sender);
-	SwitchView();
-}
-
 
 void HubPage::LoadGameButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {

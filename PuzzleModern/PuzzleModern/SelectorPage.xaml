@@ -17,6 +17,45 @@
         <CollectionViewSource
         x:Name="itemsViewSource"
         Source="{Binding Items}"/>
+        <CollectionViewSource
+        x:Name="favouritesViewSource"
+        Source="{Binding Favourites}"/>
+
+        <DataTemplate x:Name="NormalPuzzleTemplate">
+            <Grid HorizontalAlignment="Left" Width="190" Height="255">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="190" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Background="#dcdad5">
+                    <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Name}"/>
+                </Border>
+                <StackPanel Grid.Row="0" VerticalAlignment="Bottom" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
+                    <TextBlock Text="{Binding Name}" Foreground="{ThemeResource ListViewItemOverlayForegroundThemeBrush}" Style="{StaticResource BaseTextBlockStyle}" Height="30" Margin="15,0,15,0" FontWeight="SemiBold"/>
+                </StackPanel>
+                <Border Grid.Row="1" VerticalAlignment="Top" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
+                    <TextBlock Text="{Binding Synopsis}" Foreground="#eee" Style="{StaticResource BaseTextBlockStyle}" TextWrapping="WrapWholeWords" Margin="15,0,15,10" Height="65" FontSize="12"/>
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Name="SmallPuzzleTemplate">
+            <Grid HorizontalAlignment="Left" Width="220" Height="50">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="#dcdad5">
+                    <Image Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Stretch" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
+                    <TextBlock Text="{Binding Name}"
+                                                   Foreground="{ThemeResource ListViewItemOverlayForegroundThemeBrush}" 
+                                                   Style="{StaticResource BaseTextBlockStyle}" 
+                                                   Margin="15,10,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Page.BottomAppBar>
@@ -27,9 +66,13 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="LeftPanel" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                    <AppBarButton x:Name="ButtonFav" Icon="OutlineStar" Label="Add to favourites" Click="ButtonFav_Click"
+                                  Visibility="{Binding FavVisible}"/>
+                    <AppBarButton x:Name="ButtonUnfav" Icon="SolidStar" Label="Remove from favourites" Click="ButtonUnfav_Click"
+                                  Visibility="{Binding UnfavVisible}"/>
                     <AppBarButton x:Name="ButtonPin" Icon="Pin" Label="Pin to Start" Click="ButtonPin_Click"
                                   Visibility="{Binding PinVisible}"/>
-                    <AppBarButton x:Name="ButtonUnpin" Icon="UnPin" Label="Unpin" Click="ButtonUnpin_Click"
+                    <AppBarButton x:Name="ButtonUnpin" Icon="UnPin" Label="Unpin from Start" Click="ButtonUnpin_Click"
                                   Visibility="{Binding UnpinVisible}"/>
                 </StackPanel>
                 <StackPanel x:Name="RightPanel" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
@@ -52,97 +95,74 @@
             </TransitionCollection>
         </Grid.ChildrenTransitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Horizontal scrolling grid -->
-        <SemanticZoom Grid.RowSpan="2" x:Name="itemSemanticZoom"
-                      ViewChangeStarted="itemSemanticZoom_ViewChangeStarted">
-            <SemanticZoom.ZoomedInView>
-                <GridView
-                    x:Name="itemGridView"
-                    AutomationProperties.AutomationId="ItemsGridView"
-                    AutomationProperties.Name="Items"
-                    TabIndex="1"
-                    ItemsSource="{Binding Source={StaticResource itemsViewSource}}"
-                    SelectionMode="Single"
-                    Padding="116,136,116,46"
-                    SelectedIndex="-1"
-                    SelectionChanged="itemGridView_SelectionChanged"
-                    ScrollViewer.IsHorizontalScrollChainingEnabled="False"
-                    IsItemClickEnabled="True"
-                    ItemClick="itemGridView_ItemClick">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid HorizontalAlignment="Left" Width="210" Height="275">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="210" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Border Grid.Row="0" Background="#dcdad5">
-                                    <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Name}"/>
-                                </Border>
-                                <StackPanel Grid.Row="0" VerticalAlignment="Bottom" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
-                                    <TextBlock Text="{Binding Name}" Foreground="{ThemeResource ListViewItemOverlayForegroundThemeBrush}" Style="{StaticResource BaseTextBlockStyle}" Height="30" Margin="15,0,15,0" FontWeight="SemiBold"/>
-                                </StackPanel>
-                                <Border Grid.Row="1" VerticalAlignment="Top" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
-                                    <TextBlock Text="{Binding Synopsis}" Foreground="#eee" Style="{StaticResource BaseTextBlockStyle}" TextWrapping="WrapWholeWords" Margin="15,0,15,10" Height="65" FontSize="12"/>
-                                </Border>
-                            </Grid>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
-            </SemanticZoom.ZoomedInView>
-            <SemanticZoom.ZoomedOutView>
-                <GridView
-                    x:Name="zoomedItemGridView"
-                    AutomationProperties.AutomationId="ItemsGridView"
-                    AutomationProperties.Name="Items"
-                    ScrollViewer.IsHorizontalScrollChainingEnabled="False"
-                    TabIndex="1"
-                    ItemsSource="{Binding Source={StaticResource itemsViewSource}}"
-                    IsItemClickEnabled="True"
-                    ItemClick="itemGridView_ItemClick"
-                    Padding="116,236,116,146">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid HorizontalAlignment="Left" Width="220" Height="50">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0" Background="#dcdad5">
-                                    <Image Source="{Binding Icon}" Stretch="Uniform" AutomationProperties.Name="{Binding Name}"/>
-                                </Border>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Stretch" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
-                                    <TextBlock Text="{Binding Name}"
-                                               Foreground="{ThemeResource ListViewItemOverlayForegroundThemeBrush}" 
-                                               Style="{StaticResource BaseTextBlockStyle}" 
-                                               Margin="15,10,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
-            </SemanticZoom.ZoomedOutView>
-        </SemanticZoom>
-        
+        <Hub x:Name="MainHub"
+             Grid.RowSpan="2"
+             >
+            <HubSection Header="Favourites" Visibility="{Binding FavouritesSectionVisibility}">
+                <DataTemplate>
+                    <Grid>
+                        <GridView
+                            x:Name="favouritesGridView"
+                            Loaded="favouritesGridView_Loaded"
+                            AutomationProperties.AutomationId="FavouritesGridView"
+                            AutomationProperties.Name="Items"
+                            TabIndex="1"
+                            ItemsSource="{Binding Source={StaticResource favouritesViewSource}}"
+                            SelectionMode="Single"
+                            SelectedIndex="-1"
+                            Margin="0,0,0,40"
+                            SelectionChanged="itemGridView_SelectionChanged"
+                            IsItemClickEnabled="True"
+                            ItemClick="itemGridView_ItemClick">
+                            <GridView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Left" Width="190" Height="190">
+                                        <Border Background="#dcdad5">
+                                            <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Name}"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Bottom" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
+                                            <TextBlock Text="{Binding Name}" Foreground="{ThemeResource ListViewItemOverlayForegroundThemeBrush}" Style="{StaticResource BaseTextBlockStyle}" Height="30" Margin="15,0,15,0" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
+                        <Border VerticalAlignment="Bottom" Visibility="{Binding FavFooterVisible}">
+                            <TextBlock Text="Right-click or swipe down on a puzzle icon to add it to your favourites." 
+                                       Foreground="{ThemeResource ListViewItemOverlayForegroundThemeBrush}" 
+                                       Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Width="360" HorizontalAlignment="Left"  />
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </HubSection>
+            <HubSection x:Name="ItemHubSection" Header="All puzzles">
+                <DataTemplate>
+                    <GridView
+                        x:Name="itemGridView"
+                        Loaded="itemGridView_Loaded"
+                        AutomationProperties.AutomationId="ItemsGridView"
+                        AutomationProperties.Name="Items"
+                        TabIndex="2"
+                        ItemsSource="{Binding Source={StaticResource itemsViewSource}}"
+                        SelectionMode="Single"
+                        SelectedIndex="-1"
+                        SelectionChanged="itemGridView_SelectionChanged"
+                        IsItemClickEnabled="True"
+                        ItemClick="itemGridView_ItemClick"
+                        ItemTemplate="{StaticResource NormalPuzzleTemplate}" />
+                </DataTemplate>
+            </HubSection>
+        </Hub>
 
-        <!-- Back button and page title -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
-                        Style="{StaticResource NavigationBackButtonNormalStyle}"
-                        VerticalAlignment="Top"
-                        AutomationProperties.Name="Back"
-                        AutomationProperties.AutomationId="BackButton"
-                        AutomationProperties.ItemType="Navigation Button"/>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
-                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
-        </Grid>
+        <!-- Page title -->
+        <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}"
+                    IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="40,0,0,0" FontSize="48"/>
+
+        <AppBarButton Grid.RowSpan="2" HorizontalAlignment="Right" Icon="List" Margin="0,18,18,0" IsCompact="True" Visibility="{Binding ZoomOutVisible}" Click="ButtonZoomOut_Click" ToolTipService.ToolTip="Display small icons" />
+        <AppBarButton Grid.RowSpan="2" HorizontalAlignment="Right" Icon="ViewAll" Margin="0,18,18,0" IsCompact="True" Visibility="{Binding ZoomInVisible}" Click="ButtonZoomIn_Click" ToolTipService.ToolTip="Display large icons" />
     </Grid>
 </Page>
