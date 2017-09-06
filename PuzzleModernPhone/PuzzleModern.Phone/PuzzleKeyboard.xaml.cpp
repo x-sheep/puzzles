@@ -45,19 +45,22 @@ void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 
 	total = _buttons->Buttons->Size;
 
-	for (i = 0; i < total; i++)
-	{ 
+	// If the keyboard only has one button, center it horizontally and give it a width of 33%.
+	for (i = 0; i < (total != 1 ? total : 3); i++)
+	{
 		MainGrid->ColumnDefinitions->Append(ref new ColumnDefinition());
 	}
 
 	if (Application::Current->RequestedTheme == ApplicationTheme::Light)
 	{
+		MainGrid->Background = ref new SolidColorBrush(Windows::UI::Colors::LightGray);
 		_background = ref new SolidColorBrush(Windows::UI::Colors::White);
 		_foreground = ref new SolidColorBrush(Windows::UI::Colors::LightGray);
 		_text = ref new SolidColorBrush(Windows::UI::Colors::Black);
 	}
 	else
 	{
+		MainGrid->Background = ref new SolidColorBrush(Windows::UI::Colors::Black);
 		_background = safe_cast<Brush^>(Application::Current->Resources->Lookup("ContentDialogBackgroundThemeBrush"));
 		_foreground = ref new SolidColorBrush(Windows::UI::Colors::Black);
 		_text = ref new SolidColorBrush(Windows::UI::Colors::White);
@@ -66,7 +69,7 @@ void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 	_selected = safe_cast<Brush^>(Application::Current->Resources->Lookup("PhoneAccentBrush"));
 	HighlightedBorder->Background = _selected;
 
-	x = 0;
+	x = total != 1 ? 0 : 1;
 	for each (auto b in _buttons->Buttons)
 	{
 		auto rect = ref new Rectangle();

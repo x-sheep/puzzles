@@ -336,11 +336,17 @@ namespace PuzzleModern
 			ButtonType get() { return _holdAction; }
 			void set(ButtonType val) { _holdAction = val; }
 		}
+		property bool SwitchMiddle
+		{
+			bool get() { return _switchMiddle; }
+			void set(bool val) { _switchMiddle = val; }
+		}
 
 	private:
 		Windows::Foundation::Collections::IVector<VirtualButton^>^ _buttons;
 		VirtualButton ^_toggleButton, ^_toolButton;
 		Windows::System::VirtualKey _colorBlind;
+		bool _switchMiddle;
 		ButtonType _leftAction, _middleAction, _rightAction, _touchAction, _holdAction;
 	};
 

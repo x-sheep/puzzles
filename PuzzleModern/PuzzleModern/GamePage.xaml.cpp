@@ -395,9 +395,18 @@ void GamePage::OnGenerationEnd()
 		LeftRightGrid->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 
 	bool isSwitched = ButtonLeftRight->IsChecked->Value;
-	_leftAction = isSwitched ? _controls->RightAction : _controls->LeftAction;
-	_rightAction = isSwitched ? _controls->LeftAction : _controls->RightAction;
-	_middleAction = _controls->MiddleAction;
+	if (_controls->SwitchMiddle)
+	{
+		_leftAction = isSwitched ? _controls->MiddleAction : _controls->LeftAction;
+		_middleAction = isSwitched ? _controls->LeftAction : _controls->MiddleAction;
+		_rightAction = _controls->RightAction;
+	}
+	else
+	{
+		_leftAction = isSwitched ? _controls->RightAction : _controls->LeftAction;
+		_rightAction = isSwitched ? _controls->LeftAction : _controls->RightAction;
+		_middleAction = _controls->MiddleAction;
+	}
 	_touchAction = isSwitched ? _controls->HoldAction : _controls->TouchAction;
 	_holdAction = isSwitched ? _controls->TouchAction : _controls->HoldAction;
 
@@ -1469,8 +1478,16 @@ void GamePage::OnSettingChanged(Platform::Object ^sender, Platform::String ^key,
 
 void GamePage::ButtonLeftRight_Checked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	_leftAction = _controls->RightAction;
-	_rightAction = _controls->LeftAction;
+	if (_controls->SwitchMiddle)
+	{
+		_leftAction = _controls->MiddleAction;
+		_middleAction = _controls->LeftAction;
+	}
+	else
+	{
+		_leftAction = _controls->RightAction;
+		_rightAction = _controls->LeftAction;
+	}
 	_touchAction = _controls->HoldAction;
 	_holdAction = _controls->TouchAction;
 
@@ -1482,6 +1499,7 @@ void GamePage::ButtonLeftRight_Checked(Platform::Object^ sender, Windows::UI::Xa
 void GamePage::ButtonLeftRight_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	_leftAction = _controls->LeftAction;
+	_middleAction = _controls->MiddleAction;
 	_rightAction = _controls->RightAction;
 	_touchAction = _controls->TouchAction;
 	_holdAction = _controls->HoldAction;

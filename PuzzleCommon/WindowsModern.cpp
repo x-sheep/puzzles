@@ -1239,13 +1239,19 @@ namespace PuzzleModern
 			button->Name = "Jumble";
 			button->Key = VirtualKey::J;
 			button->Icon = ref new Windows::UI::Xaml::Controls::SymbolIcon(Windows::UI::Xaml::Controls::Symbol::Shuffle);
-#if !SMALL_SCREEN
 			ret->Append(button);
-#endif
-			collection->ToolButton = button;
 
 			collection->RightAction = ButtonType::MIDDLE;
 			collection->MiddleAction = ButtonType::RIGHT;
+			collection->SwitchMiddle = true;
+
+			auto fontIcon = ref new Windows::UI::Xaml::Controls::FontIcon();
+			fontIcon->FontFamily = ref new Windows::UI::Xaml::Media::FontFamily("Segoe UI Symbol");
+			wchar_t mark = 0xE1F6;
+			fontIcon->Glyph = ref new Platform::String(&mark, 1);
+			collection->ToggleButton = ref new VirtualButton();
+			collection->ToggleButton->Name = "Lock";
+			collection->ToggleButton->Icon = fontIcon;
 		}
 		if (!strcmp(ourgame->name, "Solo"))
 		{
