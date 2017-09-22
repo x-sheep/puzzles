@@ -868,13 +868,14 @@ void GamePage::OnAcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher ^send
 
 	if (e->EventType == Windows::UI::Core::CoreAcceleratorKeyEventType::KeyDown)
 	{
-		if ((_ctrlPressed && k == VirtualKey::Z) || (_undoHotkey && k == VirtualKey::U))
+		if ((_ctrlPressed && !_shiftPressed && k == VirtualKey::Z) || (_undoHotkey && k == VirtualKey::U))
 		{
 			fe->Undo();
 			e->Handled = true;
 			UpdateUndoButtons();
 		}
-		if ((_ctrlPressed && k == VirtualKey::Y) || (_redoHotkey && k == VirtualKey::R))
+		if ((_ctrlPressed && k == VirtualKey::Y) || (_redoHotkey && k == VirtualKey::R)
+			|| (_ctrlPressed && _shiftPressed && k == VirtualKey::Z))
 		{
 			fe->Redo();
 			e->Handled = true;

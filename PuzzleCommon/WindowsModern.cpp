@@ -659,7 +659,7 @@ namespace PuzzleModern
 
 	void WindowsModern::Undo()
 	{
-		midend_process_key(me, 0, 0, '\x1a');
+		midend_process_key(me, 0, 0, UI_UNDO);
 	}
 
 	bool WindowsModern::CanRedo()
@@ -669,7 +669,7 @@ namespace PuzzleModern
 
 	void WindowsModern::Redo()
 	{
-		midend_process_key(me, 0, 0, '\x12');
+		midend_process_key(me, 0, 0, UI_REDO);
 	}
 
 	int WindowsModern::GameWon()
