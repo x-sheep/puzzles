@@ -1493,7 +1493,7 @@ void GamePage::ButtonLeftRight_Checked(Platform::Object^ sender, Windows::UI::Xa
 	_holdAction = _controls->TouchAction;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton1, false, false);
+		fe->SendKey(WindowsModern::ButtonMarkOn, false, false);
 }
 
 
@@ -1506,7 +1506,7 @@ void GamePage::ButtonLeftRight_Unchecked(Platform::Object^ sender, Windows::UI::
 	_holdAction = _controls->HoldAction;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton2, false, false);
+		fe->SendKey(WindowsModern::ButtonMarkOff, false, false);
 }
 
 

@@ -770,7 +770,7 @@ void ItemPage::LeftRightButton_Checked(Platform::Object^ sender, Windows::UI::Xa
 	_holdAction = _controls->TouchAction;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton1, false, false);
+		fe->SendKey(WindowsModern::ButtonMarkOn, false, false);
 }
 
 void ItemPage::LeftRightButton_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -779,7 +779,7 @@ void ItemPage::LeftRightButton_Unchecked(Platform::Object^ sender, Windows::UI::
 	_holdAction = _controls->HoldAction;
 
 	if (!_generatingGame)
-		fe->SendKey(VirtualKey::XButton2, false, false);
+		fe->SendKey(WindowsModern::ButtonMarkOff, false, false);
 }
 
 void ItemPage::LoadGame_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)

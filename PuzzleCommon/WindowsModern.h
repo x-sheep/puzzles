@@ -70,6 +70,9 @@ namespace PuzzleModern
 		void SendKey(Windows::System::VirtualKey key, bool shift, bool control);
 		void SetInputScale(float scale);
 
+		static const Windows::System::VirtualKey ButtonMarkOn = (Windows::System::VirtualKey)BUTTON_MARK_ON;
+		static const Windows::System::VirtualKey ButtonMarkOff = (Windows::System::VirtualKey)BUTTON_MARK_OFF;
+
 	private:
 		const game *ourgame;
 		midend *me;
