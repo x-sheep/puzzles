@@ -1278,7 +1278,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	if (button == 'l' || button == 'L')
 	{
 		ui->labels = !ui->labels;
-		return "";
+		return UI_UPDATE;
 	}
 
     if (button == RIGHT_BUTTON || button == LEFT_BUTTON) {

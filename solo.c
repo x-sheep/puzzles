@@ -4622,12 +4622,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	if (button == BUTTON_MARK_ON && ui->hshow && !ui->hpencil)
 	{
 		ui->hpencil = 1;
-		return "";
+		return UI_UPDATE;
 	}
 	if (button == BUTTON_MARK_OFF && ui->hshow && ui->hpencil)
 	{
 		ui->hpencil = 0;
-		return "";
+		return UI_UPDATE;
 	}
 
     if (ui->hshow &&

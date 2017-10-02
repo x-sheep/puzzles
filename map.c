@@ -2384,7 +2384,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	
     if (button == 'l' || button == 'L') {
         ui->show_labels = (ui->show_labels == COLOUR_LABELS) ? NO_LABELS : COLOUR_LABELS;
-        return "";
+        return UI_UPDATE;
     }
 	
     if (IS_CURSOR_MOVE(button)) {
