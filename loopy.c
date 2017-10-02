@@ -237,7 +237,7 @@ struct game_drawstate {
     char *clue_satisfied;
 };
 
-static char *validate_desc(const game_params *params, const char *desc);
+static const char *validate_desc(const game_params *params, const char *desc);
 static int dot_order(const game_state* state, int i, char line_type);
 static int face_order(const game_state* state, int i, char line_type);
 static solver_state *solve_game_rec(const solver_state *sstate);
@@ -293,14 +293,14 @@ static void check_caches(const solver_state* sstate);
     {amin, omin, \
      "Width and height for this grid type must both be at least " #amin, \
      "At least one of width and height for this grid type must be at least " #omin,},
-enum { GRIDLIST(GRID_LOOPYTYPE) };
+enum { GRIDLIST(GRID_LOOPYTYPE) LOOPY_GRID_DUMMY_TERMINATOR };
 static char const *const gridnames[] = { GRIDLIST(GRID_NAME) };
 #define GRID_CONFIGS GRIDLIST(GRID_CONFIG)
 static grid_type grid_types[] = { GRIDLIST(GRID_GRIDTYPE) };
 #define NUM_GRID_TYPES (sizeof(grid_types) / sizeof(grid_types[0]))
 static const struct {
     int amin, omin;
-    char *aerr, *oerr;
+    const char *aerr, *oerr;
 } grid_size_limits[] = { GRIDLIST(GRID_SIZES) };
 
 /* Generates a (dynamically allocated) new grid, according to the
@@ -645,29 +645,25 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Grid type";
     ret[2].type = C_CHOICES;
-    ret[2].sval = GRID_CONFIGS;
-    ret[2].ival = params->type;
+    ret[2].u.choices.choicenames = GRID_CONFIGS;
+    ret[2].u.choices.selected = params->type;
 
     ret[3].name = "Difficulty";
     ret[3].type = C_CHOICES;
-    ret[3].sval = DIFFCONFIG;
-    ret[3].ival = params->diff;
+    ret[3].u.choices.choicenames = DIFFCONFIG;
+    ret[3].u.choices.selected = params->diff;
 
     ret[4].name = NULL;
     ret[4].type = C_END;
-    ret[4].sval = NULL;
-    ret[4].ival = 0;
 
     return ret;
 }
@@ -676,15 +672,15 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->type = cfg[2].ival;
-    ret->diff = cfg[3].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->type = cfg[2].u.choices.selected;
+    ret->diff = cfg[3].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->type < 0 || params->type >= NUM_GRID_TYPES)
         return "Illegal grid type";
@@ -765,11 +761,12 @@ static char *extract_grid_desc(const char **desc)
 
 /* We require that the params pass the test in validate_params and that the
  * description fills the entire game area */
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int count = 0;
     grid *g;
-    char *grid_desc, *ret;
+    char *grid_desc;
+    const char *ret;
 
     /* It's pretty inefficient to do this just for validation. All we need to
      * know is the precise number of faces. */
@@ -2917,7 +2914,7 @@ static solver_state *solve_game_rec(const solver_state *sstate_start)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     char *soln = NULL;
     solver_state *sstate, *new_sstate;
@@ -3696,7 +3693,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s;
-    char *id = NULL, *desc, *err;
+    char *id = NULL, *desc;
+    const char *err;
     int grade = FALSE;
     int ret, diff;
 #if 0 /* verbose solver not supported here (yet) */
