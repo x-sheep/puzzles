@@ -51,7 +51,7 @@ Platform::String ^FromChars(char *input, bool kill)
 	return ret;
 }
 
-void winmodern_status_bar(void *handle, char *text)
+void winmodern_status_bar(void *handle, const char *text)
 {
 	frontend *fe = (frontend *)handle;
 	PuzzleModern::IPuzzleStatusBar ^bar = *((PuzzleModern::IPuzzleStatusBar^*)fe->statusbar);
@@ -92,7 +92,7 @@ void winmodern_unclip(void *handle)
 }
 
 void winmodern_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
-	int align, int colour, char *text)
+	int align, int colour, const char *text)
 {
 	frontend *fe = (frontend *)handle;
 	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
@@ -432,7 +432,7 @@ int winmodern_read_chars(void *wctx, void *buf, int len)
 }
 
 // Writing function for serialization
-void winmodern_write_chars(void *vctx, void *buf, int len)
+void winmodern_write_chars(void *vctx, const void *buf, int len)
 {
 	PuzzleModern::write_save_context *ctx;
 	ctx = (PuzzleModern::write_save_context *)vctx;
@@ -626,7 +626,7 @@ namespace PuzzleModern
 
 	Platform::String ^WindowsModern::Solve()
 	{
-		char *msg = midend_solve(me);
+		const char *msg = midend_solve(me);
 		if (msg)
 			return FromChars(msg);
 		return nullptr;
@@ -1055,24 +1055,27 @@ namespace PuzzleModern
 		for (i = fe->configs; i->type != C_END; i++)
 		{
 			ConfigItem ^item = ref new ConfigItem();
+			item->Label = FromChars(i->name);
+
 			item->Field = i->type == C_BOOLEAN ? ConfigField::BOOLEAN : 
 				i->type == C_CHOICES ? ConfigField::ENUM : 
-				i->ival == CONFIGS_STRING ? ConfigField::TEXT :
-				i->ival == CONFIGS_FLOAT ? ConfigField::FLOAT : 
+				item->Label == "No. of balls" ? ConfigField::TEXT :
+				item->Label == "Barrier probability" ? ConfigField::FLOAT :
 				ConfigField::INTEGER;
 
-			item->Label = FromChars(i->name);
 			if (i->type == C_STRING)
-				item->StringValue = FromChars(i->sval);
-			item->IntValue = i->ival;
-
-			if (i->type == C_CHOICES)
+				item->StringValue = FromChars(i->u.string.sval);
+			else if(i->type == C_BOOLEAN)
+				item->IntValue = i->u.boolean.bval;
+			else if (i->type == C_CHOICES)
 			{
 				item->StringValues = ref new Vector<Platform::String^>();
+				item->IntValue = i->u.choices.selected;
 
 				/* Parse the list of choices. Copied from windows.c */
-				char c = i->sval[0];
-				char *str, *q, *p = i->sval + 1;
+				char c = i->u.choices.choicenames[0];
+				char *str;
+				const char *q, *p = i->u.choices.choicenames + 1;
 				while (*p) {
 					q = p;
 					while (*q && *q != c) q++;
@@ -1097,12 +1100,14 @@ namespace PuzzleModern
 		config_item *i;
 		for (i = fe->configs; i->type != C_END; i++, idx++)
 		{
-			if (i->type == C_BOOLEAN || i->type == C_CHOICES)
-				i->ival = input->GetAt(idx)->IntValue;
-			if (i->type == C_STRING)
-				i->sval = ToChars(input->GetAt(idx)->StringValue);
+			if (i->type == C_BOOLEAN)
+				i->u.boolean.bval = input->GetAt(idx)->IntValue;
+			else if (i->type == C_CHOICES)
+				i->u.choices.selected = input->GetAt(idx)->IntValue;
+			else if (i->type == C_STRING)
+				i->u.string.sval = ToChars(input->GetAt(idx)->StringValue);
 		}
-		char *err = midend_set_config(me, CFG_SETTINGS, fe->configs);
+		const char *err = midend_set_config(me, CFG_SETTINGS, fe->configs);
 		if (err)
 			return FromChars(err);
 		return nullptr;

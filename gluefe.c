@@ -31,7 +31,7 @@ void frontend_default_colour(frontend *fe, float *output)
 		output[0] = output[1] = output[2] = 0.9f;
 }
 
-void fatal(char *fmt, ...)
+void fatal(const char *fmt, ...)
 {
 	char fullmsg[1024];
 	va_list va;
@@ -69,7 +69,7 @@ void check_abort(void)
 }
 
 #ifdef DEBUGGING
-void debug_printf(char *fmt, ...)
+void debug_printf(const char *fmt, ...)
 {
 	char fullmsg[1024];
 	va_list va;

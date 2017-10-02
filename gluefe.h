@@ -42,7 +42,7 @@ struct blitter {
 void get_random_seed(void **randseed, int *randseedsize);
 char *getenv(const char *key);
 void frontend_default_colour(frontend *fe, float *output);
-void fatal(char *fmt, ...);
+void fatal(const char *fmt, ...);
 void deactivate_timer(frontend *fe);
 void activate_timer(frontend *fe);
 void check_abort(void);
