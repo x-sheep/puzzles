@@ -509,6 +509,8 @@ void ItemPage::UpdateUndoButtons()
 	if (win == +1 && !_wonGame)
 	{
 		_wonGame = true;
+		if (fe->JustPerformedUndo())
+			return;
 
 		auto settings = ApplicationData::Current->RoamingSettings;
 		if (settings->Values->HasKey("cfg_newgameprompt") && !safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt")))

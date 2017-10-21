@@ -662,6 +662,11 @@ namespace PuzzleModern
 		midend_process_key(me, 0, 0, UI_UNDO);
 	}
 
+	bool WindowsModern::JustPerformedUndo()
+	{
+		return midend_just_performed_undo(me) != 0;
+	}
+
 	bool WindowsModern::CanRedo()
 	{
 		return midend_can_redo(me) != 0;

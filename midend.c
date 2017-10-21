@@ -65,6 +65,7 @@ struct midend {
 
     char *newgame_undo_buf;
     int newgame_undo_len, newgame_undo_size;
+    int just_performed_undo;
 
     game_params *params, *curparams;
     game_drawstate *drawstate;
@@ -160,6 +161,7 @@ midend *midend_new(frontend *fe, const game *ourgame,
     me->states = NULL;
     me->newgame_undo_buf = NULL;
     me->newgame_undo_size = me->newgame_undo_len = 0;
+    me->just_performed_undo = FALSE;
     me->params = ourgame->default_params();
     me->game_id_change_notify_function = NULL;
     me->game_id_change_notify_ctx = NULL;
@@ -755,6 +757,11 @@ void midend_restart_game(midend *me)
     midend_set_timer(me);
 }
 
+int midend_just_performed_undo(midend *me)
+{
+    return me->just_performed_undo;
+}
+
 static int midend_really_process_key(midend *me, int x, int y, int button)
 {
     game_state *oldstate =
@@ -763,6 +770,7 @@ static int midend_really_process_key(midend *me, int x, int y, int button)
     float anim_time;
     game_state *s;
     char *movestr = NULL;
+    me->just_performed_undo = FALSE;
 
     if (!IS_UI_FAKE_KEY(button)) {
         movestr = me->ourgame->interpret_move(
@@ -776,6 +784,7 @@ static int midend_really_process_key(midend *me, int x, int y, int button)
 	    midend_stop_anim(me);
 	    type = me->states[me->statepos-1].movetype;
 	    gottype = TRUE;
+	    me->just_performed_undo = TRUE;
 	    if (!midend_undo(me))
 		goto done;
 	} else if (button == '\x12' || button == '\x19' ||

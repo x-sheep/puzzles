@@ -58,6 +58,7 @@ namespace PuzzleModern
 		void RestartGame();
 		bool CanUndo();
 		void Undo();
+		bool JustPerformedUndo();
 		bool CanRedo();
 		void Redo();
 		int GameWon();
