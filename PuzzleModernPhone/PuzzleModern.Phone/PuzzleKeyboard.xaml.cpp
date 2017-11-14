@@ -35,7 +35,7 @@ PuzzleKeyboard::PuzzleKeyboard()
 
 void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 {
-	int i, x, total;
+	int i, x;
 
 	MainGrid->Children->Clear();
 	MainGrid->ColumnDefinitions->Clear();
@@ -43,10 +43,10 @@ void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 	if (!_buttons)
 		return;
 
-	total = _buttons->Buttons->Size;
+	_total = _buttons->Buttons->Size;
 
 	// If the keyboard only has one button, center it horizontally and give it a width of 33%.
-	for (i = 0; i < (total != 1 ? total : 3); i++)
+	for (i = 0; i < (_total != 1 ? _total : 3); i++)
 	{
 		MainGrid->ColumnDefinitions->Append(ref new ColumnDefinition());
 	}
@@ -69,7 +69,7 @@ void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 	_selected = safe_cast<Brush^>(Application::Current->Resources->Lookup("PhoneAccentBrush"));
 	HighlightedBorder->Background = _selected;
 
-	x = total != 1 ? 0 : 1;
+	x = _total != 1 ? 0 : 1;
 	for each (auto b in _buttons->Buttons)
 	{
 		auto rect = ref new Rectangle();
@@ -125,6 +125,12 @@ void PuzzleKeyboard::Rectangle_OnPointerExited(Platform::Object ^sender, Pointer
 	auto rect = safe_cast<Rectangle^>(sender);
 	auto button = safe_cast<VirtualButton^>(rect->Tag);
 	rect->Fill = _background;
+
+	if (_total == 1)
+	{
+		HighlightedBorder->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+		_heldButton = nullptr;
+	}
 }
 
 void PuzzleKeyboard::MainGrid_PointerPressed(Platform::Object^ sender, PointerRoutedEventArgs^ e)

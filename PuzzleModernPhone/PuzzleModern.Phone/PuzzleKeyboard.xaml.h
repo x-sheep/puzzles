@@ -37,6 +37,7 @@ namespace PuzzleModern
 		Windows::UI::Xaml::Media::Brush ^_background, ^_foreground, ^_text, ^_selected;
 
 		bool _holding;
+		int _total;
 		VirtualButton ^_heldButton;
 		void MainGrid_PointerPressed(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 		void MainGrid_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
