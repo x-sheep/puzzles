@@ -69,7 +69,7 @@ struct midend {
     struct midend_state_entry *states;
 
     struct midend_serialise_buf newgame_undo, newgame_redo;
-    int just_performed_undo;
+    int just_performed_undo, just_performed_redo;
     int newgame_can_store_undo;
 
     game_params *params, *curparams;
@@ -169,6 +169,7 @@ midend *midend_new(frontend *fe, const game *ourgame,
     me->newgame_redo.buf = NULL;
     me->newgame_redo.size = me->newgame_redo.len = 0;
     me->just_performed_undo = FALSE;
+    me->just_performed_redo = FALSE;
     me->newgame_can_store_undo = FALSE;
     me->params = ourgame->default_params();
     me->game_id_change_notify_function = NULL;
@@ -773,6 +774,8 @@ static int midend_redo(midend *me)
             newgame_serialise_write(&me->newgame_undo, serbuf.buf, serbuf.len);
 
             sfree(serbuf.buf);
+
+            me->just_performed_redo = TRUE;
             return 1;
         }
     } else
@@ -862,6 +865,11 @@ int midend_just_performed_undo(midend *me)
     return me->just_performed_undo;
 }
 
+int midend_just_performed_redo(midend *me)
+{
+    return me->just_performed_redo;
+}
+
 static int midend_really_process_key(midend *me, int x, int y, int button)
 {
     game_state *oldstate =
@@ -871,6 +879,7 @@ static int midend_really_process_key(midend *me, int x, int y, int button)
     game_state *s;
     char *movestr = NULL;
     me->just_performed_undo = FALSE;
+    me->just_performed_redo = FALSE;
 
     if (!IS_UI_FAKE_KEY(button)) {
         movestr = me->ourgame->interpret_move(

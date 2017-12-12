@@ -307,6 +307,7 @@ void midend_new_game(midend *me);
 void midend_restart_game(midend *me);
 void midend_stop_anim(midend *me);
 int midend_just_performed_undo(midend *me);
+int midend_just_performed_redo(midend *me);
 int midend_process_key(midend *me, int x, int y, int button);
 void midend_force_redraw(midend *me);
 void midend_redraw(midend *me);

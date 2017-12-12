@@ -528,6 +528,9 @@ void ItemPage::UpdateUndoButtons()
 		});
 		timer->Start();
 	}
+
+	if (fe->JustPerformedRedo())
+		_wonGame = false;
 }
 
 void ItemPage::UndoButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)

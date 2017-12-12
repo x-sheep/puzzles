@@ -335,6 +335,9 @@ void GamePage::UpdateUndoButtons()
 		});
 		timer->Start();
 	}
+
+	if (fe->JustPerformedRedo())
+		_wonGame = false;
 }
 
 void GamePage::HighlightCurrentPreset()
