@@ -235,10 +235,6 @@ void winmodern_end_draw(void *handle)
 	canvas->EndDraw();
 }
 
-void winmodern_changed_state(void *handle, int can_undo, int can_redo)
-{
-}
-
 static char *winmodern_text_fallback(void *handle, const char *const *strings,
 	int nstrings)
 {

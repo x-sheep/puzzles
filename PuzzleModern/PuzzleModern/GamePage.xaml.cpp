@@ -416,13 +416,14 @@ void GamePage::OnGenerationEnd()
 	_holdAction = isSwitched ? _controls->TouchAction : _controls->HoldAction;
 
 	_wonGame = fe->GameWon() == 1;
-	UpdateUndoButtons();
 	fe->GetPresetList(true, 2);
 	HighlightCurrentPreset();
 	ResizeWindow(this->ActualWidth, this->ActualHeight);
 	ResizeGame();
 
 	_generatingGame = false;
+	UpdateUndoButtons();
+
 	if (!_finishedOverlayAnimation)
 	{
 		BusyOverlayAppearingStoryboard->Stop();
