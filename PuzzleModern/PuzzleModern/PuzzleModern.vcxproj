@@ -148,7 +148,7 @@
     <ClInclude Include="..\..\PuzzleCommon\IPuzzleCanvas.h" />
     <ClInclude Include="..\..\latin.h" />
     <ClInclude Include="..\..\loopgen.h" />
-    <ClInclude Include="..\..\maxflow.h" />
+    <ClInclude Include="..\..\matching.h" />
     <ClInclude Include="ParamsFlyout.xaml.h">
       <DependentUpon>ParamsFlyout.xaml</DependentUpon>
     </ClInclude>
@@ -608,7 +608,7 @@
     <ClCompile Include="..\..\map.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-    <ClCompile Include="..\..\maxflow.c">
+    <ClCompile Include="..\..\matching.c">
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="..\..\midend.c">

@@ -128,7 +128,7 @@
     <ClCompile Include="..\..\map.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\maxflow.c">
+    <ClCompile Include="..\..\matching.c">
       <Filter>Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\midend.c">
@@ -273,7 +273,7 @@
     <ClInclude Include="..\..\loopgen.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\maxflow.h">
+    <ClInclude Include="..\..\matching.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\penrose.h">

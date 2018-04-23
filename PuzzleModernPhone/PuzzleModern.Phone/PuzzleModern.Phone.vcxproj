@@ -105,7 +105,7 @@
     <ClInclude Include="..\..\PuzzleCommon\IPuzzleCanvas.h" />
     <ClInclude Include="..\..\latin.h" />
     <ClInclude Include="..\..\loopgen.h" />
-    <ClInclude Include="..\..\maxflow.h" />
+    <ClInclude Include="..\..\matching.h" />
     <ClInclude Include="ParamsDialog.xaml.h">
       <DependentUpon>ParamsDialog.xaml</DependentUpon>
     </ClInclude>
@@ -573,7 +573,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\maxflow.c">
+    <ClCompile Include="..\..\matching.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
