@@ -1815,6 +1815,7 @@ struct game const thegame = {
     free_ui,
     encode_ui,
     decode_ui,
+    NULL, /* game_request_keys */
     game_changed_state,
     interpret_move,
     execute_move,
