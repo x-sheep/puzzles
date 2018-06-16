@@ -225,7 +225,6 @@ namespace PuzzleModern
 	{
 	public:
 		VirtualButton();
-		static VirtualButton ^FromNumber(int c);
 
 		property Platform::String ^Name
 		{
@@ -245,25 +244,12 @@ namespace PuzzleModern
 			void set(Windows::UI::Xaml::Controls::IconElement ^value){ _icon = value; }
 		}
 
-		static VirtualButton ^Backspace()
-		{
-			auto button = ref new VirtualButton();
-			button->Name = L"\u232b";
-			button->Key = Windows::System::VirtualKey::Back;
-			return button;
-		}
-
 		static VirtualButton ^ToggleButton(Platform::String ^name, Windows::UI::Xaml::Controls::Symbol icon)
 		{
 			auto button = ref new VirtualButton();
 			button->Name = name;
 			button->Icon = ref new Windows::UI::Xaml::Controls::SymbolIcon(icon);
 			return button;
-		}
-
-		static VirtualButton ^Pencil()
-		{
-			return ToggleButton("Mark", Windows::UI::Xaml::Controls::Symbol::Edit);
 		}
 
 	private:

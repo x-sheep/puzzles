@@ -84,23 +84,4 @@ namespace PuzzleModern
 	VirtualButton::VirtualButton() : _icon(nullptr)
 	{
 	}
-
-	VirtualButton ^VirtualButton::FromNumber(int c)
-	{
-		auto ret = ref new VirtualButton();
-
-		if (c < 10)
-		{
-			ret->Name = c.ToString();
-			ret->Key = VirtualKey(c + (int)VirtualKey::Number0);
-		}
-		else
-		{
-			c -= 10;
-			wchar_t ch = (wchar_t)(c + L'A');
-			ret->Name = ref new Platform::String(&ch, 1);
-			ret->Key = VirtualKey(c + (int)VirtualKey::A);
-		}
-		return ret;
-	}
 }
