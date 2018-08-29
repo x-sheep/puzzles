@@ -1,0 +1,773 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{32839afb-652e-4852-a59e-84d912f5c979}</ProjectGuid>
+    <RootNamespace>PuzzleModern</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+    <ApplicationType>Windows Phone</ApplicationType>
+    <ApplicationTypeRevision>8.1</ApplicationTypeRevision>
+    <ProjectName>PuzzleModern.Phone</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_wp81</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_wp81</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120_wp81</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120_wp81</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
+    <AppxBundle>Always</AppxBundle>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)$(MSBuildProjectName)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <PreprocessorDefinitions>COMBINED;STYLUS_BASED;SMALL_SCREEN;PORTRAIT_SCREEN;SLOW_SYSTEM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(WindowsPhoneSDK_LibraryPath_x86)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WindowsPhoneCore.lib;RuntimeObject.lib;PhoneAppModelHost.lib;DXGI.lib;D3D11.lib;D2D1.lib;DWrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='ARM'">
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(WindowsPhoneSDK_LibraryPath_arm)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WindowsPhoneCore.lib;RuntimeObject.lib;PhoneAppModelHost.lib;DXGI.lib;D3D11.lib;D2D1.lib;DWrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="AboutPage.xaml.h">
+      <DependentUpon>AboutPage.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.h">
+      <DependentUpon>..\PuzzleCommon\Direct2DPuzzleCanvas.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\gluefe.h" />
+    <ClInclude Include="..\grid.h" />
+    <ClInclude Include="HelpPage.xaml.h">
+      <DependentUpon>HelpPage.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\PuzzleCommon\IPuzzleCanvas.h" />
+    <ClInclude Include="..\latin.h" />
+    <ClInclude Include="..\loopgen.h" />
+    <ClInclude Include="..\matching.h" />
+    <ClInclude Include="ParamsDialog.xaml.h">
+      <DependentUpon>ParamsDialog.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\penrose.h" />
+    <ClInclude Include="PresetDialog.xaml.h">
+      <DependentUpon>PresetDialog.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\PuzzleCommon\PulseEffect.xaml.h">
+      <DependentUpon>..\PuzzleCommon\PulseEffect.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\PuzzleCommon\PuzzleData.h" />
+    <ClInclude Include="..\PuzzleCommon\PuzzleHelpData.h" />
+    <ClInclude Include="..\PuzzleCommon\PuzzleImageSource.h" />
+    <ClInclude Include="PuzzleKeyboard.xaml.h">
+      <DependentUpon>PuzzleKeyboard.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\puzzles.h" />
+    <ClInclude Include="..\resource.h" />
+    <ClInclude Include="SettingsPage.xaml.h">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.h">
+      <DependentUpon>..\PuzzleCommon\ShapePuzzleCanvas.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="SpecificDialog.xaml.h">
+      <DependentUpon>SpecificDialog.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="TileButton.xaml.h">
+      <DependentUpon>TileButton.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\tree234.h" />
+    <ClInclude Include="Common\NavigationHelper.h" />
+    <ClInclude Include="Common\RelayCommand.h" />
+    <ClInclude Include="Common\SuspensionManager.h" />
+    <ClInclude Include="ItemPage.xaml.h">
+      <DependentUpon>ItemPage.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="App.xaml.h">
+      <DependentUpon>App.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="HubPage.xaml.h">
+      <DependentUpon>HubPage.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="..\PuzzleCommon\WindowsModern.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="AboutPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml" />
+    <Page Include="HelpPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="HubPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ItemPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ParamsDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PresetDialog.xaml" />
+    <Page Include="..\PuzzleCommon\PulseEffect.xaml" />
+    <Page Include="PuzzleKeyboard.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SettingsPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml" />
+    <Page Include="SpecificDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TileButton.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Common\ReadMe.txt" />
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <None Include="..\Help\blackbox.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\bridges.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\common.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\cube.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\docindex.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\dominosa.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\fifteen.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\filling.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\flip.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\flood.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\galaxies.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\guess.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\index.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\inertia.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\intro.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\keen.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\licence.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\lightup.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\loopy.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\magnets.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\map.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\mines.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\net.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\netslide.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\palisade.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\pattern.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\pearl.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\pegs.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\range.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\rect.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\samegame.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\signpost.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\singles.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\sixteen.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\slant.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\solo.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="style.css">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\tents.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\towers.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\tracks.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\twiddle.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\undead.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\unequal.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\unruly.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\Help\untangle.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\DarkGray.png" />
+    <Image Include="Assets\LightGray.png" />
+    <Image Include="Assets\Logo.scale-240.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\MediumGray.png" />
+    <Image Include="Assets\SmallLogo.scale-100.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\SmallLogo.scale-140.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\SmallLogo.scale-240.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\Square71x71Logo.scale-100.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\Square71x71Logo.scale-140.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\StoreLogo.scale-100.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\StoreLogo.scale-140.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\StoreLogo.scale-240.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\SplashScreen.scale-240.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\Square71x71Logo.scale-240.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\WideLogo.scale-240.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Icons\blackbox-large.png" />
+    <Image Include="Icons\blackbox-small.png" />
+    <Image Include="Icons\bridges-large.png" />
+    <Image Include="Icons\bridges-small.png" />
+    <Image Include="Icons\cube-large.png" />
+    <Image Include="Icons\cube-small.png" />
+    <Image Include="Icons\dominosa-large.png" />
+    <Image Include="Icons\dominosa-small.png" />
+    <Image Include="Icons\fifteen-large.png" />
+    <Image Include="Icons\fifteen-small.png" />
+    <Image Include="Icons\filling-large.png" />
+    <Image Include="Icons\filling-small.png" />
+    <Image Include="Icons\flip-large.png" />
+    <Image Include="Icons\flip-small.png" />
+    <Image Include="Icons\flood-large.png" />
+    <Image Include="Icons\flood-small.png" />
+    <Image Include="Icons\galaxies-large.png" />
+    <Image Include="Icons\galaxies-small.png" />
+    <Image Include="Icons\guess-large.png" />
+    <Image Include="Icons\guess-small.png" />
+    <Image Include="Icons\inertia-large.png" />
+    <Image Include="Icons\inertia-small.png" />
+    <Image Include="Icons\keen-large.png" />
+    <Image Include="Icons\keen-small.png" />
+    <Image Include="Icons\lightup-large.png" />
+    <Image Include="Icons\lightup-small.png" />
+    <Image Include="Icons\loopy-large.png" />
+    <Image Include="Icons\loopy-small.png" />
+    <Image Include="Icons\magnets-large.png" />
+    <Image Include="Icons\magnets-small.png" />
+    <Image Include="Icons\map-large.png" />
+    <Image Include="Icons\map-small.png" />
+    <Image Include="Icons\mines-large.png" />
+    <Image Include="Icons\mines-small.png" />
+    <Image Include="Icons\net-large.png" />
+    <Image Include="Icons\net-small.png" />
+    <Image Include="Icons\netslide-large.png" />
+    <Image Include="Icons\netslide-small.png" />
+    <Image Include="Icons\palisade-large.png" />
+    <Image Include="Icons\palisade-small.png" />
+    <Image Include="Icons\pattern-large.png" />
+    <Image Include="Icons\pattern-small.png" />
+    <Image Include="Icons\pearl-large.png" />
+    <Image Include="Icons\pearl-small.png" />
+    <Image Include="Icons\pegs-large.png" />
+    <Image Include="Icons\pegs-small.png" />
+    <Image Include="Icons\range-large.png" />
+    <Image Include="Icons\range-small.png" />
+    <Image Include="Icons\rect-large.png" />
+    <Image Include="Icons\rect-small.png" />
+    <Image Include="Icons\samegame-large.png" />
+    <Image Include="Icons\samegame-small.png" />
+    <Image Include="Icons\signpost-large.png" />
+    <Image Include="Icons\signpost-small.png" />
+    <Image Include="Icons\singles-large.png" />
+    <Image Include="Icons\singles-small.png" />
+    <Image Include="Icons\sixteen-large.png" />
+    <Image Include="Icons\sixteen-small.png" />
+    <Image Include="Icons\slant-large.png" />
+    <Image Include="Icons\slant-small.png" />
+    <Image Include="Icons\solo-large.png" />
+    <Image Include="Icons\solo-small.png" />
+    <Image Include="Icons\tents-large.png" />
+    <Image Include="Icons\tents-small.png" />
+    <Image Include="Icons\towers-large.png" />
+    <Image Include="Icons\towers-small.png" />
+    <Image Include="Icons\tracks-large.png" />
+    <Image Include="Icons\tracks-small.png" />
+    <Image Include="Icons\twiddle-large.png" />
+    <Image Include="Icons\twiddle-small.png" />
+    <Image Include="Icons\undead-large.png" />
+    <Image Include="Icons\undead-small.png" />
+    <Image Include="Icons\unequal-large.png" />
+    <Image Include="Icons\unequal-small.png" />
+    <Image Include="Icons\unruly-large.png" />
+    <Image Include="Icons\unruly-small.png" />
+    <Image Include="Icons\untangle-large.png" />
+    <Image Include="Icons\untangle-small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AboutPage.xaml.cpp">
+      <DependentUpon>AboutPage.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="App.xaml.cpp">
+      <DependentUpon>App.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\blackbox.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\bridges.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\combi.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\cube.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.cpp">
+      <DependentUpon>..\PuzzleCommon\Direct2DPuzzleCanvas.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\divvy.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\dominosa.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\drawing.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\dsf.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\fifteen.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\filling.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\findloop.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\flip.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\flood.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\galaxies.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\gluefe.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\grid.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\guess.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="HelpPage.xaml.cpp">
+      <DependentUpon>HelpPage.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\inertia.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\keen.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\latin.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\laydomino.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\lightup.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\list.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\loopgen.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\loopy.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\magnets.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\malloc.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\map.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\matching.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\midend.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\mines.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\misc.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\net.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\netslide.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\no-icon.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\nullgame.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\obfusc.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ParamsDialog.xaml.cpp">
+      <DependentUpon>ParamsDialog.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\pattern.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\palisade.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\pearl.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\pegs.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\penrose.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="PresetDialog.xaml.cpp">
+      <DependentUpon>PresetDialog.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\printing.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\PuzzleCommon\PulseEffect.xaml.cpp">
+      <DependentUpon>..\PuzzleCommon\PulseEffect.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\PuzzleCommon\PuzzleData.cpp" />
+    <ClCompile Include="..\PuzzleCommon\PuzzleImageSource.cpp" />
+    <ClCompile Include="PuzzleKeyboard.xaml.cpp">
+      <DependentUpon>PuzzleKeyboard.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\random.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\range.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\rect.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\samegame.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SettingsPage.xaml.cpp">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.cpp">
+      <DependentUpon>..\PuzzleCommon\ShapePuzzleCanvas.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\signpost.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\singles.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\sixteen.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\slant.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\solo.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SpecificDialog.xaml.cpp">
+      <DependentUpon>SpecificDialog.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\tdq.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\tents.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TileButton.xaml.cpp">
+      <DependentUpon>TileButton.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="..\towers.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\tree234.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\tracks.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\twiddle.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\undead.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\unequal.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\unruly.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\untangle.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\NavigationHelper.cpp" />
+    <ClCompile Include="Common\RelayCommand.cpp" />
+    <ClCompile Include="Common\SuspensionManager.cpp" />
+    <ClCompile Include="HubPage.xaml.cpp">
+      <DependentUpon>HubPage.xaml</DependentUpon>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</DeploymentContent>
+    </ClCompile>
+    <ClCompile Include="ItemPage.xaml.cpp">
+      <DependentUpon>ItemPage.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\PuzzleCommon\WindowsModern.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="Strings\en-US\Resources.resw">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+    </PRIResource>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

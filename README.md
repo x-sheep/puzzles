@@ -20,8 +20,8 @@ Note that this fork has several modifications which cause the original makefiles
 * `/html, /unfinished, /icons` - Only used by the upstream code.
 * `/Help` - The HTML manual.
 * `/PuzzleCommon` - Shared C++ sources. All graphics handling and interfacing with the original source code is located here.
-* `/PuzzleModern` - Solution with Windows 8.1 project.
-* `/PuzzleModernPhone` - Solution with Windows Phone 8.1 project.
+* `/PuzzleModern` - Windows 8.1 project.
+* `/PuzzleModern.Phone` - Windows Phone 8.1 project.
 
 ## Copyright
 

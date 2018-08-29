@@ -1,0 +1,750 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{b3f19886-ad3d-4685-ac40-c118b04c9010}</UniqueIdentifier>
+      <Extensions>bmp;fbx;gif;jpg;jpeg;tga;tiff;tif;png</Extensions>
+    </Filter>
+    <Image Include="Assets\Logo.scale-240.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SmallLogo.scale-240.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.scale-240.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SplashScreen.scale-240.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\WideLogo.scale-240.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square71x71Logo.scale-240.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Filter Include="Strings">
+      <UniqueIdentifier>{e8b0b88f-225d-4cad-a82c-f3488345ad8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strings\en-US">
+      <UniqueIdentifier>{3ca8866b-0618-428e-8d3c-12123cddc85f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{c5288069-9c98-4302-9f5a-30beac1c9d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Code">
+      <UniqueIdentifier>{1a44e090-6c6d-4f72-8f9b-988b9bfc229a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Headers">
+      <UniqueIdentifier>{85a8a64c-e518-471d-932c-5aacd47b8363}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Icons">
+      <UniqueIdentifier>{d1ab4138-b410-479e-8315-beecc7ae1b00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Help">
+      <UniqueIdentifier>{694edf03-1e45-43a8-a25b-3ffb68e849ac}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Common\ReadMe.txt">
+      <Filter>Common</Filter>
+    </None>
+    <ClCompile Include="Common\NavigationHelper.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\RelayCommand.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SuspensionManager.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <None Include="..\Help\blackbox.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\bridges.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\common.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\cube.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\docindex.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\dominosa.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\fifteen.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\filling.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\flip.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\galaxies.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\guess.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\index.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\inertia.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\intro.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\keen.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\licence.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\lightup.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\loopy.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\magnets.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\map.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\mines.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\net.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\netslide.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\palisade.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\pattern.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\pearl.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\pegs.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\range.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\rect.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\samegame.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\signpost.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\singles.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\sixteen.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\slant.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\solo.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="style.css">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\tents.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\towers.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\twiddle.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\undead.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\unequal.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\unruly.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\untangle.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\flood.html">
+      <Filter>Help</Filter>
+    </None>
+    <None Include="..\Help\tracks.html">
+      <Filter>Help</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\NavigationHelper.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RelayCommand.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SuspensionManager.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemPage.xaml.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="App.xaml.h" />
+    <ClInclude Include="HubPage.xaml.h" />
+    <ClInclude Include="..\PuzzleCommon\WindowsModern.h" />
+    <ClInclude Include="..\PuzzleCommon\PuzzleData.h" />
+    <ClInclude Include="..\PuzzleCommon\IPuzzleCanvas.h" />
+    <ClInclude Include="..\gluefe.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\grid.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\latin.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\loopgen.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matching.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\penrose.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\puzzles.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tree234.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\resource.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.h" />
+    <ClInclude Include="AboutPage.xaml.h" />
+    <ClInclude Include="..\PuzzleCommon\PuzzleImageSource.h" />
+    <ClInclude Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.h" />
+    <ClInclude Include="ParamsDialog.xaml.h" />
+    <ClInclude Include="PresetDialog.xaml.h" />
+    <ClInclude Include="SpecificDialog.xaml.h" />
+    <ClInclude Include="HelpPage.xaml.h" />
+    <ClInclude Include="PuzzleKeyboard.xaml.h" />
+    <ClInclude Include="..\PuzzleCommon\PuzzleHelpData.h" />
+    <ClInclude Include="SettingsPage.xaml.h" />
+    <ClInclude Include="..\PuzzleCommon\PulseEffect.xaml.h" />
+    <ClInclude Include="TileButton.xaml.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="Strings\en-US\Resources.resw">
+      <Filter>Strings\en-US</Filter>
+    </PRIResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\DarkGray.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\LightGray.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\MediumGray.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Icons\blackbox-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\blackbox-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\bridges-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\bridges-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\cube-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\cube-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\dominosa-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\dominosa-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\fifteen-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\fifteen-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\filling-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\filling-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\flip-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\flip-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\galaxies-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\galaxies-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\guess-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\guess-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\inertia-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\inertia-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\keen-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\keen-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\lightup-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\lightup-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\loopy-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\loopy-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\magnets-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\magnets-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\map-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\map-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\mines-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\mines-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\net-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\net-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\netslide-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\netslide-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\pattern-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\pattern-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\palisade-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\palisade-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\pearl-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\pearl-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\pegs-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\pegs-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\range-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\range-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\samegame-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\samegame-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\signpost-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\signpost-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\singles-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\singles-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\sixteen-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\sixteen-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\slant-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\slant-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\solo-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\solo-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\tents-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\tents-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\towers-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\towers-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\tracks-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\tracks-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\twiddle-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\twiddle-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\undead-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\undead-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\unequal-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\unequal-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\unruly-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\unruly-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\untangle-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\untangle-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\flood-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\flood-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Assets\Square71x71Logo.scale-140.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.scale-140.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SmallLogo.scale-140.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SmallLogo.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square71x71Logo.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Icons\rect-large.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\rect-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="App.xaml.cpp" />
+    <ClCompile Include="HubPage.xaml.cpp" />
+    <ClCompile Include="ItemPage.xaml.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\PuzzleCommon\WindowsModern.cpp" />
+    <ClCompile Include="..\PuzzleCommon\PuzzleData.cpp" />
+    <ClCompile Include="..\blackbox.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bridges.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\combi.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cube.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\divvy.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dominosa.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\drawing.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsf.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fifteen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filling.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+	<ClCompile Include="..\findloop.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\flip.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\galaxies.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gluefe.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\grid.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\guess.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inertia.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\latin.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\laydomino.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lightup.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\list.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\loopgen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\loopy.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\magnets.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\malloc.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\map.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\matching.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\midend.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mines.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\misc.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\net.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\netslide.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\no-icon.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nullgame.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\obfusc.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\palisade.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pattern.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pearl.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pegs.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\penrose.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\printing.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\random.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\range.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rect.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\samegame.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\signpost.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\singles.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sixteen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\slant.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\solo.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tdq.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tents.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\towers.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tree234.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twiddle.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\undead.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unequal.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unruly.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\untangle.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.cpp" />
+    <ClCompile Include="AboutPage.xaml.cpp" />
+    <ClCompile Include="..\PuzzleCommon\PuzzleImageSource.cpp" />
+    <ClCompile Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.cpp" />
+    <ClCompile Include="ParamsDialog.xaml.cpp" />
+    <ClCompile Include="PresetDialog.xaml.cpp" />
+    <ClCompile Include="SpecificDialog.xaml.cpp" />
+    <ClCompile Include="HelpPage.xaml.cpp" />
+    <ClCompile Include="PuzzleKeyboard.xaml.cpp" />
+    <ClCompile Include="..\flood.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsPage.xaml.cpp" />
+    <ClCompile Include="..\tracks.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PuzzleCommon\PulseEffect.xaml.cpp" />
+    <ClCompile Include="TileButton.xaml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="HubPage.xaml" />
+    <Page Include="ItemPage.xaml" />
+    <Page Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml" />
+    <Page Include="AboutPage.xaml" />
+    <Page Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml" />
+    <Page Include="ParamsDialog.xaml" />
+    <Page Include="PresetDialog.xaml" />
+    <Page Include="SpecificDialog.xaml" />
+    <Page Include="HelpPage.xaml" />
+    <Page Include="PuzzleKeyboard.xaml" />
+    <Page Include="SettingsPage.xaml" />
+    <Page Include="..\PuzzleCommon\PulseEffect.xaml" />
+    <Page Include="TileButton.xaml" />
+  </ItemGroup>
+</Project>
