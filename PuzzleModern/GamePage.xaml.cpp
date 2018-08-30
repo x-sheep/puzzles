@@ -135,7 +135,7 @@ void GamePage::ResizeWindow(int newWidth, int newHeight)
 void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 {
 	_puzzleName = safe_cast<String^>(e->NavigationParameter);
-	fe = std::make_shared<WindowsModern>(WindowsModern());
+	fe = ref new WindowsModern();
 	_hasGame = fe->CreateForGame(_puzzleName, DrawCanvas, this, this);
 
 	currentPuzzle = fe->GetCurrentPuzzle();

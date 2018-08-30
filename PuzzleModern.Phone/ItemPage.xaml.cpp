@@ -97,7 +97,7 @@ void ItemPage::NavigationHelper_LoadState(Object^ sender, LoadStateEventArgs^ e)
 	(void) e;		// Unused parameter
 
 	_puzzleName = safe_cast<Platform::String^>(e->NavigationParameter);
-	fe = std::make_shared<WindowsModern>(WindowsModern());
+	fe = ref new WindowsModern();
 	_hasGame = fe->CreateForGame(_puzzleName, DrawCanvas, this, this);
 
 	Puzzle^ selectedPuzzle = fe->GetCurrentPuzzle();

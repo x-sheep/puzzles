@@ -12,6 +12,8 @@ extern "C" {
 #include "PuzzleHelpData.h"
 #include <ppltasks.h>
 
+using namespace PuzzleModern;
+
 using namespace Platform::Collections;
 using namespace Windows::Foundation;
 using namespace Windows::System;
@@ -54,7 +56,7 @@ Platform::String ^FromChars(char *input, bool kill)
 void winmodern_status_bar(void *handle, const char *text)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleStatusBar ^bar = *((PuzzleModern::IPuzzleStatusBar^*)fe->statusbar);
+	IPuzzleStatusBar ^bar = *((IPuzzleStatusBar^*)fe->statusbar);
 
 	bar->UpdateStatusBar(FromChars(text));
 }
@@ -62,7 +64,7 @@ void winmodern_status_bar(void *handle, const char *text)
 int winmodern_start_draw(void *handle)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	return canvas->StartDraw();
 }
@@ -70,7 +72,7 @@ int winmodern_start_draw(void *handle)
 void winmodern_draw_update(void *handle, int x, int y, int w, int h)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	canvas->UpdateArea(x, y, w, h);
 }
@@ -78,7 +80,7 @@ void winmodern_draw_update(void *handle, int x, int y, int w, int h)
 void winmodern_clip(void *handle, int x, int y, int w, int h)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	canvas->StartClip(x, y, w, h);
 }
@@ -86,7 +88,7 @@ void winmodern_clip(void *handle, int x, int y, int w, int h)
 void winmodern_unclip(void *handle)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	canvas->EndClip();
 }
@@ -95,21 +97,21 @@ void winmodern_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
 	int align, int colour, const char *text)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
-	PuzzleModern::GameFontType gamefont = fonttype == FONT_VARIABLE ?
-		PuzzleModern::GameFontType::VariableWidth : 
-		PuzzleModern::GameFontType::FixedWidth;
+	GameFontType gamefont = fonttype == FONT_VARIABLE ?
+		GameFontType::VariableWidth : 
+		GameFontType::FixedWidth;
 
-	PuzzleModern::GameFontHAlign halign = align & ALIGN_HCENTRE ?
-		PuzzleModern::GameFontHAlign::HorizontalCenter :
+	GameFontHAlign halign = align & ALIGN_HCENTRE ?
+		GameFontHAlign::HorizontalCenter :
 		align & ALIGN_HRIGHT ?
-		PuzzleModern::GameFontHAlign::HorizontalRight :
-		PuzzleModern::GameFontHAlign::HorizontalLeft;
+		GameFontHAlign::HorizontalRight :
+		GameFontHAlign::HorizontalLeft;
 
-	PuzzleModern::GameFontVAlign valign = align & ALIGN_VCENTRE ?
-		PuzzleModern::GameFontVAlign::VerticalCentre :
-		PuzzleModern::GameFontVAlign::VerticalBase;
+	GameFontVAlign valign = align & ALIGN_VCENTRE ?
+		GameFontVAlign::VerticalCentre :
+		GameFontVAlign::VerticalBase;
 
 	canvas->DrawText(x, y, gamefont, halign, valign, fontsize, colour, FromChars(text));
 }
@@ -117,7 +119,7 @@ void winmodern_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
 void winmodern_draw_rect(void *handle, int x, int y, int w, int h, int colour)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->DrawRect(x, y, w, h, colour);
 }
@@ -126,7 +128,7 @@ void winmodern_draw_line(void *handle, int x1, int y1, int x2, int y2,
 	int colour)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->DrawLine(x1, y1, x2, y2, colour);
 }
@@ -135,7 +137,7 @@ void winmodern_draw_poly(void *handle, int *coords, int npoints,
 	int fillcolour, int outlinecolour)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	auto pc = ref new Vector<Point>();
 	int i, j;
@@ -152,7 +154,7 @@ void winmodern_draw_circle(void *handle, int cx, int cy, int radius,
 	int fillcolour, int outlinecolour)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->DrawCircle(cx, cy, radius, fillcolour, outlinecolour);
 }
@@ -166,7 +168,7 @@ float winmodern_draw_scale(void *handle)
 blitter *winmodern_blitter_new(void *handle, int w, int h)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	blitter *bl = snew(blitter);
 	bl->handle = canvas->BlitterNew(w, h);
@@ -178,7 +180,7 @@ blitter *winmodern_blitter_new(void *handle, int w, int h)
 void winmodern_blitter_free(void *handle, blitter *bl)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	canvas->BlitterFree(bl->handle);
 	sfree(bl);
@@ -187,7 +189,7 @@ void winmodern_blitter_free(void *handle, blitter *bl)
 void winmodern_blitter_save(void *handle, blitter *bl, int x, int y)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	/* Resize the blitter rectangle to never use a negative x or y */
 	if (x < 0)
@@ -217,7 +219,7 @@ void winmodern_blitter_save(void *handle, blitter *bl, int x, int y)
 void winmodern_blitter_load(void *handle, blitter *bl, int x, int y)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	if (x == BLITTER_FROMSAVED)
 		x = bl->x;
@@ -230,7 +232,7 @@ void winmodern_blitter_load(void *handle, blitter *bl, int x, int y)
 void winmodern_end_draw(void *handle)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->EndDraw();
 }
@@ -245,7 +247,7 @@ static char *winmodern_text_fallback(void *handle, const char *const *strings,
 void winmodern_line_width(void *handle, float width)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->SetLineWidth(width);
 }
@@ -253,7 +255,7 @@ void winmodern_line_width(void *handle, float width)
 void winmodern_line_dotted(void *handle, int dotted)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->SetLineDotted(dotted != 0);
 }
@@ -261,7 +263,7 @@ void winmodern_line_dotted(void *handle, int dotted)
 void winmodern_add_print_colour(void *handle, int id)
 {
 	frontend *fe = (frontend *)handle;
-	PuzzleModern::IPuzzleCanvas ^canvas = *((PuzzleModern::IPuzzleCanvas^*)fe->canvas);
+	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	int hatch = 0;
 	float r = 0, g = 0, b = 0;
@@ -336,7 +338,7 @@ void winmodern_deactivate_timer(frontend *fe)
 {
 	if (!fe || !fe->timer) return;
 
-	PuzzleModern::IPuzzleTimer ^timer = *((PuzzleModern::IPuzzleTimer^*)fe->timer);
+	IPuzzleTimer ^timer = *((IPuzzleTimer^*)fe->timer);
 	timer->EndTimer();
 }
 
@@ -344,7 +346,7 @@ void winmodern_activate_timer(frontend *fe)
 {
 	if (!fe || !fe->timer) return;
 
-	PuzzleModern::IPuzzleTimer ^timer = *((PuzzleModern::IPuzzleTimer^*)fe->timer);
+	IPuzzleTimer ^timer = *((IPuzzleTimer^*)fe->timer);
 	timer->StartTimer();
 }
 
@@ -430,8 +432,8 @@ int winmodern_read_chars(void *wctx, void *buf, int len)
 // Writing function for serialization
 void winmodern_write_chars(void *vctx, const void *buf, int len)
 {
-	PuzzleModern::write_save_context *ctx;
-	ctx = (PuzzleModern::write_save_context *)vctx;
+	write_save_context *ctx;
+	ctx = (write_save_context *)vctx;
 	
 	if (ctx->pos + len > ctx->len)
 	{
@@ -853,9 +855,9 @@ namespace PuzzleModern
 		return false;
 	}
 	
-	concurrency::task<bool> WindowsModern::LoadGameFromStorage(Platform::String ^name)
+	IAsyncOperation<bool> ^WindowsModern::LoadGameFromStorage(Platform::String ^name)
 	{
-		return concurrency::create_task([=](){
+		auto task = concurrency::create_task([=](){
 			auto settings = ApplicationData::Current->LocalSettings->Values;
 			auto savedObj = settings->Lookup(name);
 			// If loading the game crashes for whatever reason, the safest bet is to not load it again
@@ -870,11 +872,12 @@ namespace PuzzleModern
 			// If loading fails, just make a new game
 			return error == nullptr;
 		});
+		return concurrency::create_async([task]() { return task; });
 	}
 
-	concurrency::task<Platform::String^> WindowsModern::LoadGameFromTemporary()
+	IAsyncOperation<Platform::String^> ^WindowsModern::LoadGameFromTemporary()
 	{
-		return concurrency::create_task([](){
+		auto task = concurrency::create_task([](){
 			return ApplicationData::Current->TemporaryFolder->GetFileAsync("temp.puzzle");
 		}).then([=](concurrency::task<StorageFile^> prevTask){
 			StorageFile ^file = nullptr;
@@ -888,11 +891,12 @@ namespace PuzzleModern
 
 			return LoadGameFromFile(file);
 		});
+		return concurrency::create_async([task]() { return task; });
 	}
 
-	concurrency::task<Platform::String^> WindowsModern::LoadGameFromFile(Windows::Storage::StorageFile ^file)
+	IAsyncOperation<Platform::String^> ^WindowsModern::LoadGameFromFile(Windows::Storage::StorageFile ^file)
 	{
-		return concurrency::create_task([file](){
+		auto task = concurrency::create_task([file](){
 			return FileIO::ReadTextAsync(file);
 		}).then([=](concurrency::task<Platform::String^> prevTask){
 			Platform::String ^saved;
@@ -907,6 +911,7 @@ namespace PuzzleModern
 
 			return LoadGameFromString(saved);
 		});
+		return concurrency::create_async([task]() { return task; });
 	}
 
 	Platform::String ^WindowsModern::LoadGameFromString(Platform::String ^saved)
@@ -919,9 +924,9 @@ namespace PuzzleModern
 		return FromChars(err);
 	}
 
-	concurrency::task<GameLaunchParameters^> WindowsModern::LoadAndIdentify(StorageFile ^inputFile)
+	IAsyncOperation<GameLaunchParameters^> ^WindowsModern::LoadAndIdentify(StorageFile ^inputFile)
 	{
-		return concurrency::create_task([inputFile](){
+		auto task = concurrency::create_task([inputFile](){
 			return FileIO::ReadTextAsync(inputFile);
 		}).then([inputFile](concurrency::task<Platform::String^> prevTask){
 			Platform::String ^saved;
@@ -965,11 +970,12 @@ namespace PuzzleModern
 			}
 			return ret;
 		});
+		return concurrency::create_async([task]() { return task; });
 	}
 
 	Platform::String ^WindowsModern::SaveGameToString()
 	{
-		PuzzleModern::write_save_context *ctx = snew(PuzzleModern::write_save_context);
+		write_save_context *ctx = snew(write_save_context);
 		ctx->len = 2048;
 		ctx->buf = snewn(ctx->len, char);
 		ctx->pos = 0;
@@ -986,9 +992,9 @@ namespace PuzzleModern
 	}
 
 
-	concurrency::task<bool> WindowsModern::SaveGameToFile(Windows::Storage::StorageFile ^file)
+	IAsyncOperation<bool> ^WindowsModern::SaveGameToFile(Windows::Storage::StorageFile ^file)
 	{
-		return concurrency::create_task([=](){
+		auto task = concurrency::create_task([=](){
 			auto save = SaveGameToString();
 			return FileIO::WriteTextAsync(file, save);
 		}).then([=](concurrency::task<void> prevTask){
@@ -1003,12 +1009,13 @@ namespace PuzzleModern
 
 			return true;
 		});
+		return concurrency::create_async([task]() { return task; });
 	}
 
 	
-	concurrency::task<bool> WindowsModern::SaveGameToStorage(Platform::String ^name)
+	IAsyncOperation<bool> ^WindowsModern::SaveGameToStorage(Platform::String ^name)
 	{
-		return concurrency::create_task([=]{
+		auto task = concurrency::create_task([=]{
 			ApplicationData::Current->LocalSettings->Values->Remove(name);
 
 			return ApplicationData::Current->LocalFolder->CreateFileAsync(name + ".puzzle", CreationCollisionOption::ReplaceExisting);
@@ -1019,6 +1026,7 @@ namespace PuzzleModern
 				ApplicationData::Current->LocalSettings->Values->Insert(name, name + ".puzzle");
 			return prevTask;
 		});
+		return concurrency::create_async([task]() { return task; });
 	}
 
 	Platform::String^ WindowsModern::GetRandomSeed()

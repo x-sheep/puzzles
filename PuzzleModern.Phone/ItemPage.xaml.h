@@ -13,6 +13,8 @@
 #include "..\PuzzleCommon\PuzzleData.h"
 #include "..\PuzzleCommon\WindowsModern.h"
 
+using namespace PuzzleModern;
+
 namespace PuzzleModern
 {
 	namespace Phone
@@ -58,7 +60,7 @@ namespace PuzzleModern
 			void NavigationHelper_SaveState(Platform::Object^ sender, Common::SaveStateEventArgs^ e);
 
 			Platform::String ^_puzzleName, ^_puzzleNameUpper;
-			std::shared_ptr<PuzzleModern::WindowsModern> fe;
+			WindowsModern ^fe;
 			
 			unsigned long long LastTime;
 			Windows::System::Threading::ThreadPoolTimer ^PeriodicTimer;

@@ -11,6 +11,7 @@
 #include "..\PuzzleCommon\WindowsModern.h"
 
 using namespace PuzzleModern;
+using namespace concurrency;
 
 using namespace Platform;
 using namespace Windows::ApplicationModel;

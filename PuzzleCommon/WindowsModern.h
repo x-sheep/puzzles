@@ -9,6 +9,9 @@ extern "C" {
 #include "IPuzzleCanvas.h"
 #include <ppltasks.h>
 
+using namespace Windows::System;
+using namespace Windows::Foundation;
+
 namespace PuzzleModern
 {
 	struct write_save_context
@@ -18,11 +21,11 @@ namespace PuzzleModern
 		int len;
 	};
 
-	class WindowsModern sealed {
+	[Windows::Foundation::Metadata::WebHostHidden]
+	public ref class WindowsModern sealed {
 	public:
 		WindowsModern();
 		bool CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer);
-		~WindowsModern();
 
 		static PuzzleList^ GetPuzzleList();
 		Puzzle^ GetCurrentPuzzle();
@@ -43,13 +46,13 @@ namespace PuzzleModern
 		Windows::Foundation::Size PrintGame(IPuzzleCanvas ^icanvas, bool addSolution);
 		void Redraw(IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^timer, bool force);
 		void UpdateTimer(IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^timer, float delta);
-		concurrency::task<bool> LoadGameFromStorage(Platform::String ^name);
-		concurrency::task<Platform::String^> LoadGameFromTemporary();
-		concurrency::task<Platform::String^> LoadGameFromFile(Windows::Storage::StorageFile ^file);
+		IAsyncOperation<bool> ^LoadGameFromStorage(Platform::String ^name);
+		IAsyncOperation<Platform::String^> ^LoadGameFromTemporary();
+		IAsyncOperation<Platform::String^> ^LoadGameFromFile(Windows::Storage::StorageFile ^file);
 		Platform::String ^LoadGameFromString(Platform::String ^saved);
-		static concurrency::task<GameLaunchParameters^> LoadAndIdentify(Windows::Storage::StorageFile ^file);
-		concurrency::task<bool> SaveGameToStorage(Platform::String ^name);
-		concurrency::task<bool> SaveGameToFile(Windows::Storage::StorageFile ^file);
+		static IAsyncOperation<GameLaunchParameters^> ^LoadAndIdentify(Windows::Storage::StorageFile ^file);
+		IAsyncOperation<bool> ^SaveGameToStorage(Platform::String ^name);
+		IAsyncOperation<bool> ^SaveGameToFile(Windows::Storage::StorageFile ^file);
 		Platform::String ^SaveGameToString();
 
 		Platform::String ^Solve();
@@ -69,13 +72,15 @@ namespace PuzzleModern
 
 		VirtualButtonCollection^ GetVirtualButtonBar();
 		void SendClick(int x, int y, ButtonType type, ButtonState state);
-		void SendKey(Windows::System::VirtualKey key, bool shift, bool control);
+		void SendKey(VirtualKey key, bool shift, bool control);
 		void SetInputScale(float scale);
 
-		static const Windows::System::VirtualKey ButtonMarkOn = (Windows::System::VirtualKey)BUTTON_MARK_ON;
-		static const Windows::System::VirtualKey ButtonMarkOff = (Windows::System::VirtualKey)BUTTON_MARK_OFF;
+		static property VirtualKey ButtonMarkOn { VirtualKey get() { return (VirtualKey)BUTTON_MARK_ON; }}
+		static property VirtualKey ButtonMarkOff { VirtualKey get() { return (VirtualKey)BUTTON_MARK_OFF; }}
 
 	private:
+		~WindowsModern();
+
 		const game *ourgame;
 		midend *me;
 		frontend *fe;

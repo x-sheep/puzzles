@@ -4,6 +4,7 @@
 namespace PuzzleModern
 {
 	[Windows::UI::Xaml::Data::Bindable]
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class Puzzle sealed
 	{
 	public:
@@ -73,6 +74,7 @@ namespace PuzzleModern
 	};
 	
 	[Windows::UI::Xaml::Data::Bindable]
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class PuzzleList sealed
 	{
 	public:
@@ -107,6 +109,7 @@ namespace PuzzleModern
 	ref class PresetList;
 
 	[Windows::UI::Xaml::Data::Bindable]
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class Preset sealed
 	{
 	public:
@@ -146,6 +149,7 @@ namespace PuzzleModern
 	};
 
 	[Windows::UI::Xaml::Data::Bindable]
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class PresetList sealed
 	{
 	public:
@@ -177,6 +181,7 @@ namespace PuzzleModern
 
 	public enum class ConfigField { INTEGER, TEXT, BOOLEAN, ENUM, FLOAT };
 
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class ConfigItem sealed
 	{
 	public:
@@ -221,6 +226,7 @@ namespace PuzzleModern
 	};
 
 	[Windows::UI::Xaml::Data::Bindable]
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class VirtualButton sealed
 	{
 	public:
@@ -259,6 +265,7 @@ namespace PuzzleModern
 	};
 
 	[Windows::UI::Xaml::Data::Bindable]
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class VirtualButtonCollection sealed
 	{
 	public:
@@ -336,6 +343,7 @@ namespace PuzzleModern
 		ButtonType _leftAction, _middleAction, _rightAction, _touchAction, _holdAction;
 	};
 
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class GameLaunchParameters sealed
 	{
 	public:

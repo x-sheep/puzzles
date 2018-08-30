@@ -8,6 +8,7 @@
 #include "ItemPage.xaml.h"
 #include "..\PuzzleCommon\PuzzleData.h"
 
+using namespace PuzzleModern;
 using namespace PuzzleModern::Phone;
 using namespace PuzzleModern::Phone::Common;
 
@@ -35,7 +36,7 @@ App::App()
 	Suspending += ref new SuspendingEventHandler(this, &App::OnSuspending);
 }
 
-void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch, bool wasTerminated, bool clearStack)
+void App::ActivatePuzzle(GameLaunchParameters ^launch, bool wasTerminated, bool clearStack)
 {
 	auto rootFrame = dynamic_cast<Frame^>(Window::Current->Content);
 	ItemPage^ page;
@@ -298,27 +299,27 @@ void App::OnSuspending(Object^ sender, SuspendingEventArgs^ e)
 Platform::String ^App::ToUpper(Platform::String ^input)
 {
 	int nameLength = input->Length() + 1;
-	wchar_t *upper = snewn(nameLength, wchar_t);
+	wchar_t *upper = new wchar_t[nameLength];
 	auto nameData = input->Data();
 	for (int i = 0; i < nameLength; i++)
 	{
 		upper[i] = towupper(nameData[i]);
 	}
 	auto ret = ref new Platform::String(upper);
-	sfree(upper);
+	delete[] upper;
 	return ret;
 }
 
 Platform::String ^App::ToLower(Platform::String ^input)
 {
 	int nameLength = input->Length() + 1;
-	wchar_t *lower = snewn(nameLength, wchar_t);
+	wchar_t *lower = new wchar_t[nameLength];
 	auto nameData = input->Data();
 	for (int i = 0; i < nameLength; i++)
 	{
 		lower[i] = towlower(nameData[i]);
 	}
 	auto ret = ref new Platform::String(lower);
-	sfree(lower);
+	delete[] lower;
 	return ret;
 }
