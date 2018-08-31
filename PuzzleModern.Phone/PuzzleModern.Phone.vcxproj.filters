@@ -32,12 +32,6 @@
     <Filter Include="Common">
       <UniqueIdentifier>{c5288069-9c98-4302-9f5a-30beac1c9d2b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Code">
-      <UniqueIdentifier>{1a44e090-6c6d-4f72-8f9b-988b9bfc229a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Headers">
-      <UniqueIdentifier>{85a8a64c-e518-471d-932c-5aacd47b8363}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Icons">
       <UniqueIdentifier>{d1ab4138-b410-479e-8315-beecc7ae1b00}</UniqueIdentifier>
     </Filter>
@@ -208,48 +202,13 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.xaml.h" />
     <ClInclude Include="HubPage.xaml.h" />
-    <ClInclude Include="..\PuzzleCommon\WindowsModern.h" />
-    <ClInclude Include="..\PuzzleCommon\PuzzleData.h" />
-    <ClInclude Include="..\PuzzleCommon\IPuzzleCanvas.h" />
-    <ClInclude Include="..\gluefe.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\grid.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\latin.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\loopgen.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\matching.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\penrose.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\puzzles.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\tree234.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\resource.h">
-      <Filter>Source Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.h" />
     <ClInclude Include="AboutPage.xaml.h" />
-    <ClInclude Include="..\PuzzleCommon\PuzzleImageSource.h" />
-    <ClInclude Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.h" />
     <ClInclude Include="ParamsDialog.xaml.h" />
     <ClInclude Include="PresetDialog.xaml.h" />
     <ClInclude Include="SpecificDialog.xaml.h" />
     <ClInclude Include="HelpPage.xaml.h" />
     <ClInclude Include="PuzzleKeyboard.xaml.h" />
-    <ClInclude Include="..\PuzzleCommon\PuzzleHelpData.h" />
     <ClInclude Include="SettingsPage.xaml.h" />
-    <ClInclude Include="..\PuzzleCommon\PulseEffect.xaml.h" />
     <ClInclude Include="TileButton.xaml.h" />
   </ItemGroup>
   <ItemGroup>
@@ -528,205 +487,13 @@
     <ClCompile Include="HubPage.xaml.cpp" />
     <ClCompile Include="ItemPage.xaml.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="..\PuzzleCommon\WindowsModern.cpp" />
-    <ClCompile Include="..\PuzzleCommon\PuzzleData.cpp" />
-    <ClCompile Include="..\blackbox.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\bridges.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\combi.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cube.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\divvy.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dominosa.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\drawing.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dsf.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\fifteen.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filling.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-	<ClCompile Include="..\findloop.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flip.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\galaxies.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gluefe.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\grid.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\guess.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\inertia.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\keen.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\latin.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\laydomino.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lightup.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\list.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\loopgen.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\loopy.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\magnets.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\malloc.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\map.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\matching.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\midend.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\mines.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\misc.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\net.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\netslide.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\no-icon.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nullgame.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\obfusc.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\palisade.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pattern.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pearl.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pegs.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\penrose.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\printing.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\random.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\range.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\rect.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\samegame.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\signpost.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\singles.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\sixteen.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\slant.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\solo.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tdq.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tents.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\towers.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tree234.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\twiddle.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\undead.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\unequal.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\unruly.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\untangle.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.cpp" />
     <ClCompile Include="AboutPage.xaml.cpp" />
-    <ClCompile Include="..\PuzzleCommon\PuzzleImageSource.cpp" />
-    <ClCompile Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.cpp" />
     <ClCompile Include="ParamsDialog.xaml.cpp" />
     <ClCompile Include="PresetDialog.xaml.cpp" />
     <ClCompile Include="SpecificDialog.xaml.cpp" />
     <ClCompile Include="HelpPage.xaml.cpp" />
     <ClCompile Include="PuzzleKeyboard.xaml.cpp" />
-    <ClCompile Include="..\flood.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
     <ClCompile Include="SettingsPage.xaml.cpp" />
-    <ClCompile Include="..\tracks.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PuzzleCommon\PulseEffect.xaml.cpp" />
     <ClCompile Include="TileButton.xaml.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -735,16 +502,13 @@
   <ItemGroup>
     <Page Include="HubPage.xaml" />
     <Page Include="ItemPage.xaml" />
-    <Page Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml" />
     <Page Include="AboutPage.xaml" />
-    <Page Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml" />
     <Page Include="ParamsDialog.xaml" />
     <Page Include="PresetDialog.xaml" />
     <Page Include="SpecificDialog.xaml" />
     <Page Include="HelpPage.xaml" />
     <Page Include="PuzzleKeyboard.xaml" />
     <Page Include="SettingsPage.xaml" />
-    <Page Include="..\PuzzleCommon\PulseEffect.xaml" />
     <Page Include="TileButton.xaml" />
   </ItemGroup>
 </Project>

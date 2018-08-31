@@ -7,12 +7,14 @@
 
 #include "PresetDialog.g.h"
 
+using namespace PuzzleCommon;
+
 namespace PuzzleModern
 {
 	namespace Phone
 	{
 		public delegate void CustomClickedEventHandler();
-		public delegate void PresetClickedEventHandler(Platform::Object ^sender, PuzzleModern::Preset ^preset);
+		public delegate void PresetClickedEventHandler(Platform::Object ^sender, Preset ^preset);
 
 		[Windows::Foundation::Metadata::WebHostHidden]
 		public ref class PresetDialog sealed

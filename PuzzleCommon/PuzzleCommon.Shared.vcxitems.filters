@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IPuzzleCanvas.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PuzzleImageSource.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PuzzleData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PuzzleHelpData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)WindowsModern.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PulseEffect.xaml.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ShapePuzzleCanvas.xaml.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\gluefe.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\grid.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\latin.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\loopgen.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\matching.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\penrose.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\puzzles.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\resource.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\tree234.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PuzzleImageSource.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PuzzleData.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)WindowsModern.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PulseEffect.xaml.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ShapePuzzleCanvas.xaml.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\blackbox.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\bridges.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\combi.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\cube.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\divvy.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\dominosa.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\drawing.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\dsf.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\fifteen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\filling.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\findloop.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\flip.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\flood.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\galaxies.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\grid.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\guess.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\inertia.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\keen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\latin.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\laydomino.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\lightup.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\list.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\loopgen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\loopy.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\magnets.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\malloc.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\map.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\matching.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\midend.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\mines.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\misc.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\net.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\netslide.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\nullgame.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\obfusc.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\palisade.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pattern.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pearl.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\pegs.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\penrose.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\printing.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\random.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\range.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\rect.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\samegame.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\signpost.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\singles.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\sixteen.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\slant.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\solo.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\tdq.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\tents.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\towers.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\tracks.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\tree234.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\twiddle.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\undead.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\unequal.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\unruly.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\untangle.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\gluefe.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml" />
+    <Page Include="$(MSBuildThisFileDirectory)PulseEffect.xaml" />
+    <Page Include="$(MSBuildThisFileDirectory)ShapePuzzleCanvas.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Code">
+      <UniqueIdentifier>{3512bc37-cc20-4b0b-9c66-6c25ecf7b8da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Headers">
+      <UniqueIdentifier>{cd39007a-1d4a-4240-9849-8cc2acac2984}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -22,7 +22,7 @@ using namespace Windows::UI;
 using namespace Windows::UI::Xaml;
 using namespace Windows::Foundation::Collections;
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	PuzzleImageSource::PuzzleImageSource()
 	{

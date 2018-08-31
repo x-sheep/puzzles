@@ -6,14 +6,11 @@
 #pragma once
 
 #include "ItemPage.g.h"
-#include "Direct2DPuzzleCanvas.xaml.h"
 #include "ParamsDialog.xaml.h"
 #include "PuzzleKeyboard.xaml.h"
 #include "SpecificDialog.xaml.h"
-#include "..\PuzzleCommon\PuzzleData.h"
-#include "..\PuzzleCommon\WindowsModern.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {
@@ -49,7 +46,7 @@ namespace PuzzleModern
 			virtual void EndTimer();
 			
 			void BeginLoadGame(Windows::Storage::StorageFile ^file) { BeginLoadGame(file, false); }
-			void BeginActivatePuzzle(PuzzleModern::GameLaunchParameters ^p);
+			void BeginActivatePuzzle(GameLaunchParameters ^p);
 
 		protected:
 			virtual void OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e) override;
@@ -113,12 +110,12 @@ namespace PuzzleModern
 
 			static Windows::UI::Xaml::DependencyProperty^ _defaultViewModelProperty;
 			static Windows::UI::Xaml::DependencyProperty^ _navigationHelperProperty;
-			void OnNewConfiguration(ParamsDialog ^sender, Windows::Foundation::Collections::IVector<PuzzleModern::ConfigItem ^> ^newConfig);
-			void OnNewPreset(Platform::Object ^sender, PuzzleModern::Preset ^preset);
+			void OnNewConfiguration(ParamsDialog ^sender, Windows::Foundation::Collections::IVector<ConfigItem ^> ^newConfig);
+			void OnNewPreset(Platform::Object ^sender, Preset ^preset);
 			void OnGameIDSpecified(Platform::Object ^sender, Platform::String ^id, bool isRandomSeed);
 			void LoadSaveButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 			void HelpButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-			void VirtualButtonBar_ButtonPressed(Platform::Object^ sender, PuzzleModern::VirtualButton^ button);
+			void VirtualButtonBar_ButtonPressed(Platform::Object^ sender, VirtualButton^ button);
 			void ToolButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 			void LeftRightButton_Checked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 			void LeftRightButton_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);

@@ -4,16 +4,15 @@
 //
 
 #include "pch.h"
-#include "..\PuzzleCommon\PuzzleData.h"
 #include "ItemPage.xaml.h"
 #include "HelpPage.xaml.h"
 #include "ParamsDialog.xaml.h"
 #include "PresetDialog.xaml.h"
 #include "SpecificDialog.xaml.h"
-#include "PulseEffect.xaml.h"
 
 using namespace PuzzleModern::Phone;
 using namespace PuzzleModern::Phone::Common;
+using namespace PuzzleCommon;
 
 using namespace concurrency;
 using namespace Platform;
@@ -120,7 +119,7 @@ void ItemPage::NavigationHelper_LoadState(Object^ sender, LoadStateEventArgs^ e)
 		BeginActivatePuzzle(nullptr);
 }
 
-void ItemPage::BeginActivatePuzzle(PuzzleModern::GameLaunchParameters ^p)
+void ItemPage::BeginActivatePuzzle(GameLaunchParameters ^p)
 {
 	if (_isLoaded && _generatingGame)
 		return;
@@ -597,7 +596,7 @@ void ItemPage::GameID_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedE
 {
 	ExportPopup->IsOpen = false;
 	auto dialog = ref new SpecificDialog(_puzzleNameUpper, fe->GetGameDesc(), false);
-	dialog->GameIDSpecified += ref new PuzzleModern::GameIDSpecifiedEventHandler(this, &PuzzleModern::Phone::ItemPage::OnGameIDSpecified);
+	dialog->GameIDSpecified += ref new GameIDSpecifiedEventHandler(this, &PuzzleModern::Phone::ItemPage::OnGameIDSpecified);
 	dialog->ShowAsync();
 }
 
@@ -605,7 +604,7 @@ void ItemPage::RandomSeed_Click(Platform::Object^ sender, Windows::UI::Xaml::Rou
 {
 	ExportPopup->IsOpen = false;
 	auto dialog = ref new SpecificDialog(_puzzleNameUpper, fe->GetRandomSeed(), true);
-	dialog->GameIDSpecified += ref new PuzzleModern::GameIDSpecifiedEventHandler(this, &PuzzleModern::Phone::ItemPage::OnGameIDSpecified);
+	dialog->GameIDSpecified += ref new GameIDSpecifiedEventHandler(this, &PuzzleModern::Phone::ItemPage::OnGameIDSpecified);
 	dialog->ShowAsync();
 }
 
@@ -621,7 +620,7 @@ void ItemPage::OnGameIDSpecified(Platform::Object ^sender, Platform::String ^id,
 			SpecificDialog ^dialog;
 			dialog = ref new SpecificDialog(_puzzleNameUpper, id, isRandomSeed);
 
-			dialog->GameIDSpecified += ref new PuzzleModern::GameIDSpecifiedEventHandler(this, &PuzzleModern::Phone::ItemPage::OnGameIDSpecified);
+			dialog->GameIDSpecified += ref new GameIDSpecifiedEventHandler(this, &PuzzleModern::Phone::ItemPage::OnGameIDSpecified);
 			dialog->ShowAsync();
 		});
 	}
@@ -654,7 +653,7 @@ void ItemPage::OpenCustomDialog()
 	dialog->ShowAsync();
 }
 
-void ItemPage::OnNewPreset(Platform::Object ^sender, PuzzleModern::Preset ^preset)
+void ItemPage::OnNewPreset(Platform::Object ^sender, Preset ^preset)
 {
 	if (_generatingGame)
 		return;
@@ -662,7 +661,7 @@ void ItemPage::OnNewPreset(Platform::Object ^sender, PuzzleModern::Preset ^prese
 	BeginNewGame();
 }
 
-void ItemPage::OnNewConfiguration(ParamsDialog ^sender, Windows::Foundation::Collections::IVector<PuzzleModern::ConfigItem ^> ^newConfig)
+void ItemPage::OnNewConfiguration(ParamsDialog ^sender, Windows::Foundation::Collections::IVector<ConfigItem ^> ^newConfig)
 {
 	if (_generatingGame)
 		return;
@@ -749,7 +748,7 @@ void ItemPage::HelpButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Rou
 	Frame->Navigate(HelpPage::typeid, fe->GetCurrentPuzzle()->HelpName);
 }
 
-void ItemPage::VirtualButtonBar_ButtonPressed(Platform::Object^ sender, PuzzleModern::VirtualButton^ button)
+void ItemPage::VirtualButtonBar_ButtonPressed(Platform::Object^ sender, VirtualButton^ button)
 {
 	if (_generatingGame)
 		return;

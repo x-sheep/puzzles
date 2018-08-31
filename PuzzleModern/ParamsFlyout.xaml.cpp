@@ -5,9 +5,9 @@
 
 #include "pch.h"
 #include "ParamsFlyout.xaml.h"
-#include "..\PuzzleCommon\PuzzleData.h"
 
 using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 using namespace Platform;
 using namespace Windows::Foundation;

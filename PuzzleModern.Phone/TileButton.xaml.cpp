@@ -6,7 +6,7 @@
 #include "pch.h"
 #include "TileButton.xaml.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleModern::Phone;
 
 using namespace Platform;
 using namespace Windows::Foundation;
@@ -44,6 +44,6 @@ void TileButton::OnPointerReleased(PointerRoutedEventArgs^ e)
 DependencyProperty^ TileButton::_LabelProperty = DependencyProperty::Register("Label", Platform::String::typeid, TileButton::typeid, nullptr);
 DependencyProperty^ TileButton::_IconProperty = DependencyProperty::Register("Icon", UIElement::typeid, TileButton::typeid, nullptr);
 
-void PuzzleModern::TileButton::TiltContainer_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)
+void TileButton::TiltContainer_Tapped(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e)
 {
 }

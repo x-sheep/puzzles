@@ -6,7 +6,6 @@
 #pragma once
 
 #include "App.g.h"
-#include "..\PuzzleCommon\PuzzleData.h"
 using namespace Windows::UI::ApplicationSettings;
 
 namespace PuzzleModern
@@ -30,7 +29,7 @@ namespace PuzzleModern
 
 		event SettingsChangedEventHandler ^SettingChanged;
 		void NotifySettingChanged(Platform::Object ^sender, Platform::String ^key, Platform::Object ^value);
-		void ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch);
+		void ActivatePuzzle(PuzzleCommon::GameLaunchParameters ^launch);
 
 	protected:
 		virtual void OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^ e) override;

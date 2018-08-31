@@ -6,7 +6,8 @@
 #pragma once
 
 #include "ParamsFlyout.g.h"
-#include "..\PuzzleCommon\PuzzleData.h"
+
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {

@@ -6,42 +6,46 @@
 #pragma once
 
 #include "PuzzleKeyboard.g.h"
-#include "..\PuzzleCommon\PuzzleData.h"
+
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {
-	public delegate void ButtonBarChangedEvent(Platform::Object ^sender);
-	public delegate void ButtonBarPressedEvent(Platform::Object ^sender, VirtualButton ^button);
-
-	[Windows::Foundation::Metadata::WebHostHidden]
-	public ref class PuzzleKeyboard sealed
+	namespace Phone
 	{
-	public:
-		PuzzleKeyboard();
-		event ButtonBarChangedEvent ^ButtonBarChanged;
-		event ButtonBarPressedEvent ^ButtonPressed;
-		property PuzzleModern::VirtualButtonCollection ^Buttons
+		public delegate void ButtonBarChangedEvent(Platform::Object ^sender);
+		public delegate void ButtonBarPressedEvent(Platform::Object ^sender, VirtualButton ^button);
+
+		[Windows::Foundation::Metadata::WebHostHidden]
+		public ref class PuzzleKeyboard sealed
 		{
-			PuzzleModern::VirtualButtonCollection ^get() { return _buttons; }
-			void set(PuzzleModern::VirtualButtonCollection ^value)
+		public:
+			PuzzleKeyboard();
+			event ButtonBarChangedEvent ^ButtonBarChanged;
+			event ButtonBarPressedEvent ^ButtonPressed;
+			property VirtualButtonCollection ^Buttons
 			{
-				_buttons = value;
-				ButtonBarChanged(this);
+				VirtualButtonCollection ^get() { return _buttons; }
+				void set(VirtualButtonCollection ^value)
+				{
+					_buttons = value;
+					ButtonBarChanged(this);
+				}
 			}
-		}
-	private:
-		PuzzleModern::VirtualButtonCollection ^_buttons;
-		void UserControl_ButtonBarChanged(Platform::Object ^sender);
-		void Rectangle_OnPointerMoved(Platform::Object ^sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs ^e);
+		private:
+			VirtualButtonCollection ^_buttons;
+			void UserControl_ButtonBarChanged(Platform::Object ^sender);
+			void Rectangle_OnPointerMoved(Platform::Object ^sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs ^e);
 
-		Windows::UI::Xaml::Media::Brush ^_background, ^_foreground, ^_text, ^_selected;
+			Windows::UI::Xaml::Media::Brush ^_background, ^_foreground, ^_text, ^_selected;
 
-		bool _holding;
-		int _total;
-		VirtualButton ^_heldButton;
-		void MainGrid_PointerPressed(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
-		void MainGrid_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
-		void Rectangle_OnPointerExited(Platform::Object ^sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs ^e);
-		void MainGrid_PointerExited(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
-	};
+			bool _holding;
+			int _total;
+			VirtualButton ^_heldButton;
+			void MainGrid_PointerPressed(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
+			void MainGrid_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
+			void Rectangle_OnPointerExited(Platform::Object ^sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs ^e);
+			void MainGrid_PointerExited(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
+		};
+	}
 }

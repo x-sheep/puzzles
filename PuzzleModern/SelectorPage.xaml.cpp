@@ -6,11 +6,10 @@
 #include "pch.h"
 #include "SelectorPage.xaml.h"
 #include "GamePage.xaml.h"
-#include "..\PuzzleCommon\WindowsModern.h"
-#include "..\PuzzleCommon\PuzzleData.h"
 #include "HelpFlyout.xaml.h"
 
 using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 using namespace Platform;
 using namespace Platform::Collections;

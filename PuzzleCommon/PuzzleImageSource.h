@@ -11,12 +11,11 @@
 #pragma once
 
 #include "pch.h"
-#include "IPuzzleCanvas.h"
 
 using namespace Windows::Foundation::Collections;
 using namespace Windows::UI::Xaml::Media::Imaging;
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	inline void ThrowIfFailed(HRESULT hr)
 	{
@@ -48,7 +47,7 @@ namespace PuzzleModern
 		return D2D1::Point2F(point.X, point.Y);
 	}
 
-	public ref class PuzzleImageSource sealed
+	ref class PuzzleImageSource sealed
 	{
 	public:
 		PuzzleImageSource();

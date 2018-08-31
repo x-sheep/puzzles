@@ -6,7 +6,8 @@
 #pragma once
 
 #include "ParamsDialog.g.h"
-#include "..\PuzzleCommon\PuzzleData.h"
+
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {

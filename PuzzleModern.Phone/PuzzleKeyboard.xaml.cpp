@@ -5,9 +5,8 @@
 
 #include "pch.h"
 #include "PuzzleKeyboard.xaml.h"
-#include "..\PuzzleCommon\PuzzleData.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleModern::Phone;
 
 using namespace Platform;
 using namespace Windows::Foundation;
@@ -29,7 +28,7 @@ PuzzleKeyboard::PuzzleKeyboard()
 	_heldButton = nullptr;
 	_buttons = nullptr;
 	InitializeComponent();
-	ButtonBarChanged += ref new PuzzleModern::ButtonBarChangedEvent(this, &PuzzleModern::PuzzleKeyboard::UserControl_ButtonBarChanged);
+	ButtonBarChanged += ref new ButtonBarChangedEvent(this, &PuzzleKeyboard::UserControl_ButtonBarChanged);
 }
 
 
@@ -78,9 +77,9 @@ void PuzzleKeyboard::UserControl_ButtonBarChanged(Platform::Object ^sender)
 		rect->StrokeThickness = 3;
 		rect->Tag = b;
 		rect->IsHitTestVisible = true;
-		rect->PointerPressed += ref new PointerEventHandler(this, &PuzzleModern::PuzzleKeyboard::Rectangle_OnPointerMoved);
-		rect->PointerMoved += ref new PointerEventHandler(this, &PuzzleModern::PuzzleKeyboard::Rectangle_OnPointerMoved);
-		rect->PointerExited += ref new PointerEventHandler(this, &PuzzleModern::PuzzleKeyboard::Rectangle_OnPointerExited);
+		rect->PointerPressed += ref new PointerEventHandler(this, &PuzzleKeyboard::Rectangle_OnPointerMoved);
+		rect->PointerMoved += ref new PointerEventHandler(this, &PuzzleKeyboard::Rectangle_OnPointerMoved);
+		rect->PointerExited += ref new PointerEventHandler(this, &PuzzleKeyboard::Rectangle_OnPointerExited);
 		MainGrid->Children->Append(rect);
 
 		auto text = ref new TextBlock();

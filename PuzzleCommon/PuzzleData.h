@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	[Windows::UI::Xaml::Data::Bindable]
 	[Windows::Foundation::Metadata::WebHostHidden]

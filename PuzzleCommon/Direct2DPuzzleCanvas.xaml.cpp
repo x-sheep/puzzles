@@ -7,7 +7,7 @@
 #include "Direct2DPuzzleCanvas.xaml.h"
 #include "PulseEffect.xaml.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 using namespace Platform;
 using namespace Platform::Collections;
@@ -32,7 +32,7 @@ Direct2DPuzzleCanvas::Direct2DPuzzleCanvas()
 	firstColor.A = 0;
 	colors = ref new Vector<uint32>();
 
-	this->SizeChanged += ref new Windows::UI::Xaml::SizeChangedEventHandler(this, &PuzzleModern::Direct2DPuzzleCanvas::OnSizeChanged);
+	this->SizeChanged += ref new Windows::UI::Xaml::SizeChangedEventHandler(this, &Direct2DPuzzleCanvas::OnSizeChanged);
 
 	img = ref new PuzzleImageSource();
 	CreateSource(320, 320);
@@ -70,11 +70,11 @@ void Direct2DPuzzleCanvas::Pulsate(int x, int y)
 	auto circle = ref new PulseEffect();
 	circle->Margin = Thickness(x, y, 0, 0);
 	BaseCanvas->Children->Append(circle);
-	circle->Completed += ref new Windows::Foundation::EventHandler<Platform::Object ^>(this, &PuzzleModern::Direct2DPuzzleCanvas::OnPulsateCompleted);
+	circle->Completed += ref new Windows::Foundation::EventHandler<Platform::Object ^>(this, &Direct2DPuzzleCanvas::OnPulsateCompleted);
 	circle->Start();
 }
 
-void PuzzleModern::Direct2DPuzzleCanvas::OnPulsateCompleted(Platform::Object ^sender, Platform::Object ^args)
+void Direct2DPuzzleCanvas::OnPulsateCompleted(Platform::Object ^sender, Platform::Object ^args)
 {
 	auto circle = static_cast<PulseEffect^>(sender);
 	unsigned int idx = -1;
@@ -208,7 +208,7 @@ void Direct2DPuzzleCanvas::BlitterLoad(int id, int x, int y, int w, int h)
 	img->BlitterLoad(id, x, y, w, h);
 }
 
-void PuzzleModern::Direct2DPuzzleCanvas::OnSizeChanged(Platform::Object ^sender, Windows::UI::Xaml::SizeChangedEventArgs ^e)
+void Direct2DPuzzleCanvas::OnSizeChanged(Platform::Object ^sender, Windows::UI::Xaml::SizeChangedEventArgs ^e)
 {
 	if (isDrawing)
 	{

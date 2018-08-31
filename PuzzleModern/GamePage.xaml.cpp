@@ -7,10 +7,9 @@
 #include "GamePage.xaml.h"
 #include "HelpFlyout.xaml.h"
 #include "ParamsFlyout.xaml.h"
-#include "..\PuzzleCommon\ShapePuzzleCanvas.xaml.h"
-#include "..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.h"
 
 using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 using namespace Platform;
 using namespace Platform::Collections;
@@ -166,7 +165,7 @@ void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 		BeginActivatePuzzle(nullptr);
 }
 
-void GamePage::BeginActivatePuzzle(PuzzleModern::GameLaunchParameters ^p)
+void GamePage::BeginActivatePuzzle(GameLaunchParameters ^p)
 {
 	if (_isLoaded && _generatingGame)
 		return;

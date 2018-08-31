@@ -6,7 +6,8 @@
 #pragma once
 
 #include "App.g.h"
-#include "..\PuzzleCommon\PuzzleData.h"
+
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {
@@ -28,7 +29,7 @@ namespace PuzzleModern
 				}
 			}
 
-			void ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch, bool wasTerminated, bool clearStack);
+			void ActivatePuzzle(GameLaunchParameters ^launch, bool wasTerminated, bool clearStack);
 
 			static Platform::String ^ToLower(Platform::String ^input);
 			static Platform::String ^ToUpper(Platform::String ^input);

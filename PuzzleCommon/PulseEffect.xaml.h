@@ -7,7 +7,7 @@
 
 #include "PulseEffect.g.h"
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class PulseEffect sealed

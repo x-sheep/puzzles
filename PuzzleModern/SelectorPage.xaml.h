@@ -7,8 +7,8 @@
 
 #include "SelectorPage.g.h"
 #include "Common\NavigationHelper.h"
-#include "..\PuzzleCommon\PuzzleData.h"
-#include "..\PuzzleCommon\WindowsModern.h"
+
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {
@@ -68,7 +68,7 @@ namespace PuzzleModern
 		void ButtonOpen_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void OnDataRequested(Windows::ApplicationModel::DataTransfer::DataTransferManager ^sender, Windows::ApplicationModel::DataTransfer::DataRequestedEventArgs ^args);
 
-		PuzzleModern::PuzzleList ^_puzzles;
+		PuzzleList ^_puzzles;
 		void itemGridView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 
 		Windows::UI::Xaml::Controls::GridView ^itemGridView, ^favouritesGridView;

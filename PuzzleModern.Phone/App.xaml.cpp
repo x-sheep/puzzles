@@ -6,9 +6,8 @@
 #include "pch.h"
 #include "HubPage.xaml.h"
 #include "ItemPage.xaml.h"
-#include "..\PuzzleCommon\PuzzleData.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleCommon;
 using namespace PuzzleModern::Phone;
 using namespace PuzzleModern::Phone::Common;
 

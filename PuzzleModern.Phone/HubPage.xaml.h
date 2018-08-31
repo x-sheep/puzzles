@@ -6,7 +6,8 @@
 #pragma once
 
 #include "HubPage.g.h"
-#include "..\PuzzleCommon\PuzzleData.h"
+
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {
@@ -53,7 +54,7 @@ namespace PuzzleModern
 
 			void LoadGameButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 
-			PuzzleModern::PuzzleList ^_puzzles;
+			PuzzleList ^_puzzles;
 		};
 	}
 }

@@ -8,8 +8,8 @@
 #include "GamePage.g.h"
 #include "ParamsFlyout.g.h"
 #include "Common\NavigationHelper.h"
-#include "..\PuzzleCommon\PuzzleData.h"
-#include "..\PuzzleCommon\WindowsModern.h"
+
+using namespace PuzzleCommon;
 
 namespace PuzzleModern
 {
@@ -45,7 +45,7 @@ namespace PuzzleModern
 
 		void ForceRedraw();
 		void BeginLoadGame(Windows::Storage::StorageFile ^file, bool makeNew);
-		void BeginActivatePuzzle(PuzzleModern::GameLaunchParameters ^p);
+		void BeginActivatePuzzle(GameLaunchParameters ^p);
 
 		virtual void StartTimer();
 		virtual void EndTimer();
@@ -55,7 +55,7 @@ namespace PuzzleModern
 		virtual void OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e) override;
 
 	private:
-		PuzzleModern::Puzzle ^currentPuzzle;
+		Puzzle ^currentPuzzle;
 		Platform::String ^_puzzleName;
 		WindowsModern ^fe;
 		unsigned long long LastTime;
@@ -121,7 +121,7 @@ namespace PuzzleModern
 		void ButtonUndo_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ButtonRedo_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ButtonBar_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-		void OnNewConfiguration(PuzzleModern::ParamsFlyout ^sender, Windows::Foundation::Collections::IVector<PuzzleModern::ConfigItem ^> ^newConfig);
+		void OnNewConfiguration(PuzzleModern::ParamsFlyout ^sender, Windows::Foundation::Collections::IVector<ConfigItem ^> ^newConfig);
 		void OnParamsFlyoutUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e);
 		void PresetGridView_ItemClick(Platform::Object^ sender, Windows::UI::Xaml::Controls::ItemClickEventArgs^ e);		
 		void PresetMenuFlyout_Click(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e);

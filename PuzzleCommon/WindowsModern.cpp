@@ -1,18 +1,17 @@
 ﻿#include "pch.h"
 #include "WindowsModern.h"
-#include "PuzzleData.h"
 
 extern "C" {
 #include <windows.h>
 #include <stdio.h>
 
-#include "..\puzzles.h"
+#include "../puzzles.h"
 }
 #include "IPuzzleCanvas.h"
 #include "PuzzleHelpData.h"
 #include <ppltasks.h>
 
-using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 using namespace Platform::Collections;
 using namespace Windows::Foundation;
@@ -445,7 +444,7 @@ void winmodern_write_chars(void *vctx, const void *buf, int len)
 	ctx->pos += len;
 }
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	char *WindowsModern::ToChars(Platform::String ^input)
 	{

@@ -7,11 +7,10 @@
 
 #include <collection.h>
 #include "ShapePuzzleCanvas.g.h"
-#include "IPuzzleCanvas.h"
 
 using namespace Windows::Foundation::Collections;
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class ShapePuzzleCanvas sealed : IPuzzleCanvas

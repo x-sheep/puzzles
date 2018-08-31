@@ -3,7 +3,7 @@
 
 using namespace Windows::Foundation::Collections;
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	public enum class GameFontType
 	{

@@ -8,9 +8,9 @@
 #include "GamePage.xaml.h"
 #include "AboutFlyout.xaml.h"
 #include "GeneralSettingsFlyout.xaml.h"
-#include "..\PuzzleCommon\WindowsModern.h"
 
 using namespace PuzzleModern;
+using namespace PuzzleCommon;
 using namespace concurrency;
 
 using namespace Platform;
@@ -45,7 +45,7 @@ void App::OnWindowCreated(Windows::UI::Xaml::WindowCreatedEventArgs^ e)
 		ref new TypedEventHandler<SettingsPane^, SettingsPaneCommandsRequestedEventArgs^>(this, &App::OnCommandsRequested);
 }
 
-void App::ActivatePuzzle(PuzzleModern::GameLaunchParameters ^launch)
+void App::ActivatePuzzle(GameLaunchParameters ^launch)
 {
 	Frame ^rootFrame;
 	GamePage ^page;

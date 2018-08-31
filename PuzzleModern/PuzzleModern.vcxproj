@@ -126,32 +126,15 @@
     <ClInclude Include="Common\NavigationHelper.h" />
     <ClInclude Include="Common\RelayCommand.h" />
     <ClInclude Include="Common\SuspensionManager.h" />
-    <ClInclude Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.h">
-      <DependentUpon>..\PuzzleCommon\Direct2DPuzzleCanvas.xaml</DependentUpon>
-    </ClInclude>
     <ClInclude Include="GeneralSettingsFlyout.xaml.h">
       <DependentUpon>GeneralSettingsFlyout.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="HelpFlyout.xaml.h">
       <DependentUpon>HelpFlyout.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="..\PuzzleCommon\PulseEffect.xaml.h">
-      <DependentUpon>..\PuzzleCommon\PulseEffect.xaml</DependentUpon>
-    </ClInclude>
-    <ClInclude Include="..\PuzzleCommon\PuzzleHelpData.h" />
-    <ClInclude Include="..\PuzzleCommon\PuzzleImageSource.h" />
-    <ClInclude Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.h">
-      <DependentUpon>..\PuzzleCommon\ShapePuzzleCanvas.xaml</DependentUpon>
-    </ClInclude>
     <ClInclude Include="GamePage.xaml.h">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="..\gluefe.h" />
-    <ClInclude Include="..\grid.h" />
-    <ClInclude Include="..\PuzzleCommon\IPuzzleCanvas.h" />
-    <ClInclude Include="..\latin.h" />
-    <ClInclude Include="..\loopgen.h" />
-    <ClInclude Include="..\matching.h" />
     <ClInclude Include="ParamsFlyout.xaml.h">
       <DependentUpon>ParamsFlyout.xaml</DependentUpon>
     </ClInclude>
@@ -159,15 +142,9 @@
     <ClInclude Include="App.xaml.h">
       <DependentUpon>App.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="..\PuzzleCommon\PuzzleData.h" />
-    <ClInclude Include="..\penrose.h" />
-    <ClInclude Include="..\puzzles.h" />
-    <ClInclude Include="..\resource.h" />
     <ClInclude Include="SelectorPage.xaml.h">
       <DependentUpon>SelectorPage.xaml</DependentUpon>
     </ClInclude>
-    <ClInclude Include="..\tree234.h" />
-    <ClInclude Include="..\PuzzleCommon\WindowsModern.h" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -176,17 +153,10 @@
     <Page Include="AboutFlyout.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="GeneralSettingsFlyout.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="HelpFlyout.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\PuzzleCommon\PulseEffect.xaml" />
-    <Page Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="GamePage.xaml">
@@ -504,145 +474,20 @@
     <ClCompile Include="App.xaml.cpp">
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="..\blackbox.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\bridges.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\combi.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
     <ClCompile Include="Common\NavigationHelper.cpp" />
     <ClCompile Include="Common\RelayCommand.cpp" />
     <ClCompile Include="Common\SuspensionManager.cpp" />
-    <ClCompile Include="..\cube.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\PuzzleCommon\Direct2DPuzzleCanvas.xaml.cpp">
-      <DependentUpon>..\PuzzleCommon\Direct2DPuzzleCanvas.xaml</DependentUpon>
-    </ClCompile>
-    <ClCompile Include="..\divvy.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\dominosa.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\drawing.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\dsf.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\fifteen.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\filling.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\findloop.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\flip.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\flood.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\galaxies.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
     <ClCompile Include="GeneralSettingsFlyout.xaml.cpp">
       <DependentUpon>GeneralSettingsFlyout.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="HelpFlyout.xaml.cpp">
       <DependentUpon>HelpFlyout.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="..\PuzzleCommon\PulseEffect.xaml.cpp">
-      <DependentUpon>..\PuzzleCommon\PulseEffect.xaml</DependentUpon>
-    </ClCompile>
-    <ClCompile Include="..\PuzzleCommon\PuzzleImageSource.cpp" />
-    <ClCompile Include="..\PuzzleCommon\ShapePuzzleCanvas.xaml.cpp">
-      <DependentUpon>..\PuzzleCommon\ShapePuzzleCanvas.xaml</DependentUpon>
-    </ClCompile>
     <ClCompile Include="GamePage.xaml.cpp">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="..\grid.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\guess.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\inertia.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\keen.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\latin.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\laydomino.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\lightup.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\list.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\loopgen.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\loopy.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\magnets.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
     <ClCompile Include="ParamsFlyout.xaml.cpp">
       <DependentUpon>ParamsFlyout.xaml</DependentUpon>
-    </ClCompile>
-    <ClCompile Include="..\PuzzleCommon\PuzzleData.cpp" />
-    <ClCompile Include="..\malloc.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\map.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\matching.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\midend.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\mines.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\misc.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\net.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\netslide.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\no-icon.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\nullgame.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\obfusc.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\palisade.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\pattern.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -652,90 +497,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\pearl.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\pegs.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\penrose.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\printing.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\ps.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\random.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\range.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\rect.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\samegame.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
     <ClCompile Include="SelectorPage.xaml.cpp">
       <DependentUpon>SelectorPage.xaml</DependentUpon>
-    </ClCompile>
-    <ClCompile Include="..\signpost.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\singles.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\sixteen.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\slant.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\solo.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\tdq.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\tents.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\towers.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\tracks.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\tree234.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\twiddle.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\undead.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\unequal.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\unruly.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\untangle.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\PuzzleCommon\WindowsModern.cpp">
-      <CompileAsWinRT>true</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="..\gluefe.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Common\ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PuzzleCommon\PuzzleCommon.Windows\PuzzleCommon.Windows.vcxproj">
+      <Project>{9f817435-d078-4f3b-b4cf-88da324eff89}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

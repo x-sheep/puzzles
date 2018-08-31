@@ -6,7 +6,7 @@
 #include "pch.h"
 #include "PulseEffect.xaml.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 using namespace Platform;
 using namespace Windows::Foundation;

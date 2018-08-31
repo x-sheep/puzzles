@@ -1,12 +1,11 @@
 #include "pch.h"
-#include "PuzzleData.h"
 
 using namespace Windows::System;
 using namespace Windows::Data::Json;
 using namespace Windows::Foundation::Collections;
 using namespace Platform::Collections;
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	PuzzleList::PuzzleList()
 	{

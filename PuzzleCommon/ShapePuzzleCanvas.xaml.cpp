@@ -6,7 +6,7 @@
 #include "pch.h"
 #include "ShapePuzzleCanvas.xaml.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleCommon;
 
 using namespace Platform;
 using namespace Platform::Collections;

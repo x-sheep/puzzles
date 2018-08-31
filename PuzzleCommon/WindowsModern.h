@@ -2,17 +2,16 @@
 #include "pch.h"
 
 extern "C" {
-#include "../../puzzles.h"
+#include "../puzzles.h"
 }
 
-#include "PuzzleData.h"
 #include "IPuzzleCanvas.h"
 #include <ppltasks.h>
 
 using namespace Windows::System;
 using namespace Windows::Foundation;
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	struct write_save_context
 	{

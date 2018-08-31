@@ -7,10 +7,9 @@
 
 #include "Direct2DPuzzleCanvas.g.h"
 #include "PuzzleImageSource.h"
-#include "IPuzzleCanvas.h"
 
 
-namespace PuzzleModern
+namespace PuzzleCommon
 {
 	public delegate void ForceRedrawDelegate();
 	[Windows::Foundation::Metadata::WebHostHidden]

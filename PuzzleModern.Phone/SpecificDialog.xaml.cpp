@@ -6,7 +6,7 @@
 #include "pch.h"
 #include "SpecificDialog.xaml.h"
 
-using namespace PuzzleModern;
+using namespace PuzzleModern::Phone;
 
 using namespace Platform;
 using namespace Windows::Foundation;
@@ -21,7 +21,7 @@ using namespace Windows::UI::Xaml::Navigation;
 
 // The Content Dialog item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
-PuzzleModern::SpecificDialog::SpecificDialog(Platform::String ^title, Platform::String ^gameId, bool isRandomSeed)
+SpecificDialog::SpecificDialog(Platform::String ^title, Platform::String ^gameId, bool isRandomSeed)
 {
 	InitializeComponent();
 	Title = title;
@@ -32,12 +32,12 @@ PuzzleModern::SpecificDialog::SpecificDialog(Platform::String ^title, Platform::
 		IDField->Header = "Random seed";
 }
 
-void PuzzleModern::SpecificDialog::ContentDialog_PrimaryButtonClick(ContentDialog^ sender, ContentDialogButtonClickEventArgs^ args)
+void SpecificDialog::ContentDialog_PrimaryButtonClick(ContentDialog^ sender, ContentDialogButtonClickEventArgs^ args)
 {
 	Hide();
 	GameIDSpecified(this, IDField->Text, _isRandomSeed);
 }
 
-void PuzzleModern::SpecificDialog::ContentDialog_SecondaryButtonClick(ContentDialog^ sender, ContentDialogButtonClickEventArgs^ args)
+void SpecificDialog::ContentDialog_SecondaryButtonClick(ContentDialog^ sender, ContentDialogButtonClickEventArgs^ args)
 {
 }
