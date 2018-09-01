@@ -29,7 +29,7 @@ namespace PuzzleCommon
 		static PuzzleList^ GetPuzzleList();
 		Puzzle^ GetCurrentPuzzle();
 		void SetPreset(int i);
-		void NewGame(Windows::Foundation::IAsyncAction^ workItem);
+		IAsyncOperation<bool> ^NewGame();
 
 		PresetList^ GetPresetList(bool includeCustom, int maximumDepth);
 		Platform::String ^GetCurrentPresetName(PresetList ^list);

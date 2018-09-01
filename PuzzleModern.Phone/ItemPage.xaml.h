@@ -104,7 +104,7 @@ namespace PuzzleModern
 			Windows::Foundation::Point _initialPoint;
 			Windows::System::Threading::ThreadPoolTimer ^RightClickTimer;
 			
-			Windows::Foundation::IAsyncAction^ generatingWorkItem;
+			Windows::Foundation::IAsyncInfo^ generatingWorkItem;
 
 			ButtonType _touchAction, _holdAction;
 

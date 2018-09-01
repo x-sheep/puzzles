@@ -227,24 +227,21 @@ void ItemPage::BeginNewGame()
 	BusyLabel->Text = "Creating puzzle";
 	OnGenerationStart();
 
-	auto workItemDelegate = [this](IAsyncAction^ workItem)
+	auto workItemDelegate = fe->NewGame();
+
+	create_task(workItemDelegate).then([=](bool success)
 	{
-		generatingWorkItem = workItem;
-		fe->NewGame(workItem);
 		generatingWorkItem = nullptr;
 
-		bool success = workItem->Status != AsyncStatus::Canceled;
-
-		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([this, success]
+		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([=]
 		{
 			_isLoaded = true;
 			if (success)
 				OnGenerationEnd();
 		}));
-	};
+	});
 
-	auto workItemHandler = ref new Windows::System::Threading::WorkItemHandler(workItemDelegate);
-	auto workItem = Windows::System::Threading::ThreadPool::RunAsync(workItemHandler, Windows::System::Threading::WorkItemPriority::Normal);
+	generatingWorkItem = workItemDelegate;
 }
 
 void ItemPage::BusyOverlayDisappearingAnimation_Completed(Platform::Object^ sender, Platform::Object^ e)

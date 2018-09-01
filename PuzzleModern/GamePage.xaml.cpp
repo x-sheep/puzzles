@@ -255,25 +255,23 @@ void GamePage::BeginNewGame()
 	else
 		BusyCancelButton->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 
-	auto workItemDelegate = [this](IAsyncAction^ workItem)
+	auto workItemDelegate = fe->NewGame();
+	
+	create_task(workItemDelegate).then([=](bool success)
 	{
-		generatingWorkItem = workItem;
-		fe->NewGame(workItem);
 		generatingWorkItem = nullptr;
 
-		bool success = workItem->Status != AsyncStatus::Canceled;
-
-		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([=]{
+		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([=]
+		{
 			_isLoaded = true; 
 			if (success)
 				OnGenerationEnd();
 			else
 				NavigationHelper->GoBack();
 		}));
-	};
+	});
 
-	auto workItemHandler = ref new Windows::System::Threading::WorkItemHandler(workItemDelegate);
-	auto workItem = Windows::System::Threading::ThreadPool::RunAsync(workItemHandler, Windows::System::Threading::WorkItemPriority::Normal);
+	generatingWorkItem = workItemDelegate;
 }
 
 

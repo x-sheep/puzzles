@@ -354,12 +354,12 @@ void winmodern_fatal(const char *msg)
 	throw ref new Platform::FailureException(FromChars(msg));
 }
 
-static Windows::Foundation::IAsyncAction^ currentWorkItem = nullptr;
+static concurrency::cancellation_token *cancellationToken = nullptr;
 static bool cancellable = false;
 
 void winmodern_check_abort(void)
 {
-	if (cancellable && currentWorkItem && currentWorkItem->Status == Windows::Foundation::AsyncStatus::Canceled)
+	if (cancellable && (!cancellationToken || cancellationToken->is_canceled()))
 	{
 		cancellable = false;
 		throw std::exception();
@@ -602,23 +602,31 @@ namespace PuzzleCommon
 		midend_set_params(this->me, params);
 	}
 
-	void WindowsModern::NewGame(Windows::Foundation::IAsyncAction^ workItem)
+	IAsyncOperation<bool> ^WindowsModern::NewGame()
 	{
 		_generating = true;
-		currentWorkItem = workItem;
-		cancellable = true;
-		try
+		return concurrency::create_async([=](concurrency::cancellation_token token)
 		{
-			midend_new_game(this->me);
-			_generating = false;
-		}
-		catch (std::exception ex)
-		{
-			OutputDebugString(L"Operation has been canceled\n");
-			// TODO this will leak memory everywhere. Can the objects created during generation be freed?
-		}
-		cancellable = false;
-		currentWorkItem = nullptr;
+			cancellationToken = &token;
+			cancellable = true;
+
+			bool success = false;
+			try
+			{
+				midend_new_game(this->me);
+				_generating = false;
+				success = true;
+			}
+			catch (std::exception ex)
+			{
+				OutputDebugString(L"Operation has been canceled\n");
+				// TODO this will leak memory everywhere. Can the objects created during generation be freed?
+			}
+			cancellable = false;
+			cancellationToken = nullptr;
+
+			return success;
+		});
 	}
 
 	Platform::String ^WindowsModern::Solve()
@@ -795,8 +803,7 @@ namespace PuzzleCommon
 			// If the app is terminated while suspended, this memory will free again.
 			// Figure out a way to abort generation while also freeing all resources.
 			OutputDebugString(L"WARNING: Puzzle generation still in progress!\n");
-			if (currentWorkItem)
-				currentWorkItem->Cancel();
+			cancellationToken = nullptr;
 		}
 	}
 
