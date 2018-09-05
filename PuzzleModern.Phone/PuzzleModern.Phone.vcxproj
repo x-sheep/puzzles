@@ -54,6 +54,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
+  <ImportGroup Label="Shared">
+    <Import Project="..\PuzzleCommon\PuzzleCommon.Static\PuzzleCommon.Static.vcxitems" Label="Shared" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -170,139 +173,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="..\Help\blackbox.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\bridges.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\common.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\cube.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\docindex.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\dominosa.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\fifteen.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\filling.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\flip.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\flood.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\galaxies.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\guess.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\index.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\inertia.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\intro.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\keen.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\licence.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\lightup.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\loopy.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\magnets.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\map.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\mines.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\net.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\netslide.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\palisade.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\pattern.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\pearl.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\pegs.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\range.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\rect.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\samegame.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\signpost.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\singles.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\sixteen.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\slant.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\solo.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <None Include="style.css">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\tents.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\towers.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\tracks.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\twiddle.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\undead.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\unequal.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\unruly.html">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\Help\untangle.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>

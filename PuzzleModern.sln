@@ -15,11 +15,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PuzzleCommon.Windows", "Puz
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PuzzleCommon.WindowsPhone", "PuzzleCommon\PuzzleCommon.WindowsPhone\PuzzleCommon.WindowsPhone.vcxproj", "{38554673-EC28-40FD-8BBE-B4D46181B1B3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PuzzleCommon.Static", "PuzzleCommon\PuzzleCommon.Static\PuzzleCommon.Static.vcxitems", "{45D41ACC-2C3C-43D2-BC10-02AA73FFC7C7}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		PuzzleCommon\PuzzleCommon.Static\PuzzleCommon.Static.vcxitems*{32839afb-652e-4852-a59e-84d912f5c979}*SharedItemsImports = 4
 		PuzzleCommon\PuzzleCommon.Shared.vcxitems*{38554673-ec28-40fd-8bbe-b4d46181b1b3}*SharedItemsImports = 4
+		PuzzleCommon\PuzzleCommon.Static\PuzzleCommon.Static.vcxitems*{45d41acc-2c3c-43d2-bc10-02aa73ffc7c7}*SharedItemsImports = 9
 		PuzzleCommon\PuzzleCommon.Shared.vcxitems*{937f3382-b937-4425-a62f-41a378e1419b}*SharedItemsImports = 9
 		PuzzleCommon\PuzzleCommon.Shared.vcxitems*{9f817435-d078-4f3b-b4cf-88da324eff89}*SharedItemsImports = 4
+		PuzzleCommon\PuzzleCommon.Static\PuzzleCommon.Static.vcxitems*{9fe8cf0e-bf19-4d5f-9243-9cfd8b5685c9}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -92,5 +97,6 @@ Global
 		{937F3382-B937-4425-A62F-41A378E1419B} = {42625B86-3E31-4451-ABAB-3B8E6BA855B6}
 		{9F817435-D078-4F3B-B4CF-88DA324EFF89} = {42625B86-3E31-4451-ABAB-3B8E6BA855B6}
 		{38554673-EC28-40FD-8BBE-B4D46181B1B3} = {42625B86-3E31-4451-ABAB-3B8E6BA855B6}
+		{45D41ACC-2C3C-43D2-BC10-02AA73FFC7C7} = {42625B86-3E31-4451-ABAB-3B8E6BA855B6}
 	EndGlobalSection
 EndGlobal
