@@ -65,7 +65,7 @@ namespace PuzzleCommon
 		void StartClip(Windows::Foundation::Rect rect);
 		void EndClip();
 
-		int BlitterNew(uint32 w, uint32 h);
+		void BlitterNew(int id, uint32 w, uint32 h);
 		void BlitterFree(int id);
 		void BlitterSave(int id, int x, int y, int w, int h);
 		void BlitterLoad(int id, int x, int y, int w, int h);
@@ -94,7 +94,6 @@ namespace PuzzleCommon
 		DWRITE_FONT_METRICS                             m_fixedFontMetrics;
 
 		std::unordered_map<int, Microsoft::WRL::ComPtr<ID2D1Bitmap>> m_blitters;
-		int                                             m_nextBlitterId;
 
 		int                                             m_width;
 		int                                             m_height;

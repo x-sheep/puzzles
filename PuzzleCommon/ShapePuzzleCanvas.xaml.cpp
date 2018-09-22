@@ -249,10 +249,7 @@ void ShapePuzzleCanvas::SetLineDotted(bool dotted)
 	_lineDotted = dotted;
 }
 
-int ShapePuzzleCanvas::BlitterNew(int w, int h)
-{
-	return 0;
-}
+void ShapePuzzleCanvas::BlitterNew(int id, int w, int h){}
 void ShapePuzzleCanvas::BlitterFree(int id){}
 void ShapePuzzleCanvas::BlitterSave(int id, int x, int y, int w, int h){}
 void ShapePuzzleCanvas::BlitterLoad(int id, int x, int y, int w, int h){}

@@ -167,21 +167,31 @@ float winmodern_draw_scale(void *handle)
 blitter *winmodern_blitter_new(void *handle, int w, int h)
 {
 	frontend *fe = (frontend *)handle;
-	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	blitter *bl = snew(blitter);
-	bl->handle = canvas->BlitterNew(w, h);
+	bl->handle = fe->next_blitter_id++;
 	bl->w = w;
 	bl->h = h;
+
+	if (fe->canvas)
+	{
+		IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
+		canvas->BlitterNew(bl->handle, w, h);
+	}
+
 	return bl;
 }
 
 void winmodern_blitter_free(void *handle, blitter *bl)
 {
 	frontend *fe = (frontend *)handle;
-	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
-	
-	canvas->BlitterFree(bl->handle);
+
+	if (fe->canvas)
+	{
+		IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
+		canvas->BlitterFree(bl->handle);
+	}
+
 	sfree(bl);
 }
 
@@ -827,6 +837,7 @@ namespace PuzzleCommon
 		this->fe->preset_menu = NULL;
 		this->fe->configs = NULL;
 		this->fe->scale = 1.0f;
+		this->fe->next_blitter_id = 0;
 		this->canvas = icanvas;
 		this->fe->canvas = (void *)&this->canvas;
 		this->statusbar = ibar;

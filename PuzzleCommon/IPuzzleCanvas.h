@@ -35,7 +35,7 @@ namespace PuzzleCommon
 		void SetLineWidth(float width);
 		void SetLineDotted(bool dotted);
 
-		int BlitterNew(int w, int h);
+		void BlitterNew(int id, int w, int h);
 		void BlitterFree(int id);
 		void BlitterSave(int id, int x, int y, int w, int h);
 		void BlitterLoad(int id, int x, int y, int w, int h);

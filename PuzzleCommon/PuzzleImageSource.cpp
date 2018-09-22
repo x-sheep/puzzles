@@ -131,7 +131,6 @@ namespace PuzzleCommon
 			);
 
 		m_d2dContext = nullptr;
-		m_nextBlitterId = 0;
 		m_blitters.clear();
 	}
 
@@ -149,10 +148,9 @@ namespace PuzzleCommon
 		font->GetMetrics(target);
 	}
 
-	int PuzzleImageSource::BlitterNew(uint32 w, uint32 h)
+	void PuzzleImageSource::BlitterNew(int id, uint32 w, uint32 h)
 	{
-		int id = m_nextBlitterId++;
-		return id;
+		// No-op. The bitmap can only be created after drawing has started.
 	}
 
 	void PuzzleImageSource::BlitterSave(int id, int x, int y, int w, int h)

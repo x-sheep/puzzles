@@ -5,6 +5,7 @@ struct frontend {
 	struct preset_menu *preset_menu;
 	int printw, printh;
 	drawing *printdr;
+	int next_blitter_id;
 
 	float scale;
 	config_item *configs;

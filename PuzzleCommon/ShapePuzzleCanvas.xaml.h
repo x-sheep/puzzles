@@ -40,7 +40,7 @@ namespace PuzzleCommon
 		virtual void SetLineWidth(float width);
 		virtual void SetLineDotted(bool dotted);
 
-		virtual int BlitterNew(int w, int h);
+		virtual void BlitterNew(int id, int w, int h);
 		virtual void BlitterFree(int id);
 		virtual void BlitterSave(int id, int x, int y, int w, int h);
 		virtual void BlitterLoad(int id, int x, int y, int w, int h);

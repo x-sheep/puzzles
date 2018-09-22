@@ -190,9 +190,9 @@ void Direct2DPuzzleCanvas::ClearAll(){}
 void Direct2DPuzzleCanvas::SetLineWidth(float width){}
 void Direct2DPuzzleCanvas::SetLineDotted(bool dotted){}
 
-int Direct2DPuzzleCanvas::BlitterNew(int w, int h)
+void Direct2DPuzzleCanvas::BlitterNew(int id, int w, int h)
 {
-	return img->BlitterNew(w, h);
+	img->BlitterNew(id, w, h);
 }
 void Direct2DPuzzleCanvas::BlitterFree(int id)
 {
