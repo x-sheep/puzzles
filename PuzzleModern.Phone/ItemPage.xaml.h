@@ -72,6 +72,7 @@ namespace PuzzleModern
 
 			Windows::Foundation::EventRegistrationToken _forceRedrawEventToken;
 			Windows::Foundation::EventRegistrationToken _shareEventToken;
+			Windows::Foundation::EventRegistrationToken _resumingEventToken;
 
 			void BusyOverlayDisappearingAnimation_Completed(Platform::Object^ sender, Platform::Object^ e);
 			void DoubleAnimation_Completed(Platform::Object^ sender, Platform::Object^ e);
@@ -127,6 +128,7 @@ namespace PuzzleModern
 			void OnLoaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e);
 			void OnUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e);
 			void MenuButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e);
+			void OnResuming(Platform::Object ^sender, Platform::Object ^args);
 };
 	}
 }

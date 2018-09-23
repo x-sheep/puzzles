@@ -830,12 +830,15 @@ void ItemPage::OnLoaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEvent
 	_shareEventToken = DataTransferManager::GetForCurrentView()->DataRequested +=
 		ref new Windows::Foundation::TypedEventHandler<DataTransferManager ^, DataRequestedEventArgs ^>
 		(this, &ItemPage::OnDataRequested);
+	_resumingEventToken = App::Current->Resuming += 
+		ref new Windows::Foundation::EventHandler<Platform::Object ^>(this, &ItemPage::OnResuming);
 }
 
 
 void ItemPage::OnUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e)
 {
 	DataTransferManager::GetForCurrentView()->DataRequested -= _shareEventToken;
+	App::Current->Resuming -= _resumingEventToken;
 }
 
 void ItemPage::OnDataRequested(DataTransferManager ^sender, DataRequestedEventArgs ^args)
@@ -877,4 +880,17 @@ void ItemPage::MenuButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Inp
 	{
 		App::Current->ActivatePuzzle(nullptr, false, true);
 	}
+}
+
+void ItemPage::OnResuming(Platform::Object ^sender, Platform::Object ^args)
+{
+	auto handle = ref new Windows::UI::Core::DispatchedHandler(this, &ItemPage::ForceRedraw);
+	auto timerDelegate = [this, handle](Windows::System::Threading::ThreadPoolTimer^ timer)
+	{
+		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::High, handle);
+	};
+	Windows::Foundation::TimeSpan period = TimeSpan();
+	period.Duration = 5 * 10000; // 5 milliseconds
+
+	Windows::System::Threading::ThreadPoolTimer::CreateTimer(ref new Windows::System::Threading::TimerElapsedHandler(timerDelegate), period);
 }
