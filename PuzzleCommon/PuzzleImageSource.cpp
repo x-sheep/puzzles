@@ -40,7 +40,6 @@ namespace PuzzleCommon
 	}
 
 	// Initialize hardware-dependent resources.
-	// Initialize hardware-dependent resources.
 	void PuzzleImageSource::CreateDeviceResources()
 	{
 
@@ -270,11 +269,16 @@ namespace PuzzleCommon
 	}
 
 	// Ends drawing updates started by a previous BeginDraw call.
-	void PuzzleImageSource::EndDraw()
+	bool PuzzleImageSource::EndDraw()
 	{
-		ThrowIfFailed(
-			m_d2dContext->EndDraw()
-			);
+		bool success = true;
+		HRESULT endDrawHR;
+
+		endDrawHR = m_d2dContext->EndDraw();
+		if (endDrawHR == D2DERR_RECREATE_TARGET)
+			success = false;
+		else
+			ThrowIfFailed(endDrawHR);
 		
 		ComPtr<ID2D1Bitmap> bitmap;
 		m_d2dContext->GetBitmap(&bitmap);
@@ -287,9 +291,11 @@ namespace PuzzleCommon
 		m_d2dBufferContext->PopAxisAlignedClip();
 
 		// Remove the render target and end drawing.
-		ThrowIfFailed(
-			m_d2dBufferContext->EndDraw()
-			);
+		endDrawHR = m_d2dBufferContext->EndDraw();
+		if (endDrawHR == D2DERR_RECREATE_TARGET)
+			success = false;
+		else
+			ThrowIfFailed(endDrawHR);
 
 		m_d2dBufferContext->SetTarget(nullptr);
 		// Query for ISurfaceImageSourceNative interface.
@@ -298,9 +304,13 @@ namespace PuzzleCommon
 			reinterpret_cast<IUnknown*>(m_imageSource)->QueryInterface(IID_PPV_ARGS(&sisNative))
 			);
 
-		ThrowIfFailed(
-			sisNative->EndDraw()
-			);
+		endDrawHR = sisNative->EndDraw();
+		if (endDrawHR == D2DERR_RECREATE_TARGET)
+			success = false;
+		else
+			ThrowIfFailed(endDrawHR);
+
+		return success;
 	}
 
 	// Clears the background with the given color.

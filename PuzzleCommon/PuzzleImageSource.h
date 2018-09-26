@@ -54,7 +54,7 @@ namespace PuzzleCommon
 
 		bool BeginDraw(Windows::Foundation::Rect updateRect);
 		bool BeginDraw()    { return BeginDraw(Windows::Foundation::Rect(0, 0, (float)m_width, (float)m_height)); }
-		void EndDraw();
+		bool EndDraw();
 
 		void Clear(Windows::UI::Color color);
 		void FillSolidRect(uint32 color, Windows::Foundation::Rect rect);
