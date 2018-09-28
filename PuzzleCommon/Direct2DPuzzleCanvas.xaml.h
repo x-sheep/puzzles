@@ -55,7 +55,7 @@ namespace PuzzleCommon
 		Windows::UI::Color firstColor;
 		void OnSizeChanged(Platform::Object ^sender, Windows::UI::Xaml::SizeChangedEventArgs ^e);
 
-		bool isDrawing;
+		bool isDrawing, isRetrying;
 		void OnPulsateCompleted(Platform::Object ^sender, Platform::Object ^args);
 	};
 }

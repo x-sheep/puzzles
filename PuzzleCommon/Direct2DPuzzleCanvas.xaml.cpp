@@ -35,6 +35,7 @@ Direct2DPuzzleCanvas::Direct2DPuzzleCanvas()
 	this->SizeChanged += ref new Windows::UI::Xaml::SizeChangedEventHandler(this, &Direct2DPuzzleCanvas::OnSizeChanged);
 
 	img = ref new PuzzleImageSource();
+	isDrawing = isRetrying = false;
 	CreateSource(320, 320);
 }
 
@@ -128,9 +129,17 @@ bool Direct2DPuzzleCanvas::StartDraw()
 
 void Direct2DPuzzleCanvas::EndDraw()
 {
-	if (isDrawing)
-		img->EndDraw();
+	if (!isDrawing) return;
+
+	bool success = img->EndDraw();
 	isDrawing = false;
+	if (!success && !isRetrying)
+	{
+		isRetrying = true;
+		NeedsRedraw();
+	}
+	else
+		isRetrying = false;
 }
 
 void Direct2DPuzzleCanvas::UpdateArea(int x, int y, int w, int h)
