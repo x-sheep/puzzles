@@ -25,7 +25,7 @@ Note that this fork has several modifications which cause the original makefiles
 
 ## Copyright
 
-(C) 2017 Lennard Sprong
+(C) 2018 Lennard Sprong
 
 Contains icons from ModernUIIcons.com
 
