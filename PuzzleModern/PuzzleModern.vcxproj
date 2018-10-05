@@ -94,10 +94,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <PackageCertificateKeyFile>PuzzleModern_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>3A3C4252CA5531B16EEBDFA60DD7AD1FE36DF847</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>251DFBCD3685CA16F93708E3DF9847540585BA7F</PackageCertificateThumbprint>
     <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <PropertyGroup>
