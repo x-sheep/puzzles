@@ -261,12 +261,12 @@ void winmodern_line_width(void *handle, float width)
 	canvas->SetLineWidth(width);
 }
 
-void winmodern_line_dotted(void *handle, int dotted)
+void winmodern_line_dotted(void *handle, bool dotted)
 {
 	frontend *fe = (frontend *)handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
-	canvas->SetLineDotted(dotted != 0);
+	canvas->SetLineDotted(dotted);
 }
 
 void winmodern_add_print_colour(void *handle, int id)
@@ -416,7 +416,7 @@ struct frontend_adapter winmodern_adapter = {
 };
 
 // Reading function for deserialization
-int winmodern_read_chars(void *wctx, void *buf, int len)
+bool winmodern_read_chars(void *wctx, void *buf, int len)
 {
 	int i;
 	char *p;
@@ -429,13 +429,13 @@ int winmodern_read_chars(void *wctx, void *buf, int len)
 	for (i = 0; i < len; i++)
 	{
 		if (!p[i])
-			return FALSE;
+			return false;
 	}
 
 	memcpy(buf, p, len);
 	*ctx += len;
 
-	return TRUE;
+	return true;
 }
 
 // Writing function for serialization
@@ -654,12 +654,12 @@ namespace PuzzleCommon
 
 	bool WindowsModern::CanPrint()
 	{
-		return this->ourgame->can_print != 0;
+		return this->ourgame->can_print;
 	}
 
 	bool WindowsModern::CanSolve()
 	{
-		return this->ourgame->can_solve != 0;
+		return this->ourgame->can_solve;
 	}
 
 	void WindowsModern::RestartGame()
@@ -669,7 +669,7 @@ namespace PuzzleCommon
 
 	bool WindowsModern::CanUndo()
 	{
-		return midend_can_undo(me) != 0;
+		return midend_can_undo(me);
 	}
 
 	void WindowsModern::Undo()
@@ -679,17 +679,17 @@ namespace PuzzleCommon
 
 	bool WindowsModern::JustPerformedUndo()
 	{
-		return midend_just_performed_undo(me) != 0;
+		return midend_just_performed_undo(me);
 	}
 
 	bool WindowsModern::JustPerformedRedo()
 	{
-		return midend_just_performed_redo(me) != 0;
+		return midend_just_performed_redo(me);
 	}
 
 	bool WindowsModern::CanRedo()
 	{
-		return midend_can_redo(me) != 0;
+		return midend_can_redo(me);
 	}
 
 	void WindowsModern::Redo()
@@ -1132,7 +1132,7 @@ namespace PuzzleCommon
 		for (i = fe->configs; i->type != C_END; i++, idx++)
 		{
 			if (i->type == C_BOOLEAN)
-				i->u.boolean.bval = input->GetAt(idx)->IntValue;
+				i->u.boolean.bval = input->GetAt(idx)->IntValue != 0;
 			else if (i->type == C_CHOICES)
 				i->u.choices.selected = input->GetAt(idx)->IntValue;
 			else if (i->type == C_STRING)
