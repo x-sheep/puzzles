@@ -23,8 +23,7 @@ namespace PuzzleCommon
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class WindowsModern sealed {
 	public:
-		WindowsModern();
-		bool CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer);
+		WindowsModern(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer);
 
 		static PuzzleList^ GetPuzzleList();
 		Puzzle^ GetCurrentPuzzle();

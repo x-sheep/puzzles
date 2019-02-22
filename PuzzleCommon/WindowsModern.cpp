@@ -766,12 +766,6 @@ namespace PuzzleCommon
 		}
 	}
 
-	WindowsModern::WindowsModern()
-		: me(NULL), fe(NULL)
-	{
-		_generating = false;
-	}
-
 	WindowsModern::~WindowsModern()
 	{
 		OutputDebugString(L"DESTROYING...\n");
@@ -811,8 +805,9 @@ namespace PuzzleCommon
 		sfree(colours);
 	}
 
-	bool WindowsModern::CreateForGame(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer)
+	WindowsModern::WindowsModern(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer)
 	{
+		this->_generating = false;
 		this->me = NULL;
 		this->fe = snew(frontend);
 		this->fe->preset_menu = NULL;
@@ -844,13 +839,6 @@ namespace PuzzleCommon
 		this->ourgame = g;
 
 		ReloadColors();
-
-		auto settings = ApplicationData::Current->LocalSettings->Values;
-
-		if (settings->HasKey(name))
-			return true;
-
-		return false;
 	}
 	
 	IAsyncOperation<bool> ^WindowsModern::LoadGameFromStorage(Platform::String ^name)

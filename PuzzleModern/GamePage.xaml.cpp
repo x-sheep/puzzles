@@ -134,8 +134,8 @@ void GamePage::ResizeWindow(int newWidth, int newHeight)
 void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 {
 	_puzzleName = safe_cast<String^>(e->NavigationParameter);
-	fe = ref new WindowsModern();
-	_hasGame = fe->CreateForGame(_puzzleName, DrawCanvas, this, this);
+	fe = ref new WindowsModern(_puzzleName, DrawCanvas, this, this);
+	_hasGame = ApplicationData::Current->LocalSettings->Values->HasKey(_puzzleName);
 
 	currentPuzzle = fe->GetCurrentPuzzle();
 	DefaultViewModel->Insert("PuzzleName", currentPuzzle->Name);

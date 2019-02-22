@@ -96,8 +96,8 @@ void ItemPage::NavigationHelper_LoadState(Object^ sender, LoadStateEventArgs^ e)
 	(void) e;		// Unused parameter
 
 	_puzzleName = safe_cast<Platform::String^>(e->NavigationParameter);
-	fe = ref new WindowsModern();
-	_hasGame = fe->CreateForGame(_puzzleName, DrawCanvas, this, this);
+	fe = ref new WindowsModern(_puzzleName, DrawCanvas, this, this);
+	_hasGame = ApplicationData::Current->LocalSettings->Values->HasKey(_puzzleName);
 
 	Puzzle^ selectedPuzzle = fe->GetCurrentPuzzle();
 	if (!fe->CanSolve())
