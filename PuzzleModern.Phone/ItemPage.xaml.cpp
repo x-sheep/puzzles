@@ -312,7 +312,7 @@ void ItemPage::OnGenerationEnd()
 	BusyLabel->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	
 	auto presets = fe->GetPresetList(false, 1);
-	TypeButton->Label = "type: " + fe->GetCurrentPresetName(presets);
+	TypeButton->Label = "type: " + presets->GetCurrentPresetName();
 
 	if (_controls->ColorBlindKey != VirtualKey::None)
 	{

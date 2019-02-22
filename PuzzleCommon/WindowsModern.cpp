@@ -544,19 +544,6 @@ namespace PuzzleCommon
 		}
 	}
 
-	static bool check_preset_menu(PresetList ^list, int id)
-	{
-		bool result = false;
-		for each(auto item in list->Items)
-		{
-			if (item->SubMenu)
-				item->Checked = check_preset_menu(item->SubMenu, id);
-			else
-				item->Checked = item->Index == id;
-			result |= item->Checked;
-		}
-		return result;
-	}
 
 	PresetList^ WindowsModern::GetPresetList(bool includeCustom, int maximumDepth)
 	{
@@ -564,9 +551,8 @@ namespace PuzzleCommon
 		{
 			presets = ref new PresetList();
 
-			int totalItems = 0;
 			if (!fe->preset_menu)
-				fe->preset_menu = midend_get_presets(this->me, &totalItems);
+				fe->preset_menu = midend_get_presets(this->me, NULL);
 
 			populate_preset_menu(fe, fe->preset_menu, presets, maximumDepth);
 
@@ -584,7 +570,7 @@ namespace PuzzleCommon
 		}
 
 		int presetId = midend_which_preset(me);
-		check_preset_menu(presets, presetId);
+		presets->CheckPresetItem(presetId);
 
 		return presets;
 	}
@@ -594,21 +580,16 @@ namespace PuzzleCommon
 		return midend_which_preset(me) == -1;
 	}
 
-	Platform::String ^WindowsModern::GetCurrentPresetName(PresetList ^list)
-	{
-		for each(auto item in list->Items)
-		{
-			if (item->Checked && item->SubMenu)
-				return GetCurrentPresetName(item->SubMenu);
-			else if(item->Checked)
-				return item->Name;
-		}
-		return "Custom";
-	}
-
 	void WindowsModern::SetPreset(int i)
 	{
+		if (!fe->preset_menu)
+			fe->preset_menu = midend_get_presets(this->me, NULL);
+
 		game_params *params = preset_menu_lookup_by_id(fe->preset_menu, i);
+
+		if (!params)
+			throw ref new Platform::InvalidArgumentException("Invalid preset ID");
+
 		midend_set_params(this->me, params);
 	}
 

@@ -59,6 +59,35 @@ namespace PuzzleCommon
 		_items->Append(p);
 	}
 
+
+	Platform::String ^PresetList::GetCurrentPresetName()
+	{
+		for each(auto item in Items)
+		{
+			if (item->Checked && item->SubMenu)
+				return item->SubMenu->GetCurrentPresetName();
+			else if (item->Checked)
+				return item->Name;
+		}
+		return "Custom";
+	}
+
+
+	bool PresetList::CheckPresetItem(int id)
+	{
+		bool result = false;
+		for each(auto item in Items)
+		{
+			if (item->SubMenu)
+				item->Checked = item->SubMenu->CheckPresetItem(id);
+			else
+				item->Checked = item->Index == id;
+			result |= item->Checked;
+		}
+		return result;
+	}
+
+
 	Preset::Preset()
 	{
 	}

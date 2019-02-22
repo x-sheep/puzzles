@@ -32,7 +32,6 @@ namespace PuzzleCommon
 		IAsyncOperation<bool> ^NewGame();
 
 		PresetList^ GetPresetList(bool includeCustom, int maximumDepth);
-		Platform::String ^GetCurrentPresetName(PresetList ^list);
 		bool IsCustomGame();
 		Windows::Foundation::Collections::IVector<ConfigItem^>^ GetConfiguration();
 		Platform::String^ SetConfiguration(Windows::Foundation::Collections::IVector<ConfigItem^>^ input);

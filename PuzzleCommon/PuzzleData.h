@@ -169,7 +169,10 @@ namespace PuzzleCommon
 			void set(bool value) { _custom = value; }
 		}
 
+		Platform::String ^GetCurrentPresetName();
+
 		void AddPreset(Preset^ p);
+		bool CheckPresetItem(int id);
 
 	private:
 		bool _custom;
