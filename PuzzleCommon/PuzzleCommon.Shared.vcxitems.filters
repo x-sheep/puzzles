@@ -198,6 +198,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\solo.c">
       <Filter>Source Code</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\sort.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\tdq.c">
       <Filter>Source Code</Filter>
     </ClCompile>
