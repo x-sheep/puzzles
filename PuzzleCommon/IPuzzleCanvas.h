@@ -14,6 +14,9 @@ namespace PuzzleCommon
 	public enum class GameFontVAlign { VerticalBase, VerticalCentre };
 	public enum class GameFontHAlign { HorizontalLeft, HorizontalCenter, HorizontalRight };
 
+	/// <summary>
+	/// Interface for the drawing API. Each implementation of this interface represents a single drawing surface.
+	/// </summary>
 	public interface class IPuzzleCanvas
 	{
 		void AddColor(float r, float g, float b);
@@ -41,14 +44,31 @@ namespace PuzzleCommon
 		void BlitterLoad(int id, int x, int y, int w, int h);
 	};
 
+	/// <summary>
+	/// Callbacks for updating a status bar in the UI.
+	/// </summary>
 	public interface class IPuzzleStatusBar
 	{
+		/// <summary>
+		/// Replace the status bar text.
+		/// </summary>
+		/// <param name="status">The new status.</param>
 		void UpdateStatusBar(Platform::String ^status);
 	};
 
+	/// <summary>
+	/// Callbacks for starting and stopping a refresh timer.
+	/// </summary>
 	public interface class IPuzzleTimer
 	{
+		/// <summary>
+		/// Start sending tick events to the midend.
+		/// </summary>
 		void StartTimer();
+
+		/// <summary>
+		/// Stop sending tick events.
+		/// </summary>
 		void EndTimer();
 	};
 }
