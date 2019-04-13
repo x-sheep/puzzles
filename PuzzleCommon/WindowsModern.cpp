@@ -605,6 +605,7 @@ namespace PuzzleCommon
 			try
 			{
 				midend_new_game(this->me);
+				_wonGame = false;
 				_generating = false;
 				success = true;
 			}
@@ -625,6 +626,8 @@ namespace PuzzleCommon
 		const char *msg = midend_solve(me);
 		if (msg)
 			return FromChars(msg);
+
+		_wonGame = true;
 		return nullptr;
 	}
 
@@ -658,14 +661,21 @@ namespace PuzzleCommon
 		midend_process_key(me, 0, 0, UI_UNDO);
 	}
 
-	bool WindowsModern::JustPerformedUndo()
+	void WindowsModern::CheckGameCompletion()
 	{
-		return midend_just_performed_undo(me);
-	}
+		int win = midend_status(me);
 
-	bool WindowsModern::JustPerformedRedo()
-	{
-		return midend_just_performed_redo(me);
+		if (win == +1 && !_wonGame)
+		{
+			_wonGame = true;
+			if (midend_just_performed_undo(me))
+				return;
+
+			GameCompleted(this, nullptr);
+		}
+
+		if (midend_just_performed_redo(me))
+			_wonGame = false;
 	}
 
 	bool WindowsModern::CanRedo()
@@ -676,11 +686,6 @@ namespace PuzzleCommon
 	void WindowsModern::Redo()
 	{
 		midend_process_key(me, 0, 0, UI_REDO);
-	}
-
-	int WindowsModern::GameWon()
-	{
-		return midend_status(me);
 	}
 
 	bool WindowsModern::HasStatusbar()
@@ -726,6 +731,7 @@ namespace PuzzleCommon
 			button |= MOD_CTRL;
 
 		midend_process_key(me, 0, 0, button);
+		CheckGameCompletion();
 	}
 
 	void WindowsModern::SetInputScale(float scale)
@@ -764,6 +770,8 @@ namespace PuzzleCommon
 				midend_process_key(me, x, y, RIGHT_RELEASE);
 			break;
 		}
+
+		CheckGameCompletion();
 	}
 
 	WindowsModern::~WindowsModern()
@@ -820,6 +828,7 @@ namespace PuzzleCommon
 		this->fe->statusbar = (void *)&this->statusbar;
 		this->timer = itimer;
 		this->fe->timer = (void *)&this->timer;
+		this->_wonGame = false;
 		
 		char *find = ToChars(name);
 		int i;
@@ -905,6 +914,10 @@ namespace PuzzleCommon
 		char *old = ToChars(saved);
 		char *p = old;
 		const char *err = midend_deserialise(me, winmodern_read_chars, &p);
+
+		if (!err)
+			_wonGame = midend_status(me) == 1;
+
 		sfree(old);
 
 		return FromChars(err);

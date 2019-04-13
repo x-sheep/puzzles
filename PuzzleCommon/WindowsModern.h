@@ -177,14 +177,11 @@ namespace PuzzleCommon
 		/// Undo one move.
 		/// </summary>
 		void Undo();
-		bool JustPerformedUndo();
-		bool JustPerformedRedo();
 		bool CanRedo();
 		/// <summary>
 		/// Redo one move.
 		/// </summary>
 		void Redo();
-		int GameWon();
 		/// <summary>
 		/// True if a status bar should be displayed.
 		/// </summary>
@@ -224,6 +221,11 @@ namespace PuzzleCommon
 		void SetInputScale(float scale);
 
 		/// <summary>
+		/// Event that fires when a game has just been completed.
+		/// </summary>
+		event EventHandler<Platform::Object^> ^GameCompleted;
+
+		/// <summary>
 		/// The keycode for enabling the pencil marks cursor.
 		/// </summary>
 		static property VirtualKey ButtonMarkOn { VirtualKey get() { return (VirtualKey)BUTTON_MARK_ON; }}
@@ -243,9 +245,11 @@ namespace PuzzleCommon
 		IPuzzleTimer ^timer;
 		PresetList^ presets;
 		std::atomic_bool _generating;
+		bool _wonGame;
 		static Puzzle^ FromConstGame(const game *g);
 		static char *ToChars(Platform::String ^input);
 	
 		void Destroy();
+		void CheckGameCompletion();
 	};
 }

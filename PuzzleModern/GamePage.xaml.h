@@ -108,7 +108,7 @@ namespace PuzzleModern
 		void pageRoot_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 
 		bool _leftPressed, _middlePressed, _rightPressed, _initialPressed, _touchPressed, _holdPressed, _isFlyoutOpen, _generatingGame;
-		bool _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
+		bool _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _hasGame, _isLoaded;
 		bool _undoHotkey, _redoHotkey;
 		Windows::Foundation::Point _initialPoint;
 		Windows::System::Threading::ThreadPoolTimer ^RightClickTimer;
@@ -162,5 +162,6 @@ namespace PuzzleModern
 		void SpecificShareGame_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ButtonSettings_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void BottomAppBar_Closed(Platform::Object^ sender, Platform::Object^ e);		
-};
+		void OnGameCompleted(Platform::Object ^sender, Platform::Object ^args);
+	};
 }

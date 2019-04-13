@@ -101,7 +101,7 @@ namespace PuzzleModern
 			void pageRoot_PointerReleased(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 			void pageRoot_PointerMoved(Platform::Object^ sender, Windows::UI::Xaml::Input::PointerRoutedEventArgs^ e);
 
-			bool _touchPressed, _holdPressed, _initialPressed, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _wonGame, _hasGame, _isLoaded;
+			bool _touchPressed, _holdPressed, _initialPressed, _generatingGame, _finishedOverlayAnimation, _ctrlPressed, _shiftPressed, _hasGame, _isLoaded;
 			Windows::Foundation::Point _initialPoint;
 			Windows::System::Threading::ThreadPoolTimer ^RightClickTimer;
 			
@@ -129,6 +129,7 @@ namespace PuzzleModern
 			void OnUnloaded(Platform::Object ^sender, Windows::UI::Xaml::RoutedEventArgs ^e);
 			void MenuButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Input::TappedRoutedEventArgs^ e);
 			void OnResuming(Platform::Object ^sender, Platform::Object ^args);
-};
+			void OnGameCompleted(Platform::Object ^sender, Platform::Object ^args);
+		};
 	}
 }

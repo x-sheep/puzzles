@@ -97,6 +97,7 @@ void ItemPage::NavigationHelper_LoadState(Object^ sender, LoadStateEventArgs^ e)
 
 	_puzzleName = safe_cast<Platform::String^>(e->NavigationParameter);
 	fe = ref new WindowsModern(_puzzleName, DrawCanvas, this, this);
+	fe->GameCompleted += ref new EventHandler<Platform::Object^>(this, &ItemPage::OnGameCompleted);
 	_hasGame = ApplicationData::Current->LocalSettings->Values->HasKey(_puzzleName);
 
 	Puzzle^ selectedPuzzle = fe->GetCurrentPuzzle();
@@ -210,7 +211,6 @@ void ItemPage::BeginResumeGame()
 			_isLoaded = true;
 			if (loaded)
 			{
-				_wonGame = fe->GameWon() == 1;
 				OnGenerationEnd();
 			}
 			else
@@ -295,7 +295,6 @@ void ItemPage::OnGenerationEnd()
 		LeftRightButton->Icon = _controls->ToggleButton->Icon;
 	}
 
-	_wonGame = fe->GameWon() == 1;
 	UpdateUndoButtons();
 	ResizeGame();
 	if (!_finishedOverlayAnimation)
@@ -497,36 +496,30 @@ void ItemPage::ForceRedraw()
 
 void ItemPage::UpdateUndoButtons()
 {
+	if (_generatingGame)
+		return;
+
 	UndoButton->IsEnabled = fe->CanUndo();
 	RedoButton->IsEnabled = fe->CanRedo();
+}
 
-	int win = fe->GameWon();
+void ItemPage::OnGameCompleted(Platform::Object ^sender, Platform::Object ^args)
+{
+	auto settings = ApplicationData::Current->RoamingSettings;
+	if (settings->Values->HasKey("cfg_newgameprompt") && !safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt")))
+		return;
 
-	if (win == +1 && !_wonGame)
+	auto timer = ref new DispatcherTimer();
+	auto time = TimeSpan();
+	time.Duration = 700 * 10000;
+	timer->Interval = time;
+	timer->Tick += ref new EventHandler<Object^>([this, timer](Object ^sender, Object ^data)
 	{
-		_wonGame = true;
-		if (fe->JustPerformedUndo())
-			return;
+		timer->Stop();
 
-		auto settings = ApplicationData::Current->RoamingSettings;
-		if (settings->Values->HasKey("cfg_newgameprompt") && !safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt")))
-			return;
-
-		auto timer = ref new DispatcherTimer();
-		auto time = TimeSpan();
-		time.Duration = 700 * 10000;
-		timer->Interval = time;
-		timer->Tick += ref new EventHandler<Object^>([this, timer](Object ^sender, Object ^data)
-		{
-			timer->Stop();
-
-			CompletePopup->IsOpen = true;
-		});
-		timer->Start();
-	}
-
-	if (fe->JustPerformedRedo())
-		_wonGame = false;
+		CompletePopup->IsOpen = true;
+	});
+	timer->Start();
 }
 
 void ItemPage::UndoButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -692,7 +685,6 @@ void ItemPage::SolveButton_Click(Platform::Object^ sender, Windows::UI::Xaml::Ro
 
 		(ref new Windows::UI::Popups::MessageDialog(msg, "Cannot solve"))->ShowAsync();
 	}
-	_wonGame = true;
 	UpdateUndoButtons();
 }
 

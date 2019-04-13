@@ -135,6 +135,7 @@ void GamePage::LoadState(Object^ sender, Common::LoadStateEventArgs^ e)
 {
 	_puzzleName = safe_cast<String^>(e->NavigationParameter);
 	fe = ref new WindowsModern(_puzzleName, DrawCanvas, this, this);
+	fe->GameCompleted += ref new Windows::Foundation::EventHandler<Platform::Object^>(this, &GamePage::OnGameCompleted);
 	_hasGame = ApplicationData::Current->LocalSettings->Values->HasKey(_puzzleName);
 
 	currentPuzzle = fe->GetCurrentPuzzle();
@@ -282,59 +283,50 @@ void GamePage::UpdateUndoButtons()
 
 	ButtonUndo->IsEnabled = fe->CanUndo();
 	ButtonRedo->IsEnabled = fe->CanRedo();
+}
 
-	int win = fe->GameWon();
+void GamePage::OnGameCompleted(Platform::Object ^sender, Platform::Object ^args)
+{
+	auto settings = ApplicationData::Current->RoamingSettings;
+	if (settings->Values->HasKey("cfg_newgameprompt") && !safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt")))
+		return;
 
-	if (win == +1 && !_wonGame)
+	auto timer = ref new DispatcherTimer();
+	auto time = TimeSpan();
+	time.Duration = 700 * 10000;
+	timer->Interval = time;
+	timer->Tick += ref new EventHandler<Object^>([this, timer](Object ^sender, Object ^data)
 	{
-		_wonGame = true;
-		if (fe->JustPerformedUndo())
-			return;
-		
-		auto settings = ApplicationData::Current->RoamingSettings;
-		if (settings->Values->HasKey("cfg_newgameprompt") && !safe_cast<bool>(settings->Values->Lookup("cfg_newgameprompt")))
-			return;
+		timer->Stop();
 
-		auto timer = ref new DispatcherTimer();
-		auto time = TimeSpan();
-		time.Duration = 700 * 10000;
-		timer->Interval = time;
-		timer->Tick += ref new EventHandler<Object^>([this, timer](Object ^sender, Object ^data)
+		auto messageDialog = ref new MessageDialog("You have completed the puzzle!" "\n\n\n", "Congratulations");
+
+		messageDialog->Commands->Append(ref new UICommand("New Game", nullptr, PropertyValue::CreateInt32(0)));
+		messageDialog->Commands->Append(ref new UICommand("Menu", nullptr, PropertyValue::CreateInt32(1)));
+		messageDialog->Commands->Append(ref new UICommand("Close", nullptr, PropertyValue::CreateInt32(2)));
+
+		messageDialog->DefaultCommandIndex = 0;
+		messageDialog->CancelCommandIndex = 2;
+
+		create_task(messageDialog->ShowAsync()).then([this](IUICommand^ command)
 		{
-			timer->Stop();
+			if (!command->Id) return;
 
-			auto messageDialog = ref new MessageDialog("You have completed the puzzle!" "\n\n\n", "Congratulations");
-			
-			messageDialog->Commands->Append(ref new UICommand("New Game", nullptr, PropertyValue::CreateInt32(0)));
-			messageDialog->Commands->Append(ref new UICommand("Menu", nullptr, PropertyValue::CreateInt32(1)));
-			messageDialog->Commands->Append(ref new UICommand("Close", nullptr, PropertyValue::CreateInt32(2)));
+			int id = safe_cast<int>(command->Id);
 
-			messageDialog->DefaultCommandIndex = 0;
-			messageDialog->CancelCommandIndex = 2;
-
-			create_task(messageDialog->ShowAsync()).then([this](IUICommand^ command)
+			switch (id)
 			{
-				if (!command->Id) return;
-
-				int id = safe_cast<int>(command->Id);
-
-				switch (id)
-				{
-				case 0:
-					BeginNewGame();
-					break;
-				case 1:
-					NavigationHelper->GoBack();
-					break;
-				}
-			});
-
+			case 0:
+				BeginNewGame();
+				break;
+			case 1:
+				NavigationHelper->GoBack();
+				break;
+			}
 		});
-		timer->Start();
-	}
 
-	if (fe->JustPerformedRedo())
-		_wonGame = false;
+	});
+	timer->Start();
 }
 
 void GamePage::HighlightCurrentPreset()
@@ -412,7 +404,6 @@ void GamePage::OnGenerationEnd()
 	_touchAction = isSwitched ? _controls->HoldAction : _controls->TouchAction;
 	_holdAction = isSwitched ? _controls->TouchAction : _controls->HoldAction;
 
-	_wonGame = fe->GameWon() == 1;
 	fe->GetPresetList(true, 2);
 	HighlightCurrentPreset();
 	ResizeWindow(this->ActualWidth, this->ActualHeight);
@@ -523,8 +514,6 @@ void GamePage::ButtonSolve_Click(Platform::Object^ sender, Windows::UI::Xaml::Ro
 	String ^msg = fe->Solve();
 	if (msg)
 		(ref new Windows::UI::Popups::MessageDialog(App::AddPeriods(msg), "Cannot solve"))->ShowAsync();
-	else
-		_wonGame = true;
 	UpdateUndoButtons();
 }
 
