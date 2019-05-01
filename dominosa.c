@@ -7,30 +7,25 @@
 /*
  * Further possible deduction types in the solver:
  *
- *  * rule out a domino placement if it would divide an unfilled
- *    region such that at least one resulting region had an odd area
- *     + Tarjan's bridge-finding algorithm would be a way to find
- *       domino placements that split a connected region in two: form
- *       the graph whose vertices are unpaired squares and whose edges
- *       are potential (not placed but also not ruled out) dominoes
- *       covering two of them, and any bridge in that graph is a
- *       candidate.
- *     + Then, finding any old spanning forest of the unfilled squares
- *       should be sufficient to determine the area parity of the
- *       region that any such placement would cut off.
- *     + A more advanced form of this: if you have a region with _two_
- *       ways in and out of it, then you can at least decide on the
- *       relative parity of the two (either 'these two edges both
- *       bisect dominoes or neither do', or 'exactly one of these
- *       edges bisects a domino'). And occasionally that can be enough
- *       to let you rule out one of the two remaining choices.
- *        - For example, maybe if both edges bisect a domino then
- *          those two dominoes would also be both the same.
- *        - Or perhaps between them they rule out all possibilities
- *          for some other square.
- *        - Or perhaps, on purely geometric grounds, they would box in
- *          a square to the point where it ended up having to be an
+ *  * possibly an advanced form of deduce_parity via 2-connectedness.
+ *    We currently deal with areas of the graph with exactly one way
+ *    in and out; but if you have an area with exactly _two_ routes in
+ *    and out of it, then you can at least decide on the _relative_
+ *    parity of the two (either 'these two edges both bisect dominoes
+ *    or neither do', or 'exactly one of these edges bisects a
+ *    domino'). And occasionally that can be enough to let you rule
+ *    out one of the two remaining choices.
+ *     + For example, if both those edges bisect a domino, then those
+ *       two dominoes would also be both the same.
+ *     + Or perhaps between them they rule out all possibilities for
+ *       some other square.
+ *     + Or perhaps they themselves would be duplicates!
+ *     + Or perhaps, on purely geometric grounds, they would box in a
+ *       square to the point where it ended up having to be an
  *          isolated singleton.
+ *     + The tricky part of this is how you do the graph theory.
+ *       Perhaps a modified form of Tarjan's bridge-finding algorithm
+ *       would work, but I haven't thought through the details.
  *
  *  * possibly an advanced version of set analysis which doesn't have
  *    to start from squares all having the same number? For example,
@@ -344,6 +339,7 @@ struct solver_scratch {
     struct solver_square *squares;
     struct solver_placement **domino_placement_lists;
     struct solver_square **squares_by_number;
+    struct findloopstate *fls;
     bool squares_by_number_initialised;
     int *wh_scratch, *pc_scratch, *pc_scratch2, *dc_scratch;
 };
@@ -366,6 +362,7 @@ static struct solver_scratch *solver_make_scratch(int n)
     sc->placements = snewn(pc, struct solver_placement);
     sc->squares = snewn(wh, struct solver_square);
     sc->domino_placement_lists = snewn(pc, struct solver_placement *);
+    sc->fls = findloop_new_state(wh);
 
     for (di = hi = 0; hi <= n; hi++) {
         for (lo = 0; lo <= hi; lo++) {
@@ -498,6 +495,7 @@ static void solver_free_scratch(struct solver_scratch *sc)
     sfree(sc->squares);
     sfree(sc->domino_placement_lists);
     sfree(sc->squares_by_number);
+    findloop_free_state(sc->fls);
     sfree(sc->wh_scratch);
     sfree(sc->pc_scratch);
     sfree(sc->pc_scratch2);
@@ -821,13 +819,201 @@ static bool deduce_local_duplicate(struct solver_scratch *sc, int pi)
 }
 
 /*
- * If we can find a set S of mutually non-adjacent squares all
- * containing the same number, such that the set of possible dominoes
- * for all those squares put together has the same size as S, then all
- * the dominoes in that set _must_ overlap a square of S and we can
- * rule out any other placements for them.
+ * If placement P overlaps one placement for each of two squares S,T
+ * such that all the remaining placements for both S and T are the
+ * same domino D (and none of those placements joins S and T to each
+ * other), then P can't be placed, because it would leave S,T each
+ * having to be a copy of D, i.e. duplicates.
  */
-static bool deduce_set_simple(struct solver_scratch *sc)
+static bool deduce_local_duplicate_2(struct solver_scratch *sc, int pi)
+{
+    struct solver_placement *p = &sc->placements[pi];
+    int i, j, k;
+
+    if (!p->active)
+        return false;
+
+    /*
+     * Iterate over pairs of placements qi,qj overlapping p.
+     */
+    for (i = 0; i < p->noverlaps; i++) {
+        struct solver_placement *qi = p->overlaps[i];
+        struct solver_square *sqi;
+        struct solver_domino *di = NULL;
+
+        if (!qi->active)
+            continue;
+
+        /* Find the square of qi that _isn't_ part of p */
+        sqi = qi->squares[1 - common_square_index(qi, p)];
+
+        /*
+         * Identify the unique domino involved in all possible
+         * placements of sqi other than qi. If there isn't a unique
+         * one (either too many or too few), move on and try the next
+         * qi.
+         */
+        for (k = 0; k < sqi->nplacements; k++) {
+            struct solver_placement *pk = sqi->placements[k];
+            if (sqi->placements[k] == qi)
+                continue;              /* not counting qi itself */
+            if (!di)
+                di = pk->domino;
+            else if (di != pk->domino)
+                goto done_qi;
+        }
+        if (!di)
+            goto done_qi;
+
+        /*
+         * Now find an appropriate qj != qi.
+         */
+        for (j = 0; j < p->noverlaps; j++) {
+            struct solver_placement *qj = p->overlaps[j];
+            struct solver_square *sqj;
+            bool found_di = false;
+
+            if (j == i || !qj->active)
+                continue;
+
+            sqj = qj->squares[1 - common_square_index(qj, p)];
+
+            /*
+             * As above, we want the same domino di to be the only one
+             * sqj can be if placement qj is ruled out. But also we
+             * need no placement of sqj to overlap sqi.
+             */
+            for (k = 0; k < sqj->nplacements; k++) {
+                struct solver_placement *pk = sqj->placements[k];
+                if (pk == qj)
+                    continue;          /* not counting qj itself */
+                if (pk->domino != di)
+                    goto done_qj;      /* found a different domino */
+                if (pk->squares[0] == sqi || pk->squares[1] == sqi)
+                    goto done_qj; /* sqi,sqj can be joined to each other */
+                found_di = true;
+            }
+            if (!found_di)
+                goto done_qj;
+
+            /* If we get here, then every placement for either of sqi
+             * and sqj is a copy of di, except for the ones that
+             * overlap p. Success! We can rule out p. */
+#ifdef SOLVER_DIAGNOSTICS
+            if (solver_diagnostics) {
+                printf("placement %s of domino %s would force squares "
+                       "%s and %s to both be domino %s\n",
+                       p->name, p->domino->name,
+                       sqi->name, sqj->name, di->name);
+            }
+#endif
+            rule_out_placement(sc, p);
+            return true;
+
+          done_qj:;
+        }
+
+      done_qi:;
+    }
+
+    return false;
+}
+
+struct parity_findloop_ctx {
+    struct solver_scratch *sc;
+    struct solver_square *sq;
+    int i;
+};
+
+int parity_neighbour(int vertex, void *vctx)
+{
+    struct parity_findloop_ctx *ctx = (struct parity_findloop_ctx *)vctx;
+    struct solver_placement *p;
+
+    if (vertex >= 0) {
+        ctx->sq = &ctx->sc->squares[vertex];
+        ctx->i = 0;
+    } else {
+        assert(ctx->sq);
+    }
+
+    if (ctx->i >= ctx->sq->nplacements) {
+        ctx->sq = NULL;
+        return -1;
+    }
+
+    p = ctx->sq->placements[ctx->i++];
+    return p->squares[0]->index + p->squares[1]->index - ctx->sq->index;
+}
+
+/*
+ * Look for dominoes whose placement would disconnect the unfilled
+ * area of the grid into pieces with odd area. Such a domino can't be
+ * placed, because then the area on each side of it would be
+ * untileable.
+ */
+static bool deduce_parity(struct solver_scratch *sc)
+{
+    struct parity_findloop_ctx pflctx;
+    bool done_something = false;
+    int pi;
+
+    /*
+     * Run findloop, aka Tarjan's bridge-finding algorithm, on the
+     * graph whose vertices are squares, with two vertices separated
+     * by an edge iff some not-yet-ruled-out domino placement covers
+     * them both. (So each edge itself corresponds to a domino
+     * placement.)
+     *
+     * The effect is that any bridge in this graph is a domino whose
+     * placement would separate two previously connected areas of the
+     * unfilled squares of the grid.
+     *
+     * Placing that domino would not just disconnect those areas from
+     * each other, but also use up one square of each. So if we want
+     * to avoid leaving two odd areas after placing the domino, it
+     * follows that we want to avoid the bridge having an _even_
+     * number of vertices on each side.
+     */
+    pflctx.sc = sc;
+    findloop_run(sc->fls, sc->wh, parity_neighbour, &pflctx);
+
+    for (pi = 0; pi < sc->pc; pi++) {
+        struct solver_placement *p = &sc->placements[pi];
+        int size0, size1;
+
+        if (!p->active)
+            continue;
+        if (!findloop_is_bridge(
+                sc->fls, p->squares[0]->index, p->squares[1]->index,
+                &size0, &size1))
+            continue;
+        /* To make a deduction, size0 and size1 must both be even,
+         * i.e. after placing this domino decrements each by 1 they
+         * would both become odd and untileable areas. */
+        if ((size0 | size1) & 1)
+            continue;
+
+#ifdef SOLVER_DIAGNOSTICS
+        if (solver_diagnostics) {
+            printf("placement %s of domino %s would create two odd-sized "
+                   "areas\n", p->name, p->domino->name);
+        }
+#endif
+        rule_out_placement(sc, p);
+        done_something = true;
+    }
+
+    return done_something;
+}
+
+/*
+ * Try to find a set of squares all containing the same number, such
+ * that the set of possible dominoes for all the squares in that set
+ * is small enough to let us rule out placements of those dominoes
+ * elsewhere.
+ */
+static bool deduce_set(struct solver_scratch *sc, bool doubles)
 {
     struct solver_square **sqs, **sqp, **sqe;
     int num, nsq, i, j;
@@ -942,6 +1128,11 @@ static bool deduce_set_simple(struct solver_scratch *sc)
             int bitpos, nsquares, ndominoes;
             bool got_adj_squares = false;
             bool reported = false;
+            bool rule_out_nondoubles;
+            int min_nused_for_double;
+#ifdef SOLVER_DIAGNOSTICS
+            const char *rule_out_text;
+#endif
 
             /*
              * We don't do set analysis on the same square of the grid
@@ -981,50 +1172,134 @@ static bool deduce_set_simple(struct solver_scratch *sc)
 
             /*
              * Do the two sets have the right relative size?
+             */
+            if (!got_adj_squares) {
+                /*
+                 * The normal case, in which every possible domino
+                 * placement involves at most _one_ of these squares.
              *
-             * In the normal case, analogous to set analysis in many
-             * other puzzles, you want N squares which between them
-             * have to account for N distinct dominoes, with a 1-1
-             * correspondence between them.
+                 * This is exactly analogous to the set analysis
+                 * deductions in many other puzzles: if our N squares
+                 * between them have to account for N distinct
+                 * dominoes, with exactly one of those dominoes to
+                 * each square, then all those dominoes correspond to
+                 * all those squares and we can rule out any
+                 * placements of the same dominoes appearing
+                 * elsewhere.
+                 */
+                if (ndominoes != nsquares)
+                    continue;
+                rule_out_nondoubles = true;
+                min_nused_for_double = 1;
+#ifdef SOLVER_DIAGNOSTICS
+                rule_out_text = "all of them elsewhere";
+#endif
+            } else {
+                if (!doubles)
+                    continue;          /* not at this difficulty level */
+
+                /*
+                 * But in Dominosa, there's a special case if _two_
+                 * squares in this set can possibly both be covered by
+                 * the same double domino. (I.e. if they are adjacent,
+                 * and moreover, the double-domino placement
+                 * containing both is not yet ruled out.)
              *
-             * But if any two squares in this set can possibly both be
-             * covered by the same double domino (i.e. if they are
-             * adjacent, and moreover, the placement containing both
-             * is not yet ruled out), then that argument doesn't hold
+                 * In that situation, the simple argument doesn't hold
              * up, because the N squares might be covered by N-1
              * dominoes - or, put another way, if you list the
-             * containing domino for each of the squares they aren't
-             * all distinct.
+                 * containing domino for each of the squares, they
+                 * might not be all distinct.
              *
-             * In that situation, we can only do the set analysis if
-             * there is one _more_ square than there are dominoes. For
-             * example, suppose we had four squares which between them
-             * could contain only the 0-0, 0-1 and 0-2 dominoes. Then
-             * that can only work at all if the 0-0 covers two of
-             * those squares - and in that situation that _must_ be
-             * what's happened, so we can rule out those three
-             * dominoes anywhere else they might look possible.
+                 * In that situation, we can still do something, but
+                 * the details vary, and there are two further cases.
              */
-            if (ndominoes != (got_adj_squares ? nsquares - 1 : nsquares))
+                if (ndominoes == nsquares-1) {
+                    /*
+                     * Suppose there is one _more_ square in our set
+                     * than there are dominoes it can involve. For
+                     * example, suppose we had four '0' squares which
+                     * between them could contain only the 0-0, 0-1
+                     * and 0-2 dominoes.
+                     *
+                     * Then that can only work at all if the 0-0
+                     * covers two of those squares - and in that
+                     * situation that _must_ be what's happened.
+                     *
+                     * So we can rule out the 0-1 and 0-2 dominoes (in
+                     * this example) in any placement that doesn't use
+                     * one of the squares in this set. And we can rule
+                     * out a placement of the 0-0 even if it uses
+                     * _one_ square from this set: in this situation,
+                     * we have to insist on it using _two_.
+                     */
+                    rule_out_nondoubles = true;
+                    min_nused_for_double = 2;
+#ifdef SOLVER_DIAGNOSTICS
+                    rule_out_text = "all of them elsewhere "
+                        "(including the double if it fails to use both)";
+#endif
+                } else if (ndominoes == nsquares) {
+                    /*
+                     * A restricted form of the deduction is still
+                     * possible if we have the same number of dominoes
+                     * as squares.
+                     *
+                     * If we have _three_ '0' squares none of which
+                     * can be any domino other than 0-0, 0-1 and 0-2,
+                     * and there's still a possibility of an 0-0
+                     * domino using up two of them, then we can't rule
+                     * out 0-1 or 0-2 anywhere else, because it's
+                     * possible that these three squares only use two
+                     * of the dominoes between them.
+                     *
+                     * But we _can_ rule out the double 0-0, in any
+                     * placement that uses _none_ of our three
+                     * squares. Because we do know that _at least one_
+                     * of our squares must be involved in the 0-0, or
+                     * else the three of them would only have the
+                     * other two dominoes left.
+                     */
+                    rule_out_nondoubles = false;
+                    min_nused_for_double = 1;
+#ifdef SOLVER_DIAGNOSTICS
+                    rule_out_text = "the double elsewhere";
+#endif
+                } else {
+                    /*
+                     * If none of those cases has happened, then our
+                     * set admits no deductions at all.
+                     */
                 continue;
+                }
+            }
 
             /* Skip sets of size 1, or whose complement has size 1.
              * Those can be handled by a simpler analysis, and should
              * be, for more sensible solver diagnostics. */
-            if (nsquares <= 1 || nsquares >= nsq-1)
+            if (ndominoes <= 1 || ndominoes >= nsq-1)
                 continue;
 
             /*
              * We've found a set! That means we can rule out any
-             * placement of any of the dominoes in that set which do
-             * not include one of our squares.
+             * placement of any domino in that set which would leave
+             * the squares in the set with too few dominoes between
+             * them.
              *
              * We may or may not actually end up ruling anything out
              * here. But even if we don't, we should record that these
              * squares form a self-contained set, so that we don't
              * pointlessly report a superset of them later which could
              * instead be reported as just the other ones.
+             *
+             * Or rather, we do that for the main cases that let us
+             * rule out lots of dominoes. We only do this with the
+             * borderline case where we can only rule out a double if
+             * we _actually_ rule something out. Otherwise we'll never
+             * even _find_ a larger set with the same number of
+             * dominoes!
              */
+            if (rule_out_nondoubles)
             squares_done |= squares;
 
             for (bitpos = 0; bitpos < nsq; bitpos++) {
@@ -1036,21 +1311,31 @@ static bool deduce_set_simple(struct solver_scratch *sc)
 
                 for (i = d->nplacements; i-- > 0 ;) {
                     struct solver_placement *p = d->placements[i];
-                    int si;
+                    int si, nused;
 
-                    for (si = 0; si < 2; si++) {
+                    /* Count how many of our squares this placement uses. */
+                    for (si = nused = 0; si < 2; si++) {
                         struct solver_square *sq2 = p->squares[si];
                         if (sq2->number == num &&
-                            (1 & (squares >> sc->wh_scratch[sq2->index]))) {
-                            /* This placement uses one of our squares.
-                             * Leave it in. */
-                            goto skip_placement;
+                            (1 & (squares >> sc->wh_scratch[sq2->index])))
+                            nused++;
                         }
+
+                    /* See if that's too many to rule it out. */
+                    if (d->lo == d->hi) {
+                        if (nused >= min_nused_for_double)
+                            continue;
+                    } else {
+                        if (nused > 0 || !rule_out_nondoubles)
+                            continue;
                     }
 
                     if (!reported) {
                         reported = true;
                         done_something = true;
+
+                        /* In case we didn't do this above */
+                        squares_done |= squares;
 
 #ifdef SOLVER_DIAGNOSTICS
                         if (solver_diagnostics) {
@@ -1062,24 +1347,19 @@ static bool deduce_set_simple(struct solver_scratch *sc)
                                     printf("%s%s", sep, sqs[b]->name);
                                     sep = ",";
                                 }
-                            printf("} have to contain dominoes {");
+                            printf("} can contain only dominoes {");
                             for (sep = "", b = 0; b < nsq; b++)
                                 if (1 & (dominoes >> b)) {
                                     printf("%s%s", sep, ds[b]->name);
                                     sep = ",";
                                 }
-                            printf("}");
-                            if (got_adj_squares)
-                                printf(" (including both ends of the "
-                                       "double)");
+                            printf("}, so rule out %s", rule_out_text);
                             printf("\n");
                         }
 #endif
                     }
 
                     rule_out_placement(sc, p);
-
-                  skip_placement:;
                 }
             }
         }
@@ -1156,6 +1436,10 @@ static bool deduce_forcing_chain(struct solver_scratch *sc)
      * Now read out the whole dsf into pc_scratch, flattening its
      * structured data into a simple integer id per chain of dominoes
      * that must occur together.
+     *
+     * The integer ids have the property that any two that differ only
+     * in the lowest bit (i.e. of the form {2n,2n+1}) represent
+     * complementary chains, each of which rules out the other.
      */
     for (pi = 0; pi < sc->pc; pi++) {
         bool inv;
@@ -1327,6 +1611,64 @@ static bool deduce_forcing_chain(struct solver_scratch *sc)
         }
     }
 
+    /*
+     * Another thing you can do with forcing chains, besides ruling
+     * out a whole one at a time, is to look at each pair of chains
+     * that overlap each other. Each such pair gives you two sets of
+     * domino placements, such that if either set is not placed, then
+     * the other one must be.
+     *
+     * This means that any domino which has a placement in _both_
+     * chains of a pair must occupy one of those two placements, i.e.
+     * we can rule that domino out anywhere else it might appear.
+     */
+    for (di = 0; di < sc->dc; di++) {
+        struct solver_domino *d = &sc->dominoes[di];
+
+        if (d->nplacements <= 2)
+            continue;      /* not enough placements to rule one out */
+
+        for (j = 0; j+1 < d->nplacements; j++) {
+            int ij = d->placements[j]->index;
+            int cj = sc->pc_scratch[ij];
+            for (k = j+1; k < d->nplacements; k++) {
+                int ik = d->placements[k]->index;
+                int ck = sc->pc_scratch[ik];
+                if ((cj ^ ck) == 1) {
+                    /*
+                     * Placements j,k of domino d are in complementary
+                     * chains, so we can rule out all the others.
+                     */
+                    int i;
+
+#ifdef SOLVER_DIAGNOSTICS
+                    if (solver_diagnostics) {
+                        printf("domino %s occurs in both complementary "
+                               "forced chains:", d->name);
+                        for (i = 0; i < sc->pc; i++)
+                            if (sc->pc_scratch[i] == cj)
+                                printf(" %s", sc->placements[i].name);
+                        printf(" and");
+                        for (i = 0; i < sc->pc; i++)
+                            if (sc->pc_scratch[i] == ck)
+                                printf(" %s", sc->placements[i].name);
+                        printf("\n");
+                    }
+#endif
+
+                    for (i = d->nplacements; i-- > 0 ;)
+                        if (i != j && i != k)
+                            rule_out_placement(sc, d->placements[i]);
+
+                    done_something = true;
+                    goto done_this_domino;
+                }
+            }
+        }
+
+      done_this_domino:;
+    }
+
     return done_something;
 }
 
@@ -1404,10 +1746,25 @@ static int run_solver(struct solver_scratch *sc, int max_diff_allowed)
             continue;
         }
 
+        for (pi = 0; pi < sc->pc; pi++)
+            if (deduce_local_duplicate_2(sc, pi))
+                done_something = true;
+        if (done_something) {
+            sc->max_diff_used = max(sc->max_diff_used, DIFF_BASIC);
+            continue;
+        }
+
+        if (deduce_parity(sc))
+            done_something = true;
+        if (done_something) {
+            sc->max_diff_used = max(sc->max_diff_used, DIFF_BASIC);
+            continue;
+        }
+
         if (max_diff_allowed <= DIFF_BASIC)
             continue;
 
-        if (deduce_set_simple(sc))
+        if (deduce_set(sc, false))
             done_something = true;
         if (done_something) {
             sc->max_diff_used = max(sc->max_diff_used, DIFF_HARD);
@@ -1416,6 +1773,13 @@ static int run_solver(struct solver_scratch *sc, int max_diff_allowed)
 
         if (max_diff_allowed <= DIFF_HARD)
             continue;
+
+        if (deduce_set(sc, true))
+            done_something = true;
+        if (done_something) {
+            sc->max_diff_used = max(sc->max_diff_used, DIFF_EXTREME);
+            continue;
+        }
 
         if (deduce_forcing_chain(sc))
             done_something = true;
@@ -1450,15 +1814,407 @@ static int run_solver(struct solver_scratch *sc, int max_diff_allowed)
 }
 
 /* ----------------------------------------------------------------------
- * End of solver code.
+ * Functions for generating a candidate puzzle (before we run the
+ * solver to check it's soluble at the right difficulty level).
  */
+
+struct alloc_val;
+struct alloc_loc;
+
+struct alloc_scratch {
+    /* Game parameters. */
+    int n, w, h, wh, dc;
+
+    /* The domino layout. Indexed by squares in the usual y*w+x raster
+     * order: layout[i] gives the index of the other square in the
+     * same domino as square i. */
+    int *layout;
+
+    /* The output array, containing a number in every square. */
+    int *numbers;
+
+    /* List of domino values (i.e. number pairs), indexed by DINDEX. */
+    struct alloc_val *vals;
+
+    /* List of domino locations, indexed arbitrarily. */
+    struct alloc_loc *locs;
+
+    /* Preallocated scratch spaces. */
+    int *wh_scratch;                   /* size wh */
+    int *wh2_scratch;                  /* size 2*wh */
+};
+
+struct alloc_val {
+    int lo, hi;
+    bool confounder;
+};
+
+struct alloc_loc {
+    int sq[2];
+};
+
+static struct alloc_scratch *alloc_make_scratch(int n)
+{
+    struct alloc_scratch *as = snew(struct alloc_scratch);
+    int lo, hi;
+
+    as->n = n;
+    as->w = n+2;
+    as->h = n+1;
+    as->wh = as->w * as->h;
+    as->dc = DCOUNT(n);
+
+    as->layout = snewn(as->wh, int);
+    as->numbers = snewn(as->wh, int);
+    as->vals = snewn(as->dc, struct alloc_val);
+    as->locs = snewn(as->dc, struct alloc_loc);
+    as->wh_scratch = snewn(as->wh, int);
+    as->wh2_scratch = snewn(as->wh * 2, int);
+
+    for (hi = 0; hi <= n; hi++)
+        for (lo = 0; lo <= hi; lo++) {
+            struct alloc_val *v = &as->vals[DINDEX(hi, lo)];
+            v->lo = lo;
+            v->hi = hi;
+        }
+
+    return as;
+}
+
+static void alloc_free_scratch(struct alloc_scratch *as)
+{
+    sfree(as->layout);
+    sfree(as->numbers);
+    sfree(as->vals);
+    sfree(as->locs);
+    sfree(as->wh_scratch);
+    sfree(as->wh2_scratch);
+    sfree(as);
+}
+
+static void alloc_make_layout(struct alloc_scratch *as, random_state *rs)
+{
+    int i, pos;
+
+    domino_layout_prealloc(as->w, as->h, rs,
+                           as->layout, as->wh_scratch, as->wh2_scratch);
+
+    for (i = pos = 0; i < as->wh; i++) {
+        if (as->layout[i] > i) {
+            struct alloc_loc *loc;
+            assert(pos < as->dc);
+
+            loc = &as->locs[pos++];
+            loc->sq[0] = i;
+            loc->sq[1] = as->layout[i];
+        }
+    }
+    assert(pos == as->dc);
+}
+
+static void alloc_trivial(struct alloc_scratch *as, random_state *rs)
+{
+    int i;
+    for (i = 0; i < as->dc; i++)
+        as->wh_scratch[i] = i;
+    shuffle(as->wh_scratch, as->dc, sizeof(*as->wh_scratch), rs);
+
+    for (i = 0; i < as->dc; i++) {
+        struct alloc_val *val = &as->vals[as->wh_scratch[i]];
+        struct alloc_loc *loc = &as->locs[i];
+        int which_lo = random_upto(rs, 2), which_hi = 1 - which_lo;
+        as->numbers[loc->sq[which_lo]] = val->lo;
+        as->numbers[loc->sq[which_hi]] = val->hi;
+    }
+}
+
+/*
+ * Given a domino location in the form of two square indices, compute
+ * the square indices of the domino location that would lie on one
+ * side of it. Returns false if the location would be outside the
+ * grid, or if it isn't actually a domino in the layout.
+ */
+static bool alloc_find_neighbour(
+    struct alloc_scratch *as, int p0, int p1, int *n0, int *n1)
+{
+    int x0 = p0 % as->w, y0 = p0 / as->w, x1 = p1 % as->w, y1 = p1 / as->w;
+    int dy = y1-y0, dx = x1-x0;
+    int nx0 = x0 + dy, ny0 = y0 - dx, nx1 = x1 + dy, ny1 = y1 - dx;
+    int np0, np1;
+
+    if (!(nx0 >= 0 && nx0 < as->w && ny0 >= 0 && ny0 < as->h &&
+          nx1 >= 1 && nx1 < as->w && ny1 >= 1 && ny1 < as->h))
+        return false;                  /* out of bounds */
+
+    np0 = ny0 * as->w + nx0;
+    np1 = ny1 * as->w + nx1;
+    if (as->layout[np0] != np1)
+        return false;                  /* not a domino */
+
+    *n0 = np0;
+    *n1 = np1;
+    return true;
+}
+
+static bool alloc_try_unique(struct alloc_scratch *as, random_state *rs)
+{
+    int i;
+    for (i = 0; i < as->dc; i++)
+        as->wh_scratch[i] = i;
+    shuffle(as->wh_scratch, as->dc, sizeof(*as->wh_scratch), rs);
+    for (i = 0; i < as->dc; i++)
+        as->wh2_scratch[i] = i;
+    shuffle(as->wh2_scratch, as->dc, sizeof(*as->wh2_scratch), rs);
+
+    for (i = 0; i < as->wh; i++)
+        as->numbers[i] = -1;
+
+    for (i = 0; i < as->dc; i++) {
+        struct alloc_val *val = &as->vals[as->wh_scratch[i]];
+        struct alloc_loc *loc = &as->locs[as->wh2_scratch[i]];
+        int which_lo, which_hi;
+        bool can_lo_0 = true, can_lo_1 = true;
+        int n0, n1;
+
+        /*
+         * This is basically the same strategy as alloc_trivial:
+         * simply iterate through the locations and values in random
+         * relative order and pair them up. But we make sure to avoid
+         * the most common, and also simplest, cause of a non-unique
+         * solution:two dominoes side by side, sharing a number at
+         * opposite ends. Any section of that form automatically leads
+         * to an alternative solution:
+         *
+         *  +-------+         +---+---+
+         *  | 1   2 |         | 1 | 2 |
+         *  +-------+   <->   |   |   |
+         *  | 2   3 |         | 2 | 3 |
+         *  +-------+         +---+---+
+         *
+         * So as we place each domino, we check for a neighbouring
+         * domino on each side, and if there is one, rule out any
+         * placement of _this_ domino that places a number diagonally
+         * opposite the same number in the neighbour.
+         *
+         * Sometimes this can fail completely, if a domino on each
+         * side is already placed and between them they rule out all
+         * placements of this one. But it happens rarely enough that
+         * it's fine to just abort and try the layout again.
+         */
+
+        if (alloc_find_neighbour(as, loc->sq[0], loc->sq[1], &n0, &n1) &&
+            (as->numbers[n0] == val->hi || as->numbers[n1] == val->lo))
+            can_lo_0 = false;
+        if (alloc_find_neighbour(as, loc->sq[1], loc->sq[0], &n0, &n1) &&
+            (as->numbers[n0] == val->hi || as->numbers[n1] == val->lo))
+            can_lo_1 = false;
+
+        if (!can_lo_0 && !can_lo_1)
+            return false;              /* layout failed */
+        else if (can_lo_0 && can_lo_1)
+            which_lo = random_upto(rs, 2);
+        else
+            which_lo = can_lo_0 ? 0 : 1;
+
+        which_hi = 1 - which_lo;
+        as->numbers[loc->sq[which_lo]] = val->lo;
+        as->numbers[loc->sq[which_hi]] = val->hi;
+    }
+
+    return true;
+}
+
+static bool alloc_try_hard(struct alloc_scratch *as, random_state *rs)
+{
+    int i, x, y, hi, lo, vals, locs, confounders_needed;
+    bool ok;
+
+    for (i = 0; i < as->wh; i++)
+        as->numbers[i] = -1;
+
+    /*
+     * Shuffle the location indices.
+     */
+    for (i = 0; i < as->dc; i++)
+        as->wh2_scratch[i] = i;
+    shuffle(as->wh2_scratch, as->dc, sizeof(*as->wh2_scratch), rs);
+
+    /*
+     * Start by randomly placing the double dominoes, to give a
+     * starting instance of every number to try to put other things
+     * next to.
+     */
+    for (i = 0; i <= as->n; i++)
+        as->wh_scratch[i] = DINDEX(i, i);
+    shuffle(as->wh_scratch, i, sizeof(*as->wh_scratch), rs);
+    for (i = 0; i <= as->n; i++) {
+        struct alloc_loc *loc = &as->locs[as->wh2_scratch[i]];
+        as->numbers[loc->sq[0]] = as->numbers[loc->sq[1]] = i;
+    }
+
+    /*
+     * Find all the dominoes that don't yet have a _wrong_ placement
+     * somewhere in the grid.
+     */
+    for (i = 0; i < as->dc; i++)
+        as->vals[i].confounder = false;
+    for (y = 0; y < as->h; y++) {
+        for (x = 0; x < as->w; x++) {
+            int p = y * as->w + x;
+            if (as->numbers[p] == -1)
+                continue;
+
+            if (x+1 < as->w) {
+                int p1 = y * as->w + (x+1);
+                if (as->layout[p] != p1 && as->numbers[p1] != -1)
+                    as->vals[DINDEX(as->numbers[p], as->numbers[p1])]
+                        .confounder = true;
+            }
+            if (y+1 < as->h) {
+                int p1 = (y+1) * as->w + x;
+                if (as->layout[p] != p1 && as->numbers[p1] != -1)
+                    as->vals[DINDEX(as->numbers[p], as->numbers[p1])]
+                        .confounder = true;
+            }
+        }
+    }
+
+    for (i = confounders_needed = 0; i < as->dc; i++)
+        if (!as->vals[i].confounder)
+            confounders_needed++;
+
+    /*
+     * Make a shuffled list of all the unplaced dominoes, and go
+     * through it trying to find a placement for each one that also
+     * fills in at least one of the needed confounders.
+     */
+    vals = 0;
+    for (hi = 0; hi <= as->n; hi++)
+        for (lo = 0; lo < hi; lo++)
+            as->wh_scratch[vals++] = DINDEX(hi, lo);
+    shuffle(as->wh_scratch, vals, sizeof(*as->wh_scratch), rs);
+
+    locs = as->dc;
+
+    while (vals > 0) {
+        int valpos, valout, oldvals = vals;
+
+        for (valpos = valout = 0; valpos < vals; valpos++) {
+            int validx = as->wh_scratch[valpos];
+            struct alloc_val *val = &as->vals[validx];
+            struct alloc_loc *loc;
+            int locpos, si, which_lo;
+
+            for (locpos = 0; locpos < locs; locpos++) {
+                int locidx = as->wh2_scratch[locpos];
+                int wi, flip;
+
+                loc = &as->locs[locidx];
+                if (as->numbers[loc->sq[0]] != -1)
+                    continue;              /* this location is already filled */
+
+                flip = random_upto(rs, 2);
+
+                /* Try this location both ways round. */
+                for (wi = 0; wi < 2; wi++) {
+                    int n0, n1;
+
+                    which_lo = wi ^ flip;
+
+                    /* First, do the same check as in alloc_try_unique, to
+                     * avoid making an obviously insoluble puzzle. */
+                    if (alloc_find_neighbour(as, loc->sq[which_lo],
+                                             loc->sq[1-which_lo], &n0, &n1) &&
+                        (as->numbers[n0] == val->hi ||
+                         as->numbers[n1] == val->lo))
+                        break;             /* can't place it this way round */
+
+                    if (confounders_needed == 0)
+                        goto place_ok;
+
+                    /* Look to see if we're adding at least one
+                     * previously absent confounder. */
+                    for (si = 0; si < 2; si++) {
+                        int x = loc->sq[si] % as->w, y = loc->sq[si] / as->w;
+                        int n = (si == which_lo ? val->lo : val->hi);
+                        int d;
+                        for (d = 0; d < 4; d++) {
+                            int dx = d==0 ? +1 : d==2 ? -1 : 0;
+                            int dy = d==1 ? +1 : d==3 ? -1 : 0;
+                            int x1 = x+dx, y1 = y+dy, p1 = y1 * as->w + x1;
+                            if (x1 >= 0 && x1 < as->w &&
+                                y1 >= 0 && y1 < as->h &&
+                                as->numbers[p1] != -1 &&
+                                !(as->vals[DINDEX(n, as->numbers[p1])]
+                                  .confounder)) {
+                                /*
+                                 * Place this domino.
+                                 */
+                                goto place_ok;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* If we get here without executing 'goto place_ok', we
+             * didn't find anywhere useful to put this domino. Put it
+             * back on the list for the next pass. */
+            as->wh_scratch[valout++] = validx;
+            continue;
+
+          place_ok:;
+
+            /* We've found a domino to place. Place it, and fill in
+             * all the confounders it adds. */
+            as->numbers[loc->sq[which_lo]] = val->lo;
+            as->numbers[loc->sq[1 - which_lo]] = val->hi;
+
+            for (si = 0; si < 2; si++) {
+                int p = loc->sq[si];
+                int n = as->numbers[p];
+                int x = p % as->w, y = p / as->w;
+                int d;
+                for (d = 0; d < 4; d++) {
+                    int dx = d==0 ? +1 : d==2 ? -1 : 0;
+                    int dy = d==1 ? +1 : d==3 ? -1 : 0;
+                    int x1 = x+dx, y1 = y+dy, p1 = y1 * as->w + x1;
+
+                    if (x1 >= 0 && x1 < as->w && y1 >= 0 && y1 < as->h &&
+                        p1 != loc->sq[1-si] && as->numbers[p1] != -1) {
+                        int di = DINDEX(n, as->numbers[p1]);
+                        if (!as->vals[di].confounder)
+                            confounders_needed--;
+                        as->vals[di].confounder = true;
+                    }
+                }
+            }
+        }
+
+        vals = valout;
+
+        if (oldvals == vals)
+            break;
+    }
+
+    ok = true;
+
+    for (i = 0; i < as->dc; i++)
+        if (!as->vals[i].confounder)
+            ok = false;
+    for (i = 0; i < as->wh; i++)
+        if (as->numbers[i] == -1)
+            ok = false;
+
+    return ok;
+}
 
 static char *new_game_desc(const game_params *params, random_state *rs,
 			   char **aux, bool interactive)
 {
     int n = params->n, w = n+2, h = n+1, wh = w*h, diff = params->diff;
-    int *grid, *grid2, *list;
     struct solver_scratch *sc;
+    struct alloc_scratch *as;
     int i, j, k, len;
     char *ret;
 
@@ -1481,10 +2237,8 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     /*
      * Allocate space in which to lay the grid out.
      */
-    grid = snewn(wh, int);
-    grid2 = snewn(wh, int);
-    list = snewn(2*wh, int);
     sc = solver_make_scratch(n);
+    as = alloc_make_scratch(n);
 
     /*
      * I haven't been able to think of any particularly clever
@@ -1515,96 +2269,76 @@ static char *new_game_desc(const game_params *params, random_state *rs,
      * and 26 respectively, which is a lot more sensible.
      */
 
-    do {
-		check_abort();
-        domino_layout_prealloc(w, h, rs, grid, grid2, list);
+    while (1) {
+        check_abort();
+        alloc_make_layout(as, rs);
 
+        if (diff == DIFF_AMBIGUOUS) {
+            /* Just assign numbers to each domino completely at random. */
+            alloc_trivial(as, rs);
+        } else if (diff < DIFF_HARD) {
+            /* Try to rule out the most common case of a non-unique solution */
+            if (!alloc_try_unique(as, rs))
+                continue;
+        } else {
         /*
-         * Now we have a complete layout covering the whole
-         * rectangle with dominoes. So shuffle the actual domino
-         * values and fill the rectangle with numbers.
+             * For Hard puzzles and above, we'd like there not to be
+             * any easy toehold to start with.
+             *
+             * Mostly, that's arranged by alloc_try_hard, which will
+             * ensure that no domino starts off with only one
+             * potential placement. But a few other deductions
+             * possible at Basic level can still sneak through the
+             * cracks - for example, if the only two placements of one
+             * domino overlap in a square, and you therefore rule out
+             * some other domino that can use that square, you might
+             * then find that _that_ domino now has only one
+             * placement, and you've made a start.
+             *
+             * Of course, the main difficulty-level check will still
+             * guarantee that you have to do a harder deduction
+             * _somewhere_ in the grid. But it's more elegant if
+             * there's nowhere obvious to get started at all.
          */
-        k = 0;
-        for (i = 0; i <= params->n; i++)
-            for (j = 0; j <= i; j++) {
-                list[k++] = i;
-                list[k++] = j;
-            }
-        shuffle(list, k/2, 2*sizeof(*list), rs);
-        j = 0;
-        for (i = 0; i < wh; i++)
-            if (grid[i] > i) {
-                /* Optionally flip the domino round. */
-                int flip = -1;
+            int di;
+            bool ok;
 
-                if (diff != DIFF_AMBIGUOUS) {
-                    int t1, t2;
-                    /*
-                     * If we're after a unique solution, we can do
-                     * something here to improve the chances. If
-                     * we're placing a domino so that it forms a
-                     * 2x2 rectangle with one we've already placed,
-                     * and if that domino and this one share a
-                     * number, we can try not to put them so that
-                     * the identical numbers are diagonally
-                     * separated, because that automatically causes
-                     * non-uniqueness:
-                     * 
-                     * +---+      +-+-+
-                     * |2 3|      |2|3|
-                     * +---+  ->  | | |
-                     * |4 2|      |4|2|
-                     * +---+      +-+-+
-                     */
-                    t1 = i;
-                    t2 = grid[i];
-                    if (t2 == t1 + w) {  /* this domino is vertical */
-                        if (t1 % w > 0 &&/* and not on the left hand edge */
-                            grid[t1-1] == t2-1 &&/* alongside one to left */
-                            (grid2[t1-1] == list[j] ||   /* and has a number */
-                             grid2[t1-1] == list[j+1] ||   /* in common */
-                             grid2[t2-1] == list[j] ||
-                             grid2[t2-1] == list[j+1])) {
-                            if (grid2[t1-1] == list[j] ||
-                                grid2[t2-1] == list[j+1])
-                                flip = 0;
-                            else
-                                flip = 1;
+            if (!alloc_try_hard(as, rs))
+                continue;
+
+            solver_setup_grid(sc, as->numbers);
+            if (run_solver(sc, DIFF_BASIC) < 2)
+                continue;
+
+            ok = true;
+            for (di = 0; di < sc->dc; di++)
+                if (sc->dominoes[di].nplacements <= 1) {
+                    ok = false;
+                    break;
+            }
+
+            if (!ok) {
+                continue;
                         }
-                    } else {           /* this domino is horizontal */
-                        if (t1 / w > 0 &&/* and not on the top edge */
-                            grid[t1-w] == t2-w &&/* alongside one above */
-                            (grid2[t1-w] == list[j] ||   /* and has a number */
-                             grid2[t1-w] == list[j+1] ||   /* in common */
-                             grid2[t2-w] == list[j] ||
-                             grid2[t2-w] == list[j+1])) {
-                            if (grid2[t1-w] == list[j] ||
-                                grid2[t2-w] == list[j+1])
-                                flip = 0;
-                            else
-                                flip = 1;
                         }
+
+        if (diff != DIFF_AMBIGUOUS) {
+            int solver_result;
+            solver_setup_grid(sc, as->numbers);
+            solver_result = run_solver(sc, diff);
+            if (solver_result > 1)
+                continue; /* puzzle couldn't be solved at this difficulty */
+            if (sc->max_diff_used < diff)
+                continue; /* puzzle _could_ be solved at easier difficulty */
                     }
-                }
 
-                if (flip < 0)
-                    flip = random_upto(rs, 2);
-
-                grid2[i] = list[j + flip];
-                grid2[grid[i]] = list[j + 1 - flip];
-                j += 2;
+        break;
             }
-        assert(j == k);
-        solver_setup_grid(sc, grid2);
-    } while (diff != DIFF_AMBIGUOUS &&
-             (run_solver(sc, diff) > 1 || sc->max_diff_used < diff));
-
-    solver_free_scratch(sc);
 
 #ifdef GENERATION_DIAGNOSTICS
     for (j = 0; j < h; j++) {
         for (i = 0; i < w; i++) {
-            putchar('0' + grid2[j*w+i]);
+            putchar('0' + as->numbers[j*w+i]);
         }
         putchar('\n');
     }
@@ -1644,7 +2378,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     ret = snewn(len+1, char);
     j = 0;
     for (i = 0; i < wh; i++) {
-        k = grid2[i];
+        k = as->numbers[i];
         if (k < 10)
             ret[j++] = '0' + k;
         else
@@ -1661,7 +2395,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
 	char *auxinfo = snewn(wh+1, char);
 
 	for (i = 0; i < wh; i++) {
-	    int v = grid[i];
+	    int v = as->layout[i];
 	    auxinfo[i] = (v == i+1 ? 'L' : v == i-1 ? 'R' :
 			  v == i+w ? 'T' : v == i-w ? 'B' : '.');
 	}
@@ -1670,9 +2404,8 @@ static char *new_game_desc(const game_params *params, random_state *rs,
 	*aux = auxinfo;
     }
 
-    sfree(list);
-    sfree(grid2);
-    sfree(grid);
+    solver_free_scratch(sc);
+    alloc_free_scratch(as);
 
     return ret;
 }
@@ -2719,6 +3452,7 @@ int main(int argc, char **argv)
     game_params *p;
     game_state *s, *s2;
     char *id = NULL, *desc;
+    int maxdiff = DIFFCOUNT;
     const char *err;
     bool grade = false, diagnostics = false;
     struct solver_scratch *sc;
@@ -2730,6 +3464,21 @@ int main(int argc, char **argv)
             diagnostics = true;
         } else if (!strcmp(p, "-g")) {
             grade = true;
+        } else if (!strncmp(p, "-d", 2) && p[2] && !p[3]) {
+            int i;
+            bool bad = true;
+            for (i = 0; i < lenof(dominosa_diffchars); i++)
+                if (dominosa_diffchars[i] != DIFF_AMBIGUOUS &&
+                    dominosa_diffchars[i] == p[2]) {
+                    bad = false;
+                    maxdiff = i;
+                    break;
+                }
+            if (bad) {
+                fprintf(stderr, "%s: unrecognised difficulty `%c'\n",
+                        argv[0], p[2]);
+                return 1;
+            }
         } else if (*p == '-') {
             fprintf(stderr, "%s: unrecognised option `%s'\n", argv[0], p);
             return 1;
@@ -2762,7 +3511,7 @@ int main(int argc, char **argv)
     solver_diagnostics = diagnostics;
     sc = solver_make_scratch(p->n);
     solver_setup_grid(sc, s->numbers->numbers);
-    retd = run_solver(sc, DIFFCOUNT);
+    retd = run_solver(sc, maxdiff);
     if (retd == 0) {
         printf("Puzzle is inconsistent\n");
     } else if (grade) {
