@@ -23,6 +23,7 @@ const struct help_item helpitems[] {
 	{ "Magnets", "Place magnets to satisfy the clues and avoid like poles touching." },
 	{ "Map", "Colour the map so that adjacent regions are never the same colour." },
 	{ "Mines", "Find all the mines without treading on any of them." },
+	{ "Mosaic", "Fill in the grid given clues about number of nearby black squares." },
 	{ "Net", "Rotate each tile to reassemble the network." },
 	{ "Netslide", "Slide a row at a time to reassemble the network." },
 	{ "Palisade", "Divide the grid into equal-sized areas in accordance with the clues." },

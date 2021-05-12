@@ -813,6 +813,19 @@ namespace PuzzleCommon
 		sfree(colours);
 	}
 
+	bool WindowsModern::IsValidPuzzleName(Platform::String^ name)
+	{
+		char* find = ToChars(name);
+		int i;
+		for (i = 0; i < gamecount; i++)
+		{
+			if (!strcmp(find, gamelist[i]->name))
+				break;
+		}
+		sfree(find);
+		return i != gamecount;
+	}
+
 	WindowsModern::WindowsModern(Platform::String ^name, IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^itimer)
 	{
 		this->_generating = false;
@@ -901,7 +914,7 @@ namespace PuzzleCommon
 			}
 			catch (Platform::Exception^)
 			{
-				return ref new Platform::String(L"The file was corrupted.");
+				return ref new Platform::String(L"The file was corrupted or is not a valid puzzle file.");
 			}
 
 			return LoadGameFromString(saved);
@@ -1277,7 +1290,7 @@ namespace PuzzleCommon
 		{
 			collection->ToggleButton = VirtualButton::ToggleButton("Flag", Windows::UI::Xaml::Controls::Symbol::Flag);
 		}
-		else if (name == "Pattern" || name == "Unruly")
+		else if (name == "Pattern" || name == "Unruly" || name == "Mosaic")
 		{
 			collection->ToggleButton = VirtualButton::ToggleButton("Color", Windows::UI::Xaml::Controls::Symbol::Edit);
 		}

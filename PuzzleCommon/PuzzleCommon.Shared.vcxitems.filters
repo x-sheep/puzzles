@@ -141,6 +141,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\misc.c">
       <Filter>Source Code</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\mosaic.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\net.c">
       <Filter>Source Code</Filter>
     </ClCompile>

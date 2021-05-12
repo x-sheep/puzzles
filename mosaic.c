@@ -1432,6 +1432,7 @@ static void draw_cell(drawing *dr, int cell, int ts, signed char clue_val,
     int startX = ((x * ts) + ts / 2) - 1, startY = ((y * ts) + ts / 2) - 1;
     int color, text_color = COL_TEXT_DARK;
 
+    clip(dr, startX-1, startY-1, ts+1, ts+1);
     draw_rect_outline(dr, startX - 1, startY - 1, ts + 1, ts + 1,
                       (cell & DRAWFLAG_CURSOR) ? COL_CURSOR : COL_GRID);
 
@@ -1459,6 +1460,7 @@ static void draw_cell(drawing *dr, int cell, int ts, signed char clue_val,
                   ALIGN_VCENTRE | ALIGN_HCENTRE, text_color, clue);
     }
     draw_update(dr, startX, startY, ts - 1, ts - 1);
+    unclip(dr);
 }
 
 static void game_redraw(drawing *dr, game_drawstate *ds,

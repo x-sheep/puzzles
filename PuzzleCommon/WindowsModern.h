@@ -140,6 +140,7 @@ namespace PuzzleCommon
 		/// <param name="file">The file to open.</param>
 		/// <returns>The launch parameters for this save file.</returns>
 		static IAsyncOperation<GameLaunchParameters^> ^LoadAndIdentify(Windows::Storage::StorageFile ^file);
+		static bool IsValidPuzzleName(Platform::String^ name);
 		/// <summary>
 		/// Save the current game to the app local storage.
 		/// </summary>
