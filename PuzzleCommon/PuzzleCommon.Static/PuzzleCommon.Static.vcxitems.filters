@@ -72,6 +72,9 @@
     <None Include="$(MSBuildThisFileDirectory)..\..\Help\mines.html">
       <Filter>Help</Filter>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\Help\mosaic.html">
+      <Filter>Help</Filter>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)..\..\Help\net.html">
       <Filter>Help</Filter>
     </None>

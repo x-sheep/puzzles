@@ -80,6 +80,9 @@
     <None Include="$(MSBuildThisFileDirectory)..\..\Help\mines.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\Help\mosaic.html">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)..\..\Help\net.html">
       <DeploymentContent>true</DeploymentContent>
     </None>
