@@ -25,6 +25,7 @@
     A(magnets) \
     A(map) \
     A(mines) \
+    A(mosaic) \
     A(net) \
     A(netslide) \
     A(palisade) \
