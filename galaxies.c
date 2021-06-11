@@ -372,20 +372,21 @@ static bool ok_to_add_assoc_with_opposite_internal(
     return toret;
 }
 
+#ifndef EDITOR
 static bool ok_to_add_assoc_with_opposite(
     const game_state *state, space *tile, space *dot)
 {
     space *opposite = space_opposite_dot(state, tile, dot);
     return ok_to_add_assoc_with_opposite_internal(state, tile, opposite);
 }
+#endif
 
 static void add_assoc_with_opposite(game_state *state, space *tile, space *dot) {
     space *opposite = space_opposite_dot(state, tile, dot);
 
-    if(opposite)
+    if(opposite && ok_to_add_assoc_with_opposite_internal(
+           state, tile, opposite))
     {
-        assert(ok_to_add_assoc_with_opposite_internal(state, tile, opposite));
-
         remove_assoc_with_opposite(state, tile);
         add_assoc(state, tile, dot);
         remove_assoc_with_opposite(state, opposite);
@@ -393,12 +394,14 @@ static void add_assoc_with_opposite(game_state *state, space *tile, space *dot) 
     }
 }
 
+#ifndef EDITOR
 static space *sp2dot(const game_state *state, int x, int y)
 {
     space *sp = &SPACE(state, x, y);
     if (!(sp->flags & F_TILE_ASSOC)) return NULL;
     return &SPACE(state, sp->dotx, sp->doty);
 }
+#endif
 
 #define IS_VERTICAL_EDGE(x) ((x % 2) == 0)
 
@@ -407,8 +410,24 @@ static bool game_can_format_as_text_now(const game_params *params)
     return true;
 }
 
+static char *encode_game(const game_state *state);
+
 static char *game_text_format(const game_state *state)
 {
+#ifdef EDITOR
+    game_params par;
+    char *params, *desc, *ret;
+    par.w = state->w;
+    par.h = state->h;
+    par.diff = DIFF_MAX;               /* shouldn't be used */
+    params = encode_params(&par, false);
+    desc = encode_game(state);
+    ret = snewn(strlen(params) + strlen(desc) + 2, char);
+    sprintf(ret, "%s:%s", params, desc);
+    sfree(params);
+    sfree(desc);
+    return ret;
+#else
     int maxlen = (state->sx+1)*state->sy, x, y;
     char *ret, *p;
     space *sp;
@@ -462,6 +481,7 @@ static char *game_text_format(const game_state *state)
     *p = '\0';
 
     return ret;
+#endif
 }
 
 static void dbg_state(const game_state *state)
@@ -684,7 +704,7 @@ static void tiles_from_edge(game_state *state, space *sp, space **ts)
 /* Returns a move string for use by 'solve', including the initial
  * 'S' if issolve is true. */
 static char *diff_game(const game_state *src, const game_state *dest,
-                       bool issolve)
+                       bool issolve, int set_cdiff)
 {
     int movelen = 0, movesize = 256, x, y, len;
     char *move = snewn(movesize, char), buf[80];
@@ -698,6 +718,26 @@ static char *diff_game(const game_state *src, const game_state *dest,
         move[movelen++] = 'S';
         sep = ";";
     }
+#ifdef EDITOR
+    if (set_cdiff >= 0) {
+        switch (set_cdiff) {
+          case DIFF_IMPOSSIBLE:
+            movelen += sprintf(move+movelen, "%sII", sep);
+            break;
+          case DIFF_AMBIGUOUS:
+            movelen += sprintf(move+movelen, "%sIA", sep);
+            break;
+          case DIFF_UNFINISHED:
+            movelen += sprintf(move+movelen, "%sIU", sep);
+            break;
+          default:
+            movelen += sprintf(move+movelen, "%si%c",
+                               sep, galaxies_diffchars[set_cdiff]);
+            break;
+        }
+        sep = ";";
+    }
+#endif
     move[movelen] = '\0';
     for (x = 0; x < src->sx; x++) {
         for (y = 0; y < src->sy; y++) {
@@ -747,7 +787,8 @@ static char *diff_game(const game_state *src, const game_state *dest,
 
 /* Returns true if a dot here would not be too close to any other dots
  * (and would avoid other game furniture). */
-static bool dot_is_possible(game_state *state, space *sp, bool allow_assoc)
+static bool dot_is_possible(const game_state *state, space *sp,
+                            bool allow_assoc)
 {
     int bx = 0, by = 0, dx, dy;
     space *adj;
@@ -921,7 +962,7 @@ static void free_game(game_state *state)
  * an edit mode.
  */
 
-static char *encode_game(game_state *state)
+static char *encode_game(const game_state *state)
 {
     char *desc, *p;
     int run, x, y, area;
@@ -2309,7 +2350,7 @@ solved:
      */
     for (i = 0; i < tosolve->sx*tosolve->sy; i++)
         tosolve->grid[i].flags &= ~F_TILE_ASSOC;
-    ret = diff_game(currstate, tosolve, true);
+    ret = diff_game(currstate, tosolve, true, -1);
     free_game(tosolve);
     return ret;
 }
@@ -2383,7 +2424,7 @@ struct game_drawstate {
     blitter *blmirror;
 
     bool dragging;
-    int dragx, dragy;
+    int dragx, dragy, oppx, oppy;
 
     int *colour_scratch;
 
@@ -2448,15 +2489,13 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     px = 2*FROMCOORD((float)x) + 0.5;
     py = 2*FROMCOORD((float)y) + 0.5;
 
-    state->cdiff = -1;
-
     if (button == 'C' || button == 'c') return dupstr("C");
 
     if (button == 'S' || button == 's') {
         char *ret;
         game_state *tmp = dup_game(state);
-        state->cdiff = solver_state(tmp, DIFF_UNREASONABLE-1);
-        ret = diff_game(state, tmp, 0);
+        int cdiff = solver_state(tmp, DIFF_UNREASONABLE-1);
+        ret = diff_game(state, tmp, 0, cdiff);
         free_game(tmp);
         return ret;
     }
@@ -2473,6 +2512,21 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     return NULL;
 }
 #else
+static bool edge_placement_legal(const game_state *state, int x, int y)
+{
+    space *sp = &SPACE(state, x, y);
+    if (sp->type != s_edge)
+        return false;   /* this is a face-centre or a grid vertex */
+
+    /* Check this line doesn't actually intersect a dot */
+    unsigned int flags = (GRID(state, grid, x, y).flags |
+                          GRID(state, grid, x & ~1U, y & ~1U).flags |
+                          GRID(state, grid, (x+1) & ~1U, (y+1) & ~1U).flags);
+    if (flags & F_DOT)
+        return false;
+    return true;
+}
+
 static char *interpret_move(const game_state *state, game_ui *ui,
                             const game_drawstate *ds,
                             int x, int y, int button)
@@ -2499,7 +2553,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         char *ret;
         game_state *tmp = dup_game(state);
         solver_obvious(tmp);
-        ret = diff_game(state, tmp, false);
+        ret = diff_game(state, tmp, false, -1);
         free_game(tmp);
         return ret;
     }
@@ -2510,13 +2564,11 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                             &px, &py);
 
         if (!INUI(state, px, py)) return NULL;
+        if (!edge_placement_legal(state, px, py))
+            return NULL;
 
-        sp = &SPACE(state, px, py);
-        assert(sp->type == s_edge);
-        {
-            sprintf(buf, "E%d,%d", px, py);
-            return dupstr(buf);
-        }
+        sprintf(buf, "E%d,%d", px, py);
+        return dupstr(buf);
     } else if (button == RIGHT_BUTTON) {
         int px1, py1;
 
@@ -2677,7 +2729,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->srcx = ui->cur_x;
             ui->srcy = ui->cur_y;
             return UI_UPDATE;
-        } else if (sp->type == s_edge) {
+        } else if (sp->type == s_edge &&
+                   edge_placement_legal(state, ui->cur_x, ui->cur_y)) {
             sprintf(buf, "E%d,%d", ui->cur_x, ui->cur_y);
             return dupstr(buf);
         }
@@ -2959,6 +3012,35 @@ static game_state *execute_move(const game_state *state, const char *move)
         } else if (c == 'C') {
             move++;
             clear_game(ret, true);
+        } else if (c == 'i') {
+            int diff;
+            move++;
+            for (diff = 0; diff <= DIFF_UNREASONABLE; diff++)
+                if (*move == galaxies_diffchars[diff])
+                    break;
+            if (diff > DIFF_UNREASONABLE)
+                goto badmove;
+
+            ret->cdiff = diff;
+            move++;
+        } else if (c == 'I') {
+            int diff;
+            move++;
+            switch (*move) {
+              case 'A':
+                diff = DIFF_AMBIGUOUS;
+                break;
+              case 'I':
+                diff = DIFF_IMPOSSIBLE;
+                break;
+              case 'U':
+                diff = DIFF_UNFINISHED;
+                break;
+              default:
+                goto badmove;
+            }
+            ret->cdiff = diff;
+            move++;
 #endif
         } else if (c == 'S') {
             move++;
@@ -3098,7 +3180,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->bl = NULL;
     ds->blmirror = NULL;
     ds->dragging = false;
-    ds->dragx = ds->dragy = 0;
+    ds->dragx = ds->dragy = ds->oppx = ds->oppy = 0;
 
     ds->colour_scratch = snewn(ds->w * ds->h, int);
 
@@ -3145,7 +3227,10 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
 static void draw_arrow(drawing *dr, game_drawstate *ds,
                        int cx, int cy, int ddx, int ddy, int col)
 {
-    float vlen = (float)sqrt(ddx*ddx+ddy*ddy);
+    int sqdist = ddx*ddx+ddy*ddy;
+    if (sqdist == 0)
+        return;                        /* avoid division by zero */
+    float vlen = (float)sqrt(sqdist);
     float xdx = ddx/vlen, xdy = ddy/vlen;
     float ydx = -xdy, ydy = xdx;
     int e1x = cx + (int)(xdx*TILE_SIZE/3), e1y = cy + (int)(xdy*TILE_SIZE/3);
@@ -3257,7 +3342,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     int w = ds->w, h = ds->h;
     int x, y;
     bool flashing = false;
-    int oppx, oppy;
 
     if (flashtime > 0) {
         int frame = (int)(flashtime / FLASH_TIME);
@@ -3267,14 +3351,10 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     if (ds->dragging) {
         assert(ds->bl);
         assert(ds->blmirror);
-        calculate_opposite_point(ui, ds, ds->dragx + TILE_SIZE/2,
-                                 ds->dragy + TILE_SIZE/2, &oppx, &oppy);
-        oppx -= TILE_SIZE/2;
-        oppy -= TILE_SIZE/2;
+        blitter_load(dr, ds->blmirror, ds->oppx, ds->oppy);
+        draw_update(dr, ds->oppx, ds->oppy, TILE_SIZE, TILE_SIZE);
         blitter_load(dr, ds->bl, ds->dragx, ds->dragy);
         draw_update(dr, ds->dragx, ds->dragy, TILE_SIZE, TILE_SIZE);
-        blitter_load(dr, ds->blmirror, oppx, oppy);
-        draw_update(dr, oppx, oppy, TILE_SIZE, TILE_SIZE);
         ds->dragging = false;
     }
     if (ds->cur_visible) {
@@ -3432,16 +3512,28 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     }
 
     if (ui->dragging) {
+        int oppx, oppy;
+
         ds->dragging = true;
         ds->dragx = ui->dx - TILE_SIZE/2;
         ds->dragy = ui->dy - TILE_SIZE/2;
         calculate_opposite_point(ui, ds, ui->dx, ui->dy, &oppx, &oppy);
+        ds->oppx = oppx - TILE_SIZE/2;
+        ds->oppy = oppy - TILE_SIZE/2;
+
         blitter_save(dr, ds->bl, ds->dragx, ds->dragy);
-        blitter_save(dr, ds->blmirror, oppx - TILE_SIZE/2, oppy - TILE_SIZE/2);
+        clip(dr, ds->dragx, ds->dragy, TILE_SIZE, TILE_SIZE);
         draw_arrow(dr, ds, ui->dx, ui->dy, SCOORD(ui->dotx) - ui->dx,
                    SCOORD(ui->doty) - ui->dy, COL_ARROW);
+        unclip(dr);
+        draw_update(dr, ds->dragx, ds->dragy, TILE_SIZE, TILE_SIZE);
+
+        blitter_save(dr, ds->blmirror, ds->oppx, ds->oppy);
+        clip(dr, ds->oppx, ds->oppy, TILE_SIZE, TILE_SIZE);
         draw_arrow(dr, ds, oppx, oppy, SCOORD(ui->dotx) - oppx,
                    SCOORD(ui->doty) - oppy, COL_ARROW);
+        unclip(dr);
+        draw_update(dr, ds->oppx, ds->oppy, TILE_SIZE, TILE_SIZE);
     }
 #ifdef EDITOR
     {
