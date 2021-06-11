@@ -1516,7 +1516,7 @@ static float game_flash_length(const game_state *oldstate,
                                const game_state *newstate, int dir,
                                game_ui *ui)
 {
-    if (!oldstate->cheating && oldstate->not_completed_clues > 0 &&
+    if (!oldstate->cheating && oldstate->not_completed_clues &&
         newstate->not_completed_clues == 0) {
         return FLASH_TIME;
     }
