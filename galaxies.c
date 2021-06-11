@@ -2517,6 +2517,8 @@ static bool edge_placement_legal(const game_state *state, int x, int y)
     space *sp = &SPACE(state, x, y);
     if (sp->type != s_edge)
         return false;   /* this is a face-centre or a grid vertex */
+    if (sp->flags & F_EDGE_SET)
+        return true; /* always allow erasure moves */
 
     /* Check this line doesn't actually intersect a dot */
     unsigned int flags = (GRID(state, grid, x, y).flags |
