@@ -1397,7 +1397,7 @@ static float *game_colours(frontend *fe, int *ncolours)
     COLOUR(ret, COL_MARKED, 20 / 255.0F, 20 / 255.0F, 20 / 255.0F);
     COLOUR(ret, COL_UNMARKED, 148 / 255.0F, 196 / 255.0F, 190 / 255.0F);
     COLOUR(ret, COL_TEXT_SOLVED, 100 / 255.0F, 100 / 255.0F, 100 / 255.0F);
-    COLOUR(ret, COL_CURSOR, 255 / 255.0F, 200 / 255.0F, 200 / 255.0F);
+    COLOUR(ret, COL_CURSOR, 255 / 255.0F, 128 / 255.0F, 128 / 255.0F);
 
     *ncolours = NCOLOURS;
     return ret;
@@ -1433,8 +1433,7 @@ static void draw_cell(drawing *dr, int cell, int ts, signed char clue_val,
     int color, text_color = COL_TEXT_DARK;
 
     clip(dr, startX-1, startY-1, ts+1, ts+1);
-    draw_rect_outline(dr, startX - 1, startY - 1, ts + 1, ts + 1,
-                      (cell & DRAWFLAG_CURSOR) ? COL_CURSOR : COL_GRID);
+    draw_rect_outline(dr, startX - 1, startY - 1, ts + 1, ts + 1, COL_GRID);
 
     if (cell & STATE_MARKED) {
         color = COL_MARKED;
@@ -1453,6 +1452,20 @@ static void draw_cell(drawing *dr, int cell, int ts, signed char clue_val,
     }
 
     draw_rect(dr, startX, startY, ts - 1, ts - 1, color);
+
+    if (cell & DRAWFLAG_CURSOR) {
+        int cs = max(3, ts - 10);
+        if (cell & (STATE_MARKED | STATE_BLANK))
+        {
+            draw_rect_outline(dr, startX + 5, startY + 5, cs, cs, COL_CURSOR);
+            draw_rect_outline(dr, startX + 6, startY + 6, cs - 2, cs - 2, COL_CURSOR);
+        }
+        else
+        {
+            draw_rect(dr, startX + 5, startY + 5, cs, cs, COL_CURSOR);
+        }
+    }
+
     if (clue_val >= 0) {
         char clue[80];
         sprintf(clue, "%d", clue_val);
