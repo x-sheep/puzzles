@@ -304,6 +304,7 @@ namespace PuzzleModern.UWP
         {
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated -= OnAcceleratorKeyActivated;
             Window.Current.CoreWindow.VisibilityChanged -= OnVisibilityChanged;
+            Window.Current.CoreWindow.Activated -= OnActivated;
             DataTransferManager.GetForCurrentView().DataRequested -= OnDataRequested;
         }
 
@@ -311,6 +312,7 @@ namespace PuzzleModern.UWP
         {
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += OnAcceleratorKeyActivated;
             Window.Current.CoreWindow.VisibilityChanged += OnVisibilityChanged;
+            Window.Current.CoreWindow.Activated += OnActivated;
             DataTransferManager.GetForCurrentView().DataRequested += OnDataRequested;
         }
 

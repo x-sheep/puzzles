@@ -240,6 +240,13 @@ namespace PuzzleModern.UWP
             menu.IsEnabled = true;
         }
 
+        private void OnActivated(CoreWindow sender, WindowActivatedEventArgs args)
+        {
+            GameMenu.IsEnabled = true;
+            PresetMenu.IsEnabled = true;
+            HelpMenu.IsEnabled = true;
+        }
+
         private void AppBarButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             var menu = (AppBarButton)sender;
