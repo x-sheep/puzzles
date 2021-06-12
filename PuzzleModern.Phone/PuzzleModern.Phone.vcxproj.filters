@@ -190,6 +190,12 @@
     <Image Include="Icons\mines-small.png">
       <Filter>Icons</Filter>
     </Image>
+    <Image Include="Icons\mosaic-small.png">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="Icons\mosaic-large.png">
+      <Filter>Icons</Filter>
+    </Image>
     <Image Include="Icons\net-large.png">
       <Filter>Icons</Filter>
     </Image>

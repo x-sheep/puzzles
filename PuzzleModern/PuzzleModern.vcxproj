@@ -292,6 +292,8 @@
     <Image Include="Icons\map-small.png" />
     <Image Include="Icons\mines-large.png" />
     <Image Include="Icons\mines-small.png" />
+    <Image Include="Icons\mosaic-large.png" />
+    <Image Include="Icons\mosaic-small.png" />
     <Image Include="Icons\net-large.png" />
     <Image Include="Icons\net-small.png" />
     <Image Include="Icons\netslide-large.png" />
