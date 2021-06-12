@@ -27,7 +27,7 @@
             <!-- Section 1 body -->
             <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap">
                 Windows Store version
-                <LineBreak/>&#xA9; 2019 Lennard Sprong
+                <LineBreak/>&#xA9; 2021 Lennard Sprong
                 <LineBreak/>
                 <LineBreak/>Based on Simon Tatham's Portable Puzzle Collection
             </TextBlock>
@@ -35,7 +35,7 @@
             <HyperlinkButton NavigateUri="https://x-sheep.github.io/puzzles/" Padding="0">x-sheep.github.io/puzzles</HyperlinkButton>
         </StackPanel>
 
-        
+
         <!-- Content Section 2-->
         <StackPanel Style="{StaticResource SettingsFlyoutSectionStyle}">
 
@@ -46,9 +46,9 @@
 
             <!-- Section 2 body -->
             <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap">
-                This software is copyright 2004-2019 Simon Tatham.
+                This software is copyright 2004-2021 Simon Tatham.
                 <LineBreak/>
-                <LineBreak/>Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas K&#246;lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou, Bernd Schmidt, Steffen Bauer, Lennard Sprong, Rogier Goossens, Chris Boyle, Phil Tunstall and Michael Quevillon.
+                <LineBreak/>Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas K&#246;lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou, Bernd Schmidt, Steffen Bauer, Lennard Sprong, Rogier Goossens, Michael Quevillon, Chris Boyle, Phil Tunstall, Asher Gordon and Didi Kohen.
                 <LineBreak/>
                 <LineBreak/>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &#8216;Software&#8217;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
                 <LineBreak/>
@@ -56,7 +56,7 @@
                 <LineBreak/>
                 <LineBreak/>THE SOFTWARE IS PROVIDED &#8216;AS IS&#8217;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             </TextBlock>
-            
+
             <HyperlinkButton NavigateUri="https://www.chiark.greenend.org.uk/~sgtatham/puzzles/" Padding="0">Original project website</HyperlinkButton>
         </StackPanel>
 
