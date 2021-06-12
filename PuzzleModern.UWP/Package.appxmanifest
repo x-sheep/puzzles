@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap mp">
+
+  <Identity
+    Name="1867LennardSprong.PortablePuzzleCollection"
+    Publisher="CN=C7A19714-C98A-463A-9F54-22A0392BAFF5"
+    Version="2021.5.10.0" />
+
+  <mp:PhoneIdentity PhoneProductId="4e0016aa-4e6a-48bf-b0d0-0e3d27bfe16b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>Portable Puzzle Collection</DisplayName>
+    <PublisherDisplayName>Lennard Sprong</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="PuzzleModern.UWP.App">
+      <uap:VisualElements
+        DisplayName="Portable Puzzle Collection"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        Description="PuzzleModern.UWP"
+        BackgroundColor="#008000">
+        <uap:DefaultTile Square71x71Logo="Assets\SmallTile.png" ShortName="Portable Puzzles">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile >
+        <uap:SplashScreen Image="Assets\SplashScreen.png"  BackgroundColor="#001100"/>
+      </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name=".puzzle">
+            <uap:SupportedFileTypes>
+              <uap:FileType ContentType="text/prs.sgtatham.puzzles">.puzzle</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:DisplayName>Saved puzzle game</uap:DisplayName>
+            <uap:InfoTip>Saved game for the Portable Puzzle Collection</uap:InfoTip>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+</Package>

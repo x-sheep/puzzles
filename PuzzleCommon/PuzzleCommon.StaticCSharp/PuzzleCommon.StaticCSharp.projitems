@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>5ce90463-407e-4ef6-a992-e740ce25f7ce</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>
+    </Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\blackbox.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\bridges.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\common.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\cube.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\docindex.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\dominosa.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\fifteen.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\filling.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\flip.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\flood.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\galaxies.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\guess.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\index.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\inertia.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\intro.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\keen.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\licence.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\lightup.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\loopy.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\magnets.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\map.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\mines.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\mosaic.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\net.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\netslide.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\palisade.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\pattern.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\pearl.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\pegs.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\range.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\rect.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\samegame.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\signpost.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\singles.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\sixteen.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\slant.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\solo.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\tents.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\towers.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\tracks.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\twiddle.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\undead.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\unequal.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\unruly.html" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\Help\untangle.html" />
+  </ItemGroup>
+</Project>

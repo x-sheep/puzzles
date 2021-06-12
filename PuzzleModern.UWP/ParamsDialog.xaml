@@ -1,0 +1,40 @@
+﻿<ContentDialog
+    x:Class="PuzzleModern.UWP.ParamsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    PrimaryButtonText="Apply"
+    PrimaryButtonClick="ConfirmButton_Click"
+    SecondaryButtonText="Cancel"
+    Style="{StaticResource ScrollableContentDialogStyle}"
+    ScrollViewer.HorizontalScrollMode="Disabled"
+    mc:Ignorable="d">
+
+    <ContentDialog.Resources>
+        <DataTemplate x:Name="LabelTemplate">
+            <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+        </DataTemplate>
+
+        <Storyboard x:Name="ErrorAppearingStoryboard">
+            <ColorAnimation
+                    EnableDependentAnimation="true"
+                    Storyboard.TargetName="ErrorLabel"
+                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                    Duration="0:0:1"
+                    From="Red"
+                    To="DarkRed"
+                    />
+        </Storyboard>
+
+    </ContentDialog.Resources>
+
+    <StackPanel>
+        <TextBlock x:Name="NameLabel" d:Text="Parameters" FontSize="20" Margin="0,0,0,12" />
+        <StackPanel Width="320"
+            x:Name="ItemsPanel">
+        </StackPanel>
+        <TextBlock x:Name="ErrorLabel" Width="320" FontSize="20" Foreground="Red" FontWeight="Bold" TextWrapping="Wrap" Margin="0,30,0,0" Visibility="Collapsed" />
+        <TextBlock Text="This puzzle does not support custom parameters." x:Name="NoConfigLabel" TextWrapping="Wrap" FontSize="16" Visibility="Collapsed"/>
+    </StackPanel>
+</ContentDialog>

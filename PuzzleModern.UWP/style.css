@@ -1,0 +1,50 @@
+body { 
+    font-size: 100%; 
+    font-family: 'Segoe UI'; 
+    padding: 30px;
+}
+
+h1 {
+    font-weight: bold;
+    font-size: 150%;
+}
+h2 {
+    font-weight: bold;
+    font-size: 130%;
+}
+h3 {
+    font-weight: bold;
+    font-size: 120%;
+}
+
+address {
+    display: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.light {
+    color: black;
+}
+
+.light a:link, .light a:visited {
+    color: #0066cc;
+}
+
+.light a:hover {
+    color: #ce8b10;
+}
+
+.dark {
+    color: white;
+}
+
+.dark a:link, .dark a:visited {
+    color: #ccccff;
+}
+
+.dark a:hover {
+    color: #fce545;
+}

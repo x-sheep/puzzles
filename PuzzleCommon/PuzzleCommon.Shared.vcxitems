@@ -27,7 +27,6 @@
       <DependentUpon>$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)IPuzzleCanvas.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PulseEffect.xaml.h">
       <DependentUpon>$(MSBuildThisFileDirectory)PulseEffect.xaml</DependentUpon>
     </ClInclude>
@@ -294,9 +293,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml.cpp">
       <DependentUpon>$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml</DependentUpon>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PulseEffect.xaml.cpp">
       <DependentUpon>$(MSBuildThisFileDirectory)PulseEffect.xaml</DependentUpon>

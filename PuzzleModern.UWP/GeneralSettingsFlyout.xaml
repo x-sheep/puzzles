@@ -1,0 +1,113 @@
+﻿<SettingsFlyout
+    x:Class="PuzzleModern.UWP.GeneralSettingsFlyout"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    IconSource="Assets/SmallLogo.png"
+    Title="Settings"
+    d:DesignWidth="346">
+
+    <SettingsFlyout.Resources>
+        <DataTemplate x:Name="LabelTemplate">
+            <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+        </DataTemplate>
+    </SettingsFlyout.Resources>
+
+    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
+
+        <ToggleSwitch x:Name="NewGameSwitch" HeaderTemplate="{StaticResource LabelTemplate}" Toggled="NewGameSwitch_Toggled" IsOn="True">Show prompt on completing game</ToggleSwitch>
+        <ToggleSwitch x:Name="ColorblindSwitch" HeaderTemplate="{StaticResource LabelTemplate}" Toggled="ColorblindSwitch_Toggled">Colorblind Mode (supported puzzles only)</ToggleSwitch>
+
+        <Grid Margin="4,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="96" />
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Column="0" x:Name="MapPaletteBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="MapPaletteBox_SelectionChanged" Header="Map - Color palette" SelectedIndex="0">
+                <ComboBoxItem>Default</ComboBoxItem>
+                <ComboBoxItem>Vivid</ComboBoxItem>
+            </ComboBox>
+
+            <Border x:Name="VividPalettePreview" Visibility="Collapsed" Grid.Column="1" Height="36" Margin="9,26,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#c04040" />
+                    <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#4db34d" />
+                    <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#4d4db3" />
+                    <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#d9d91a" />
+                </Grid>
+            </Border>
+
+            <Border x:Name="DefaultPalettePreview" Grid.Column="1" Height="36" Margin="9,26,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#b38066" />
+                    <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#cdb366" />
+                    <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#809a66" />
+                    <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#8d735a" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Grid Margin="4,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="96" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0" x:Name="FixedPencilMarksBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="FixedPencilMarksBox_SelectionChanged" Header="Pencil mark style" SelectedIndex="0" Margin="0,10,0,0">
+                <ComboBoxItem>Sequential</ComboBoxItem>
+                <ComboBoxItem>Fixed position</ComboBoxItem>
+            </ComboBox>
+            <Border x:Name="SequentialPencilPreview" Grid.Column="1" Background="#ffe6e6e6" BorderBrush="Black" BorderThickness="2" Width="50" Height="50" VerticalAlignment="Bottom">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">2</TextBlock>
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">3</TextBlock>
+                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">6</TextBlock>
+                    <TextBlock Grid.Row="1"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">7</TextBlock>
+                </Grid>
+            </Border>
+            <Border x:Name="FixedPencilPreview" Grid.Column="1" Visibility="Collapsed" Background="#ffe6e6e6" BorderBrush="Black" BorderThickness="2" Width="50" Height="50" VerticalAlignment="Bottom">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">2</TextBlock>
+                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">3</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">6</TextBlock>
+                    <TextBlock Grid.Row="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">7</TextBlock>
+                </Grid>
+            </Border>
+        </Grid>
+    </StackPanel>
+</SettingsFlyout>
