@@ -1270,13 +1270,7 @@ namespace PuzzleCommon
 			collection->MiddleAction = ButtonType::RIGHT;
 			collection->SwitchMiddle = true;
 
-			auto fontIcon = ref new Windows::UI::Xaml::Controls::FontIcon();
-			fontIcon->FontFamily = ref new Windows::UI::Xaml::Media::FontFamily("Segoe UI Symbol");
-			wchar_t mark = 0xE1F6;
-			fontIcon->Glyph = ref new Platform::String(&mark, 1);
-			collection->ToggleButton = ref new VirtualButton();
-			collection->ToggleButton->Name = "Lock";
-			collection->ToggleButton->Icon = fontIcon;
+			collection->ToggleButton = VirtualButton::ToggleButton("Lock", (Windows::UI::Xaml::Controls::Symbol)0xE1F6);
 		}
 		else if (name == "Dominosa")
 		{
