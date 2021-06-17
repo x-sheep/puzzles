@@ -1,6 +1,6 @@
 # Portable Puzzle Collection for Windows Store
 
-[![Build status](https://ci.appveyor.com/api/projects/status/1025rpc6remat8xu/branch/master?svg=true)](https://ci.appveyor.com/project/x-sheep/puzzles/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/0bq5fuxibnqx3gbt?svg=true)](https://ci.appveyor.com/project/x-sheep/puzzles)
 
 Port of [Simon Tatham's Portable Puzzle Collection](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/) to C++ Windows Store and Windows Phone apps. The interface is built in XAML, and the graphics are drawn with Direct2D.
 
