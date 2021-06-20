@@ -25,7 +25,7 @@ Note that this fork has several modifications which cause the original makefiles
 ## Contents
 
 * `/` - The root folder contains the original sources written in C.
-* `/html, /unfinished, /icons, /osx, /cmake` - Only used by the upstream code.
+* `/html, /unfinished, /icons, /osx` - Only used by the upstream code.
 * `/Help` - The HTML manual.
 * `/PuzzleCommon` - Shared C++ sources. All graphics handling and interfacing with the original source code is located here.
 * `/PuzzleModern` - Windows 8.1 project.
