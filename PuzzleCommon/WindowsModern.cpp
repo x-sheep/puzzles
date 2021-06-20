@@ -392,6 +392,12 @@ char *winmodern_getenv(const char *key)
 			return "Y";
 	}
 
+	if (!strcmp(key, "DISABLE_VICTORY"))
+	{
+		if (settings->HasKey("env_DISABLE_VICTORY") && safe_cast<bool>(settings->Lookup("env_DISABLE_VICTORY")))
+			return "Y";
+	}
+
 	return NULL;
 }
 

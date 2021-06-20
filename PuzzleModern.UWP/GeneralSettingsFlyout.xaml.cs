@@ -27,6 +27,7 @@ namespace PuzzleModern.UWP
 
             var settings = ApplicationData.Current.RoamingSettings.Values;
             ColorblindSwitch.IsOn = settings["cfg_colorblind"] as bool? ?? false;
+            VictoryFlashSwitch.IsOn = settings["env_DISABLE_VICTORY"] as bool? != true;
             NewGameSwitch.IsOn = settings["cfg_newgameprompt"] as bool? ?? true;
 
             if (settings["env_MAP_VIVID_COLOURS"] as bool? == true)
@@ -58,6 +59,14 @@ namespace PuzzleModern.UWP
 
             ApplicationData.Current.RoamingSettings.Values["cfg_colorblind"] = ColorblindSwitch.IsOn;
             App.Current.NotifySettingChanged("cfg_colorblind", ColorblindSwitch.IsOn);
+        }
+
+        private void VictoryFlashSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_loaded) return;
+
+            ApplicationData.Current.RoamingSettings.Values["env_DISABLE_VICTORY"] = !VictoryFlashSwitch.IsOn;
+            App.Current.NotifySettingChanged("env_DISABLE_VICTORY", !VictoryFlashSwitch.IsOn);
         }
 
         private void MapPaletteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

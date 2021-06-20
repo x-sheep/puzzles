@@ -18,6 +18,7 @@
     <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
 
         <ToggleSwitch x:Name="NewGameSwitch" HeaderTemplate="{StaticResource LabelTemplate}" Toggled="NewGameSwitch_Toggled" IsOn="True">Show prompt on completing game</ToggleSwitch>
+        <ToggleSwitch x:Name="VictoryFlashSwitch" HeaderTemplate="{StaticResource LabelTemplate}" Toggled="VictoryFlashSwitch_Toggled" IsOn="True">Play victory animations on completing game</ToggleSwitch>
         <ToggleSwitch x:Name="ColorblindSwitch" HeaderTemplate="{StaticResource LabelTemplate}" Toggled="ColorblindSwitch_Toggled">Colorblind Mode (supported puzzles only)</ToggleSwitch>
 
         <Grid Margin="4,0,0,0">

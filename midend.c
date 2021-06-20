@@ -814,7 +814,7 @@ static void midend_finish_move(midend *me)
 					      me->states[me->statepos-1].state,
 					      me->oldstate ? me->dir : +1,
 					      me->ui);
-	if (flashtime > 0) {
+	if (flashtime > 0 && !getenv("DISABLE_VICTORY")) {
 	    me->flash_pos = 0.0F;
 	    me->flash_time = flashtime;
 	}
