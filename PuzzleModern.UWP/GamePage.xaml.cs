@@ -361,7 +361,19 @@ namespace PuzzleModern.UWP
             bool loaded = false;
             try
             {
-                loaded = await fe.LoadGameFromStorage(_puzzleName);
+                var settings = ApplicationData.Current.LocalSettings.Values;
+                if (settings.ContainsKey(_puzzleName))
+                {
+                    var savedObj = settings[_puzzleName];
+                    // If loading the game crashes for whatever reason, the safest bet is to not load it again
+                    settings.Remove(_puzzleName);
+
+                    var savedName = savedObj.ToString();
+
+                    var file = await ApplicationData.Current.LocalFolder.GetFileAsync(savedName);
+                    var err = fe.LoadGameFromString(await FileIO.ReadTextAsync(file));
+                    loaded = string.IsNullOrEmpty(err);
+                }
             }
             catch { }
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
