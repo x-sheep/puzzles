@@ -91,7 +91,7 @@ namespace PuzzleModern.UWP
             base.OnNavigatedFrom(e);
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated -= OnAcceleratorKeyActivated;
             if (!_generatingGame && savingWorkItem?.IsCompleted != false)
-                savingWorkItem = fe.SaveGameToStorage(_puzzleName).AsTask();
+                savingWorkItem = SaveToStorage();
         }
 
         private void OnGameCompleted(object sender, object e)
@@ -294,7 +294,7 @@ namespace PuzzleModern.UWP
             {
                 var cb = e.SuspendingOperation.GetDeferral();
                 if (savingWorkItem?.IsCompleted != false)
-                    savingWorkItem = fe.SaveGameToStorage(_puzzleName).AsTask();
+                    savingWorkItem = SaveToStorage();
                 await savingWorkItem;
                 cb.Complete();
             }
@@ -485,7 +485,7 @@ namespace PuzzleModern.UWP
             if (!args.Visible)
             {
                 if (savingWorkItem?.IsCompleted != false)
-                    savingWorkItem = fe.SaveGameToStorage(_puzzleName).AsTask();
+                    savingWorkItem = SaveToStorage();
             }
             else
                 ForceRedraw();
@@ -549,6 +549,24 @@ namespace PuzzleModern.UWP
             {
                 PeriodicTimer.Cancel();
                 PeriodicTimer = null;
+            }
+        }
+
+        private async Task SaveToStorage()
+        {
+            if (_generatingGame) return;
+            
+            var serialized = fe.SaveGameToString();
+
+            try
+            {
+                var file = await ApplicationData.Current.LocalFolder.CreateFileAsync(_puzzleName + ".puzzle", CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(file, serialized);
+                ApplicationData.Current.LocalSettings.Values[_puzzleName] = _puzzleName + ".puzzle";
+            }
+            catch
+            {
+                /// TODO log non-fatal exception
             }
         }
     }
