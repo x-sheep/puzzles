@@ -11,7 +11,7 @@ for:
 -
   environment:
     only:
-      - BUILD_UWP: "false"
+      BUILD_UWP: "false"
   
   image: Visual Studio 2015
 
