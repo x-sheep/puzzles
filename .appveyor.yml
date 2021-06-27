@@ -2,6 +2,8 @@ version: b{build}
 skip_tags: true
 environment:
   matrix:
+  - PUZZLES_PROJECT: PuzzleModern.UWP/PuzzleModern.UWP.vcxproj
+    BUILD_UWP: true
   - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj /p:Platform=ARM
     BUILD_WIN8: true
   - PUZZLES_PROJECT: PuzzleModern/PuzzleModern.vcxproj
@@ -11,8 +13,11 @@ for:
 -
   environment:
     only: BUILD_WIN8
-  
   image: Visual Studio 2015
+-
+  environment:
+    only: BUILD_UWP
+  image: Visual Studio 2019
 
 build_script:
 - cmd: msbuild %PUZZLES_PROJECT% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:AppxPackageSigningEnabled=false
