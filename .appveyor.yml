@@ -9,10 +9,9 @@ environment:
 
 for:
 -
-  matrix:
+  environment:
     only:
-      - environment: 
-          BUILD_UWP: false
+      - BUILD_UWP: false
   
   image: Visual Studio 2015
 
