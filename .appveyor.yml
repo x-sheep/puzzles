@@ -11,8 +11,8 @@ for:
 -
   matrix:
     only:
-      environment: 
-        BUILD_UWP: false
+      - environment: 
+          BUILD_UWP: false
   
   image: Visual Studio 2015
 
