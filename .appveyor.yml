@@ -1,10 +1,21 @@
 version: b{build}
 skip_tags: true
-image: Visual Studio 2015
 environment:
   matrix:
   - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj /p:Platform=ARM
+    BUILD_UWP: false
   - PUZZLES_PROJECT: PuzzleModern/PuzzleModern.vcxproj
+    BUILD_UWP: false
+
+for:
+-
+  matrix:
+    only:
+      environment: 
+        BUILD_UWP: false
+  
+  image: Visual Studio 2015
+
 build_script:
 - cmd: msbuild %PUZZLES_PROJECT% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:AppxPackageSigningEnabled=false
 test: off
