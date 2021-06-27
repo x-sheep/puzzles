@@ -3,15 +3,15 @@ skip_tags: true
 environment:
   matrix:
   - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj /p:Platform=ARM
-    BUILD_UWP: false
+    BUILD_UWP: "false"
   - PUZZLES_PROJECT: PuzzleModern/PuzzleModern.vcxproj
-    BUILD_UWP: false
+    BUILD_UWP: "false"
 
 for:
 -
   environment:
     only:
-      - BUILD_UWP: false
+      - BUILD_UWP: "false"
   
   image: Visual Studio 2015
 
