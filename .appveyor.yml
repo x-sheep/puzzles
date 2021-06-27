@@ -2,7 +2,7 @@ version: b{build}
 skip_tags: true
 environment:
   matrix:
-  - PUZZLES_PROJECT: PuzzleModern.UWP/PuzzleModern.UWP.vcxproj
+  - PUZZLES_PROJECT: PuzzleModern.UWP/PuzzleModern.UWP.csproj
     BUILD_UWP: true
   - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj /p:Platform=ARM
     BUILD_WIN8: true
