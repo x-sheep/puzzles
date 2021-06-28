@@ -11,10 +11,10 @@ environment:
   matrix:
   - PUZZLES_PROJECT: PuzzleModern.UWP/PuzzleModern.UWP.csproj
     BUILD_UWP: true
-  - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj
-    BUILD_WINPHONE: true
   - PUZZLES_PROJECT: PuzzleModern/PuzzleModern.vcxproj
     BUILD_WIN8: true
+  - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj
+    BUILD_WINPHONE: true
 
 matrix:
   exclude:
@@ -42,6 +42,6 @@ for:
   image: Visual Studio 2019
 
 build_script:
-- cmd: msbuild %PUZZLES_PROJECT% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:AppxPackageSigningEnabled=false
+- cmd: msbuild %PUZZLES_PROJECT% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=%PLATFORM% /p:Configuration=Release /p:AppxPackageSigningEnabled=false
 test: off
 deploy: off
