@@ -1,18 +1,40 @@
 version: b{build}
 skip_tags: true
+
+platform:
+  - Win32
+  - x64
+  - ARM
+  - ARM64
+
 environment:
   matrix:
   - PUZZLES_PROJECT: PuzzleModern.UWP/PuzzleModern.UWP.csproj
     BUILD_UWP: true
-  - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj /p:Platform=ARM
-    BUILD_WIN8: true
+  - PUZZLES_PROJECT: PuzzleModern.Phone/PuzzleModern.Phone.vcxproj
+    BUILD_WINPHONE: true
   - PUZZLES_PROJECT: PuzzleModern/PuzzleModern.vcxproj
     BUILD_WIN8: true
+
+matrix:
+  exclude:
+    - platform: Win32
+      BUILD_WINPHONE: true
+    - platform: x64
+      BUILD_WINPHONE: true
+    - platform: ARM64
+      BUILD_WINPHONE: true
+    - platform: ARM64
+      BUILD_WIN8: true
 
 for:
 -
   environment:
     only: BUILD_WIN8
+  image: Visual Studio 2015
+-
+  environment:
+    only: BUILD_WINPHONE
   image: Visual Studio 2015
 -
   environment:
