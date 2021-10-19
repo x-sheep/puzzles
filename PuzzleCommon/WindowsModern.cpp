@@ -132,7 +132,7 @@ void winmodern_draw_line(void *handle, int x1, int y1, int x2, int y2,
 	canvas->DrawLine(x1, y1, x2, y2, colour);
 }
 
-void winmodern_draw_poly(void *handle, int *coords, int npoints,
+void winmodern_draw_poly(void *handle, const int *coords, int npoints,
 	int fillcolour, int outlinecolour)
 {
 	frontend *fe = (frontend *)handle;
