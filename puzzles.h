@@ -389,6 +389,13 @@ void game_mkhighlight(frontend *fe, float *ret,
 void game_mkhighlight_specific(frontend *fe, float *ret,
 			       int background, int highlight, int lowlight);
 
+enum {
+    COLOURPRESET_ENTRY,
+    COLOURPRESET_PENCIL,
+} colourpreset_type;
+/* Set a color from a preset. */
+void game_colour_preset(frontend* fe, float* ret, enum colourpreset_type preset);
+
 /* Randomly shuffles an array of items. */
 void shuffle(void *array, int nelts, int eltsize, random_state *rs);
 

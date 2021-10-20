@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -20,9 +21,29 @@ namespace PuzzleModern.UWP
 {
     public sealed partial class GeneralSettingsFlyout
     {
+        public IObservableMap<string, object> DefaultViewModel
+        {
+            get { return (IObservableMap<string, object>)GetValue(_DefaultViewModel); }
+            set { SetValue(_DefaultViewModel, value); }
+        }
+
+        public readonly DependencyProperty _DefaultViewModel = DependencyProperty.Register(
+            nameof(DefaultViewModel),
+            typeof(IObservableMap<string, object>),
+            typeof(GeneralSettingsFlyout), null);
+
         bool _loaded = false;
+
+        static SolidColorBrush[] PresetColours =
+        {
+            new SolidColorBrush(Color.FromArgb(0xff, 0x00, 0x89, 0x00)),
+            new SolidColorBrush(Color.FromArgb(0xff, 0x73, 0x73, 0xe6)),
+            new SolidColorBrush(Color.FromArgb(0xff, 0x89, 0x00, 0x89)),
+        };
+
         public GeneralSettingsFlyout()
         {
+            DefaultViewModel = new PropertySet();
             this.InitializeComponent();
 
             var settings = ApplicationData.Current.RoamingSettings.Values;
@@ -42,6 +63,11 @@ namespace PuzzleModern.UWP
                 FixedPencilPreview.Visibility = Visibility.Visible;
                 SequentialPencilPreview.Visibility = Visibility.Collapsed;
             }
+
+            EntryColourBox.SelectedIndex = Math.Max(0, Math.Min(PresetColours.Length, settings["env_COLOURPRESET_ENTRY"] as int? ?? 0));
+            DefaultViewModel["EntryColour"] = PresetColours[EntryColourBox.SelectedIndex];
+            PencilColourBox.SelectedIndex = Math.Max(0, Math.Min(PresetColours.Length, settings["env_COLOURPRESET_PENCIL"] as int? ?? 1));
+            DefaultViewModel["PencilColour"] = PresetColours[PencilColourBox.SelectedIndex];
 
             _loaded = true;
         }
@@ -105,6 +131,28 @@ namespace PuzzleModern.UWP
 
             ApplicationData.Current.RoamingSettings.Values["env_FIXED_PENCIL_MARKS"] = isFixed;
             App.Current.NotifySettingChanged("env_FIXED_PENCIL_MARKS", isFixed);
+        }
+
+        private void EntryColourBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loaded) return;
+
+            int newValue = EntryColourBox.SelectedIndex;
+
+            DefaultViewModel["EntryColour"] = PresetColours[newValue];
+            ApplicationData.Current.RoamingSettings.Values["env_COLOURPRESET_ENTRY"] = newValue;
+            App.Current.NotifySettingChanged("env_COLOURPRESET_ENTRY", newValue);
+        }
+
+        private void PencilColourBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loaded) return;
+
+            int newValue = PencilColourBox.SelectedIndex;
+
+            DefaultViewModel["PencilColour"] = PresetColours[newValue];
+            ApplicationData.Current.RoamingSettings.Values["env_COLOURPRESET_PENCIL"] = newValue;
+            App.Current.NotifySettingChanged("env_COLOURPRESET_PENCIL", newValue);
         }
     }
 }

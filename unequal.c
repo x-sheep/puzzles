@@ -1736,17 +1736,13 @@ static float *game_colours(frontend *fe, int *ncolours)
     }
 
     /* Lots of these were taken from solo.c. */
-    ret[COL_GUESS * 3 + 0] = 0.0F;
-    ret[COL_GUESS * 3 + 1] = 0.6F * ret[COL_BACKGROUND * 3 + 1];
-    ret[COL_GUESS * 3 + 2] = 0.0F;
+    game_colour_preset(fe, &ret[COL_GUESS * 3], COLOURPRESET_ENTRY);
 
     ret[COL_ERROR * 3 + 0] = 1.0F;
     ret[COL_ERROR * 3 + 1] = 0.0F;
     ret[COL_ERROR * 3 + 2] = 0.0F;
 
-    ret[COL_PENCIL * 3 + 0] = 0.5F * ret[COL_BACKGROUND * 3 + 0];
-    ret[COL_PENCIL * 3 + 1] = 0.5F * ret[COL_BACKGROUND * 3 + 1];
-    ret[COL_PENCIL * 3 + 2] = ret[COL_BACKGROUND * 3 + 2];
+    game_colour_preset(fe, &ret[COL_PENCIL * 3], COLOURPRESET_PENCIL);
 
     *ncolours = NCOLOURS;
     return ret;

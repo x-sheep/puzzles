@@ -376,6 +376,8 @@ void winmodern_check_abort(void)
 	}
 }
 
+static char* preset_colours[] = { "008900", "7373e6", "890089"};
+
 char *winmodern_getenv(const char *key)
 {
 	auto settings = Windows::Storage::ApplicationData::Current->RoamingSettings->Values;
@@ -396,6 +398,24 @@ char *winmodern_getenv(const char *key)
 	{
 		if (settings->HasKey("env_DISABLE_VICTORY") && safe_cast<bool>(settings->Lookup("env_DISABLE_VICTORY")))
 			return "Y";
+	}
+
+	if (!strcmp(key, "COLOURPRESET_ENTRY"))
+	{
+		int val = 0;
+		if (settings->HasKey("env_COLOURPRESET_ENTRY"))
+			val = safe_cast<int>(settings->Lookup("env_COLOURPRESET_ENTRY"));
+		val = max(0, min(lenof(preset_colours), val));
+		return preset_colours[val];
+	}
+
+	if (!strcmp(key, "COLOURPRESET_PENCIL"))
+	{
+		int val = 1;
+		if (settings->HasKey("env_COLOURPRESET_PENCIL"))
+			val = safe_cast<int>(settings->Lookup("env_COLOURPRESET_PENCIL"));
+		val = max(0, min(lenof(preset_colours), val));
+		return preset_colours[val];
 	}
 
 	return NULL;

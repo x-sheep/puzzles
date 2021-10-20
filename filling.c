@@ -1685,9 +1685,7 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_ERROR * 3 + 1] = 0.85F * ret[COL_BACKGROUND * 3 + 1];
     ret[COL_ERROR * 3 + 2] = 0.85F * ret[COL_BACKGROUND * 3 + 2];
 
-    ret[COL_USER * 3 + 0] = 0.0F;
-    ret[COL_USER * 3 + 1] = 0.6F * ret[COL_BACKGROUND * 3 + 1];
-    ret[COL_USER * 3 + 2] = 0.0F;
+    game_colour_preset(fe, &ret[COL_USER * 3], COLOURPRESET_ENTRY);
 
     *ncolours = NCOLOURS;
     return ret;

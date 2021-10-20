@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
     mc:Ignorable="d"
     IconSource="Assets/SmallLogo.png"
     Title="Settings"
@@ -70,11 +71,40 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="96" />
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" x:Name="FixedPencilMarksBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="FixedPencilMarksBox_SelectionChanged" Header="Pencil mark style" SelectedIndex="0" Margin="0,10,0,0">
+
+            <ComboBox Grid.Column="0" x:Name="EntryColourBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="EntryColourBox_SelectionChanged" Header="Entry number colour" SelectedIndex="0" Margin="0,10,0,0">
+                <ComboBoxItem>Green</ComboBoxItem>
+                <ComboBoxItem>Blue</ComboBoxItem>
+                <ComboBoxItem>Purple</ComboBoxItem>
+            </ComboBox>
+            <Border x:Name="EntryPreview" Grid.Column="1" Background="#ffe6e6e6" BorderBrush="Black" BorderThickness="2" Width="50" Height="50" Margin="0,24,0,0" VerticalAlignment="Bottom">
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding EntryColour}" FontSize="30">2</TextBlock>
+            </Border>
+        </Grid>
+
+        <Grid Margin="4,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="96" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ComboBox x:Name="PencilColourBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="PencilColourBox_SelectionChanged" Header="Pencil number colour" SelectedIndex="0" Margin="0,10,0,0">
+                <ComboBoxItem>Green</ComboBoxItem>
+                <ComboBoxItem>Blue</ComboBoxItem>
+                <ComboBoxItem>Purple</ComboBoxItem>
+            </ComboBox>
+
+            <ComboBox Grid.Row="1" x:Name="FixedPencilMarksBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="FixedPencilMarksBox_SelectionChanged" Header="Pencil mark style" SelectedIndex="0" Margin="0,10,0,0">
                 <ComboBoxItem>Sequential</ComboBoxItem>
                 <ComboBoxItem>Fixed position</ComboBoxItem>
             </ComboBox>
-            <Border x:Name="SequentialPencilPreview" Grid.Column="1" Background="#ffe6e6e6" BorderBrush="Black" BorderThickness="2" Width="50" Height="50" VerticalAlignment="Bottom">
+
+            <Border x:Name="SequentialPencilPreview" Grid.Column="1" Grid.RowSpan="2" Background="#ffe6e6e6" BorderBrush="Black" BorderThickness="2" Width="50" Height="50" Margin="0,32,0,0" VerticalAlignment="Center">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -85,13 +115,13 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">2</TextBlock>
-                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">3</TextBlock>
-                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">6</TextBlock>
-                    <TextBlock Grid.Row="1"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">7</TextBlock>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">2</TextBlock>
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">3</TextBlock>
+                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">6</TextBlock>
+                    <TextBlock Grid.Row="1"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">7</TextBlock>
                 </Grid>
             </Border>
-            <Border x:Name="FixedPencilPreview" Grid.Column="1" Visibility="Collapsed" Background="#ffe6e6e6" BorderBrush="Black" BorderThickness="2" Width="50" Height="50" VerticalAlignment="Bottom">
+            <Border x:Name="FixedPencilPreview" Grid.Column="1" Grid.RowSpan="2" Visibility="Collapsed" Background="#ffe6e6e6" BorderBrush="Black" BorderThickness="2" Width="50" Height="50" Margin="0,32,0,0" VerticalAlignment="Center">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -103,12 +133,13 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">2</TextBlock>
-                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">3</TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">6</TextBlock>
-                    <TextBlock Grid.Row="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF7272E5" FontSize="16">7</TextBlock>
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">2</TextBlock>
+                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">3</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">6</TextBlock>
+                    <TextBlock Grid.Row="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">7</TextBlock>
                 </Grid>
             </Border>
         </Grid>
+
     </StackPanel>
 </SettingsFlyout>

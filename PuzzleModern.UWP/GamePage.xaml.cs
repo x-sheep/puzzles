@@ -1,6 +1,7 @@
 ﻿using PuzzleCommon;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -272,7 +273,7 @@ namespace PuzzleModern.UWP
             var key = e.Key;
             if (_controls != null && key == "cfg_colorblind" && _controls.ColorBlindKey != VirtualKey.None && !_generatingGame)
                 fe.SendKey(_controls.ColorBlindKey, false, false);
-            if (key == "env_MAP_VIVID_COLOURS" && _puzzleName == "Map" && _isLoaded)
+            if (_isLoaded && new[] { "env_MAP_VIVID_COLOURS", "env_COLOURPRESET_ENTRY", "env_COLOURPRESET_PENCIL" }.Contains(key))
             {
                 DrawCanvas.RemoveColors();
                 fe.ReloadColors();

@@ -1594,9 +1594,7 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_GRID * 3 + 1] = 0.0F;
     ret[COL_GRID * 3 + 2] = 0.0F;
 
-    ret[COL_USER * 3 + 0] = 0.0F;
-    ret[COL_USER * 3 + 1] = 0.6F * ret[COL_BACKGROUND * 3 + 1];
-    ret[COL_USER * 3 + 2] = 0.0F;
+    game_colour_preset(fe, &ret[COL_USER * 3], COLOURPRESET_ENTRY);
 
     ret[COL_HIGHLIGHT * 3 + 0] = 0.78F * ret[COL_BACKGROUND * 3 + 0];
     ret[COL_HIGHLIGHT * 3 + 1] = 0.78F * ret[COL_BACKGROUND * 3 + 1];
@@ -1606,9 +1604,7 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_ERROR * 3 + 1] = 0.0F;
     ret[COL_ERROR * 3 + 2] = 0.0F;
 
-    ret[COL_PENCIL * 3 + 0] = 0.5F * ret[COL_BACKGROUND * 3 + 0];
-    ret[COL_PENCIL * 3 + 1] = 0.5F * ret[COL_BACKGROUND * 3 + 1];
-    ret[COL_PENCIL * 3 + 2] = ret[COL_BACKGROUND * 3 + 2];
+    game_colour_preset(fe, &ret[COL_PENCIL * 3], COLOURPRESET_PENCIL);
 
     ret[COL_DONE * 3 + 0] = ret[COL_BACKGROUND * 3 + 0] / 1.5F;
     ret[COL_DONE * 3 + 1] = ret[COL_BACKGROUND * 3 + 1] / 1.5F;
