@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -141,7 +142,9 @@ namespace PuzzleModern.UWP
                 Grid.SetColumn(rect, x);
                 Grid.SetColumn(text, x);
 
-                if (twoRows && y == 1 && x >= _total / 2)
+                /* Make the backspace button twice as tall, if we have an odd number of buttons */
+                if (twoRows && y == 1 && x >= _total / 2 &&
+                    _buttons.Buttons.Last().Key == VirtualKey.Back)
                 {
                     Grid.SetRow(rect, 0);
                     Grid.SetRowSpan(rect, 2);
@@ -155,7 +158,8 @@ namespace PuzzleModern.UWP
                 }
 
                 x++;
-                if (twoRows && y == 0 && x >= _total / 2)
+                if (twoRows && y == 0 && x >= _total / 2 && 
+                    (_buttons.Buttons.Last().Key == VirtualKey.Back || x >= (_total + 1) / 2))
                 {
                     x = 0;
                     y++;
