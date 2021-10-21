@@ -2421,6 +2421,9 @@ static void int_redraw(drawing *dr, game_drawstate *ds,
             draw_line(dr, COORD(0), COORD(y), COORD(w), COORD(y), COL_GRID);
         for (x = 0; x <= w; x++)
             draw_line(dr, COORD(x), COORD(0), COORD(x), COORD(h), COL_GRID);
+
+        if (!printing)
+            ds->started = true;
     }
 
     if (flashtime > 0)
