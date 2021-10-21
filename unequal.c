@@ -1854,7 +1854,7 @@ static void draw_adjs(drawing *dr, game_drawstate *ds, int ox, int oy,
             draw_rect_outline(dr, ox+TILE_SIZE+g38, oy, g4, TILE_SIZE, COL_ERROR);
         }
     } else if (bg >= 0) {
-        draw_rect(dr, ox+TILE_SIZE+g38, oy, g4, TILE_SIZE, bg);
+        draw_rect(dr, ox+TILE_SIZE+g38-1, oy-1, g4+2, TILE_SIZE+2, bg);
     }
     draw_update(dr, ox+TILE_SIZE, oy, g, TILE_SIZE);
 
@@ -1865,7 +1865,7 @@ static void draw_adjs(drawing *dr, game_drawstate *ds, int ox, int oy,
             draw_rect_outline(dr, ox, oy+TILE_SIZE+g38, TILE_SIZE, g4, COL_ERROR);
         }
     } else if (bg >= 0) {
-        draw_rect(dr, ox, oy+TILE_SIZE+g38, TILE_SIZE, g4, bg);
+        draw_rect(dr, ox-1, oy+TILE_SIZE+g38-1, TILE_SIZE+2, g4+2, bg);
     }
     draw_update(dr, ox, oy+TILE_SIZE, TILE_SIZE, g);
 }
