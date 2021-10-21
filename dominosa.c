@@ -3126,16 +3126,30 @@ static void draw_tile(drawing *dr, game_drawstate *ds, const game_state *state,
     int cx = COORD(x), cy = COORD(y);
     int nc;
     char str[80];
-    int flags;
+    int flags = type & ~TYPE_MASK;
+    type &= TYPE_MASK;
 
     clip(dr, cx, cy, TILESIZE, TILESIZE);
     draw_rect(dr, cx, cy, TILESIZE, TILESIZE, COL_BACKGROUND);
 
-    flags = type &~ TYPE_MASK;
-    type &= TYPE_MASK;
-
     if (type != TYPE_BLANK) {
         int i, bg;
+
+        /* Clip around the bounds of the domino instead of the bounds of the square */
+        unclip(dr);
+
+        int clipx = cx, clipy = cy, clipw = TILESIZE - DOMINO_GUTTER, cliph = clipw;
+
+        if (type != TYPE_R)
+            clipx += DOMINO_GUTTER;
+        if (type != TYPE_B)
+            clipy += DOMINO_GUTTER;
+        if (type == TYPE_T || type == TYPE_B)
+            clipw -= DOMINO_GUTTER;
+        if (type == TYPE_L || type == TYPE_R)
+            cliph -= DOMINO_GUTTER;
+
+        clip(dr, clipx, clipy, clipw, cliph);
 
         /*
          * Draw one end of a domino. This is composed of:
