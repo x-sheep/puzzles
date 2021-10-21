@@ -2464,14 +2464,16 @@ static const char *validate_desc(const game_params *params, const char *desc)
 static key_label *game_request_keys(const game_params *params, int *nkeys)
 {
     int i;
-    int n = min(9, params->n);
+    char buf[4];
+    int n = min(35, params->n);
     key_label *keys = snewn(n+1, key_label);
     *nkeys = n+1;
     
     for (i = 0; i <= n; ++i)
     {
-        keys[i].button = '0' + i;
-        keys[i].label = NULL;
+        sprintf(buf, "%d", i);
+        keys[i].button = i < 10 ? '0' + i : 'A' + (i - 10);
+        keys[i].label = dupstr(buf);
     }
     return keys;
 }
@@ -2836,8 +2838,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         sprintf(buf, "%c%d,%d", (int)(button == CURSOR_SELECT2 ? 'E' : 'D'), d1, d2);
         return dupstr(buf);
-    } else if (isdigit((unsigned char)button)) {
+    } else if (isdigit((unsigned char)button) || (button >= 'A' && button <= 'Z')) {
         int n = state->params.n, num = button - '0';
+        if (button >= 'A' && button <= 'Z')
+            num = button - 'A' + 10;
         if (num > n) {
             return NULL;
         } else if (ui->highlight_1 == num) {
