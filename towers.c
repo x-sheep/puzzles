@@ -1681,6 +1681,10 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
 	coords[7] = coords[1] - yoff;
 	draw_polygon(dr, coords, 4, bg, COL_GRID);
 
+    /* Redraw bottom and left borders, in case it's rounded off */
+    draw_line(dr, tx, ty, tx, ty + TILESIZE, COL_GRID);
+    draw_line(dr, tx, ty + TILESIZE, tx + TILESIZE, ty + TILESIZE, COL_GRID);
+
 	/* now offset all subsequent drawing to the top of the tower */
 	tx += xoff;
 	ty -= yoff;
