@@ -1433,48 +1433,57 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
     sfree(ds);
 }
 
-static void draw_cell(drawing *dr, int cell, int ts, signed char clue_val,
+static void draw_cell(drawing* dr, int cell, int ts, signed char clue_val,
                       int x, int y)
 {
+    if (cell & (DRAWFLAG_MARGIN_R | DRAWFLAG_MARGIN_D))
+        return;
+
     int startX = ((x * ts) + ts / 2) - 1, startY = ((y * ts) + ts / 2) - 1;
     int color, text_color = COL_TEXT_DARK;
 
-    clip(dr, startX - 1, startY - 1, ts, ts);
-    if (!(cell & DRAWFLAG_MARGIN_R))
-        draw_rect(dr, startX - 1, startY - 1, ts, 1,
-                  (cell & (DRAWFLAG_CURSOR | DRAWFLAG_CURSOR_U) ?
-                   COL_CURSOR : COL_GRID));
-    if (!(cell & DRAWFLAG_MARGIN_D))
-        draw_rect(dr, startX - 1, startY - 1, 1, ts,
-                  (cell & (DRAWFLAG_CURSOR | DRAWFLAG_CURSOR_L) ?
-                   COL_CURSOR : COL_GRID));
-    if (cell & DRAWFLAG_CURSOR_UL)
-        draw_rect(dr, startX - 1, startY - 1, 1, 1, COL_CURSOR);
+    clip(dr, startX - 1, startY - 1, ts + 1, ts + 1);
+    draw_rect(dr, startX - 1, startY - 1, ts + 1, ts + 1, COL_GRID);
 
-    if (!(cell & (DRAWFLAG_MARGIN_R | DRAWFLAG_MARGIN_D))) {
-        if (cell & STATE_MARKED) {
-            color = COL_MARKED;
-            text_color = COL_TEXT_LIGHT;
-        } else if (cell & STATE_BLANK) {
-            text_color = COL_TEXT_DARK;
-            color = COL_BLANK;
-        } else {
-            text_color = COL_TEXT_DARK;
-            color = COL_UNMARKED;
-        }
-        if (cell & STATE_ERROR) {
-            text_color = COL_ERROR;
-        } else if (cell & STATE_SOLVED) {
-            text_color = COL_TEXT_SOLVED;
-        }
+    if (cell & STATE_MARKED) {
+        color = COL_MARKED;
+        text_color = COL_TEXT_LIGHT;
+    }
+    else if (cell & STATE_BLANK) {
+        text_color = COL_TEXT_DARK;
+        color = COL_BLANK;
+    }
+    else {
+        text_color = COL_TEXT_DARK;
+        color = COL_UNMARKED;
+    }
+    if (cell & STATE_ERROR) {
+        text_color = COL_ERROR;
+    }
+    else if (cell & STATE_SOLVED) {
+        text_color = COL_TEXT_SOLVED;
+    }
 
-        draw_rect(dr, startX, startY, ts - 1, ts - 1, color);
-        if (clue_val >= 0) {
-            char clue[80];
-            sprintf(clue, "%d", clue_val);
-            draw_text(dr, startX + ts / 2, startY + ts / 2, 1, ts * 3 / 5,
-                      ALIGN_VCENTRE | ALIGN_HCENTRE, text_color, clue);
+    draw_rect(dr, startX, startY, ts - 1, ts - 1, color);
+
+    if (cell & DRAWFLAG_CURSOR) {
+        int cs = max(3, ts - 10);
+        if (cell & (STATE_MARKED | STATE_BLANK))
+        {
+            draw_rect_outline(dr, startX + 5, startY + 5, cs, cs, COL_CURSOR);
+            draw_rect_outline(dr, startX + 6, startY + 6, cs - 2, cs - 2, COL_CURSOR);
         }
+        else
+        {
+            draw_rect(dr, startX + 5, startY + 5, cs, cs, COL_CURSOR);
+        }
+    }
+
+    if (clue_val >= 0) {
+        char clue[80];
+        sprintf(clue, "%d", clue_val);
+        draw_text(dr, startX + ts / 2, startY + ts / 2, 1, ts * 3 / 5,
+            ALIGN_VCENTRE | ALIGN_HCENTRE, text_color, clue);
     }
 
     unclip(dr);
