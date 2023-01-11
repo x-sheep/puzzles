@@ -684,7 +684,7 @@ namespace PuzzleCommon
 
 	void WindowsModern::Undo()
 	{
-		midend_process_key(me, 0, 0, UI_UNDO);
+		midend_process_key(me, 0, 0, UI_UNDO, NULL);
 	}
 
 	void WindowsModern::CheckGameCompletion()
@@ -711,7 +711,7 @@ namespace PuzzleCommon
 
 	void WindowsModern::Redo()
 	{
-		midend_process_key(me, 0, 0, UI_REDO);
+		midend_process_key(me, 0, 0, UI_REDO, NULL);
 	}
 
 	bool WindowsModern::HasStatusbar()
@@ -756,7 +756,7 @@ namespace PuzzleCommon
 		if (control)
 			button |= MOD_CTRL;
 
-		midend_process_key(me, 0, 0, button);
+		midend_process_key(me, 0, 0, button, NULL);
 		CheckGameCompletion();
 	}
 
@@ -773,27 +773,27 @@ namespace PuzzleCommon
 		{
 		case ButtonType::LEFT:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
-				midend_process_key(me, x, y, LEFT_BUTTON);
+				midend_process_key(me, x, y, LEFT_BUTTON, NULL);
 			if (state == ButtonState::DRAG)
-				midend_process_key(me, x, y, LEFT_DRAG);
+				midend_process_key(me, x, y, LEFT_DRAG, NULL);
 			if (state == ButtonState::UP || state == ButtonState::TAP)
-				midend_process_key(me, x, y, LEFT_RELEASE);
+				midend_process_key(me, x, y, LEFT_RELEASE, NULL);
 			break;
 		case ButtonType::MIDDLE:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
-				midend_process_key(me, x, y, MIDDLE_BUTTON);
+				midend_process_key(me, x, y, MIDDLE_BUTTON, NULL);
 			if (state == ButtonState::DRAG)
-				midend_process_key(me, x, y, MIDDLE_DRAG);
+				midend_process_key(me, x, y, MIDDLE_DRAG, NULL);
 			if (state == ButtonState::UP || state == ButtonState::TAP)
-				midend_process_key(me, x, y, MIDDLE_RELEASE);
+				midend_process_key(me, x, y, MIDDLE_RELEASE, NULL);
 			break;
 		case ButtonType::RIGHT:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
-				midend_process_key(me, x, y, RIGHT_BUTTON);
+				midend_process_key(me, x, y, RIGHT_BUTTON, NULL);
 			if (state == ButtonState::DRAG)
-				midend_process_key(me, x, y, RIGHT_DRAG);
+				midend_process_key(me, x, y, RIGHT_DRAG, NULL);
 			if (state == ButtonState::UP || state == ButtonState::TAP)
-				midend_process_key(me, x, y, RIGHT_RELEASE);
+				midend_process_key(me, x, y, RIGHT_RELEASE, NULL);
 			break;
 		}
 
@@ -1246,7 +1246,7 @@ namespace PuzzleCommon
 		*ow = iw;
 		*oh = ih;
 
-		midend_size(me, ow, oh, TRUE);
+		midend_size(me, ow, oh, TRUE, 1.0);
 	}
 
 	VirtualButtonCollection^ WindowsModern::GetVirtualButtonBar()
