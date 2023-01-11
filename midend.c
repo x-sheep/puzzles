@@ -90,7 +90,8 @@ struct midend {
 
     int pressed_mouse_button;
 
-    int preferred_tilesize, tilesize, winwidth, winheight;
+    int preferred_tilesize, preferred_tilesize_dpr, tilesize;
+    int winwidth, winheight;
 
     void (*game_id_change_notify_function)(void *);
     void *game_id_change_notify_ctx;
@@ -131,11 +132,14 @@ static const char *midend_deserialise_internal(
 void midend_reset_tilesize(midend *me)
 {
     me->preferred_tilesize = me->ourgame->preferred_tilesize;
+    me->preferred_tilesize_dpr = 1.0;
     {
         /*
          * Allow an environment-based override for the default tile
          * size by defining a variable along the lines of
          * `NET_TILESIZE=15'.
+         *
+         * XXX How should this interact with DPR?
          */
 
 	char buf[80], *e;
@@ -314,7 +318,46 @@ static void midend_size_new_drawstate(midend *me)
     }
 }
 
-void midend_size(midend *me, int *x, int *y, bool user_size)
+/*
+ * There is no one correct way to convert tilesizes between device
+ * pixel ratios, because there's only a loosely-defined relationship
+ * between tilesize and the actual size of a puzzle.  We define this
+ * function as the canonical conversion function so everything in the
+ * midend will be consistent.
+ */
+static int convert_tilesize(midend *me, int old_tilesize,
+                            double old_dpr, double new_dpr)
+{
+    int x, y, rx, ry, min, max;
+    game_params *defaults = me->ourgame->default_params();
+
+    if (new_dpr == old_dpr)
+        return old_tilesize;
+    me->ourgame->compute_size(defaults, old_tilesize, &x, &y);
+    x *= new_dpr / old_dpr;
+    y *= new_dpr / old_dpr;
+
+    min = max = 1;
+    do {
+        max *= 2;
+        me->ourgame->compute_size(defaults, max, &rx, &ry);
+    } while (rx <= x && ry <= y);
+
+    while (max - min > 1) {
+	int mid = (max + min) / 2;
+	me->ourgame->compute_size(defaults, mid, &rx, &ry);
+	if (rx <= x && ry <= y)
+	    min = mid;
+	else
+	    max = mid;
+    }
+
+    me->ourgame->free_params(defaults);
+    return min;
+}
+
+void midend_size(midend *me, int *x, int *y, bool user_size,
+                 double device_pixel_ratio)
 {
     int min, max;
     int rx, ry;
@@ -347,7 +390,9 @@ void midend_size(midend *me, int *x, int *y, bool user_size)
 	    me->ourgame->compute_size(me->params, max, &rx, &ry);
 	} while (rx <= *x && ry <= *y);
     } else
-	max = me->preferred_tilesize + 1;
+	max = convert_tilesize(me, me->preferred_tilesize,
+                               me->preferred_tilesize_dpr,
+                               device_pixel_ratio) + 1;
     min = 1;
 
     /*
@@ -370,9 +415,11 @@ void midend_size(midend *me, int *x, int *y, bool user_size)
      */
 
     me->tilesize = min;
-    if (user_size)
+    if (user_size) {
         /* If the user requested a change in size, make it permanent. */
         me->preferred_tilesize = me->tilesize;
+        me->preferred_tilesize_dpr = device_pixel_ratio;
+    }
     midend_size_new_drawstate(me);
     *x = me->winwidth;
     *y = me->winheight;
@@ -389,6 +436,28 @@ void midend_set_params(midend *me, game_params *params)
 game_params *midend_get_params(midend *me)
 {
     return me->ourgame->dup_params(me->params);
+}
+
+static char *encode_params(midend *me, const game_params *params, bool full)
+{
+    char *encoded = me->ourgame->encode_params(params, full);
+    int i;
+
+    /* Assert that the params consist of printable ASCII containing
+     * neither '#' nor ':'. */
+    for (i = 0; encoded[i]; i++)
+        assert(encoded[i] >= 32 && encoded[i] < 127 &&
+	       encoded[i] != '#' && encoded[i] != ':');
+    return encoded;
+}
+
+static void assert_printable_ascii(char const *s)
+{
+    /* Assert that s is entirely printable ASCII, and hence safe for
+     * writing in a save file. */
+    int i;
+    for (i = 0; s[i]; i++)
+        assert(s[i] >= 32 && s[i] < 127);
 }
 
 static void midend_set_timer(midend *me)
@@ -499,6 +568,7 @@ void midend_new_game(midend *me)
 	 */
         me->desc = me->ourgame->new_desc(me->curparams, rs,
 					 &me->aux_info, (me->drawing != NULL));
+	assert_printable_ascii(me->desc);
 	me->privdesc = NULL;
         random_free(rs);
     }
@@ -626,8 +696,8 @@ static const char *newgame_undo_deserialise_check(
      * We check both params and cparams, to be as safe as possible.
      */
 
-    old = me->ourgame->encode_params(me->params, true);
-    new = me->ourgame->encode_params(data->params, true);
+    old = encode_params(me, me->params, true);
+    new = encode_params(me, data->params, true);
     if (strcmp(old, new)) {
         /* Set a flag to distinguish this deserialise failure
          * from one due to faulty decoding */
@@ -635,8 +705,8 @@ static const char *newgame_undo_deserialise_check(
         return "Undoing this new-game operation would change params";
     }
 
-    old = me->ourgame->encode_params(me->curparams, true);
-    new = me->ourgame->encode_params(data->cparams, true);
+    old = encode_params(me, me->curparams, true);
+    new = encode_params(me, data->cparams, true);
     if (strcmp(old, new)) {
         ctx->refused = true;
         return "Undoing this new-game operation would change params";
@@ -884,7 +954,8 @@ bool midend_just_performed_redo(midend *me)
     return me->just_performed_redo;
 }
 
-static bool midend_really_process_key(midend *me, int x, int y, int button)
+static bool midend_really_process_key(midend *me, int x, int y, int button,
+                                      bool *handled)
 {
     game_state *oldstate =
         me->ourgame->dup_game(me->states[me->statepos - 1].state);
@@ -911,21 +982,26 @@ static bool midend_really_process_key(midend *me, int x, int y, int button)
 	    gottype = true;
 	    if (!midend_undo(me))
 		goto done;
+        *handled = true;
 	} else if (button == '\x12' || button == '\x19' ||
                    button == UI_REDO) {
 	    midend_stop_anim(me);
 	    if (!midend_redo(me))
 		goto done;
+            *handled = true;
 	} else if ((button == '\x13' || button == UI_SOLVE) &&
                    me->ourgame->can_solve) {
+            *handled = true;
 	    if (midend_solve(me))
 		goto done;
 	} else
 	    goto done;
     } else {
+        *handled = true;
 	if (movestr == UI_UPDATE)
 	    s = me->states[me->statepos-1].state;
 	else {
+	    assert_printable_ascii(movestr);
 	    s = me->ourgame->execute_move(me->states[me->statepos-1].state,
 					  movestr);
 	    assert(s != NULL);
@@ -992,10 +1068,12 @@ static bool midend_really_process_key(midend *me, int x, int y, int button)
     return 1;
 }
 
-bool midend_process_key(midend *me, int x, int y, int button)
+bool midend_process_key(midend *me, int x, int y, int button, bool *handled)
 {
-    bool ret = true;
+    bool ret = true, dummy_handled;
 
+    if (handled == NULL) handled = &dummy_handled;
+    *handled = false;
     /*
      * Harmonise mouse drag and release messages.
      * 
@@ -1095,7 +1173,7 @@ bool midend_process_key(midend *me, int x, int y, int button)
          */
         ret = ret && midend_really_process_key
             (me, x, y, (me->pressed_mouse_button +
-                        (LEFT_RELEASE - LEFT_BUTTON)));
+                        (LEFT_RELEASE - LEFT_BUTTON)), handled);
     }
 
     /*
@@ -1118,7 +1196,7 @@ bool midend_process_key(midend *me, int x, int y, int button)
     /*
      * Now send on the event we originally received.
      */
-    ret = ret && midend_really_process_key(me, x, y, button);
+    ret = ret && midend_really_process_key(me, x, y, button, handled);
 
     /*
      * And update the currently pressed button.
@@ -1150,6 +1228,15 @@ key_label *midend_request_keys(midend *me, int *n)
         *n = nkeys;
 
     return keys;
+}
+
+/* Return a good label to show next to a key right now. */
+const char *midend_current_key_label(midend *me, int button)
+{
+    assert(IS_CURSOR_SELECT(button));
+    if (!me->ourgame->current_key_label) return "";
+    return me->ourgame->current_key_label(
+        me->ui, me->states[me->statepos-1].state, button);
 }
 
 void midend_redraw(midend *me)
@@ -1245,6 +1332,7 @@ float *midend_colours(midend *me, int *ncolours)
     float *ret;
 
     ret = me->ourgame->colours(me->frontend, ncolours);
+    assert(*ncolours >= 1);
 
     {
         int i;
@@ -1271,6 +1359,9 @@ float *midend_colours(midend *me, int *ncolours)
                 ret[i*3 + 1] = g / 255.0F;
                 ret[i*3 + 2] = b / 255.0F;
             }
+            assert(0.0F <= ret[i*3 + 0] && ret[i*3 + 0] <= 1.0F);
+            assert(0.0F <= ret[i*3 + 1] && ret[i*3 + 1] <= 1.0F);
+            assert(0.0F <= ret[i*3 + 2] && ret[i*3 + 2] <= 1.0F);
         }
     }
 
@@ -1403,7 +1494,7 @@ static void preset_menu_encode_params(midend *me, struct preset_menu *menu)
     for (i = 0; i < menu->n_entries; i++) {
         if (menu->entries[i].params) {
             me->encoded_presets[menu->entries[i].id] =
-                me->ourgame->encode_params(menu->entries[i].params, true);
+	        encode_params(me, menu->entries[i].params, true);
         } else {
             preset_menu_encode_params(me, menu->entries[i].submenu);
         }
@@ -1482,7 +1573,7 @@ struct preset_menu *midend_get_presets(midend *me, int *id_limit)
 
 int midend_which_preset(midend *me)
 {
-    char *encoding = me->ourgame->encode_params(me->params, true);
+    char *encoding = encode_params(me, me->params, true);
     int i, ret;
 
     ret = -1;
@@ -1540,6 +1631,10 @@ bool midend_get_cursor_location(midend *me,
 void midend_supersede_game_desc(midend *me, const char *desc,
                                 const char *privdesc)
 {
+    /* Assert that the descriptions consists only of printable ASCII. */
+    assert_printable_ascii(desc);
+    if (privdesc)
+	assert_printable_ascii(privdesc);
     sfree(me->desc);
     sfree(me->privdesc);
     me->desc = dupstr(desc);
@@ -1589,7 +1684,7 @@ config_item *midend_get_config(midend *me, int which, char **wintitle)
          * the former is likely to persist across many code
          * changes).
          */
-        parstr = me->ourgame->encode_params(me->curparams, which == CFG_SEED);
+        parstr = encode_params(me, me->curparams, which == CFG_SEED);
         assert(parstr);
         if (which == CFG_DESC) {
             rest = me->desc ? me->desc : "";
@@ -1733,7 +1828,7 @@ static const char *midend_game_id_int(midend *me, const char *id, int defmode)
 
             newparams = me->ourgame->dup_params(me->params);
 
-            tmpstr = me->ourgame->encode_params(newcurparams, false);
+            tmpstr = encode_params(me, newcurparams, false);
             me->ourgame->decode_params(newparams, tmpstr);
 
             sfree(tmpstr);
@@ -1805,7 +1900,7 @@ char *midend_get_game_id(midend *me)
 {
     char *parstr, *ret;
 
-    parstr = me->ourgame->encode_params(me->curparams, false);
+    parstr = encode_params(me, me->curparams, false);
     assert(parstr);
     assert(me->desc);
     ret = snewn(strlen(parstr) + strlen(me->desc) + 2, char);
@@ -1821,7 +1916,7 @@ char *midend_get_random_seed(midend *me)
     if (!me->seedstr)
         return NULL;
 
-    parstr = me->ourgame->encode_params(me->curparams, true);
+    parstr = encode_params(me, me->curparams, true);
     assert(parstr);
     ret = snewn(strlen(parstr) + strlen(me->seedstr) + 2, char);
     sprintf(ret, "%s#%s", parstr, me->seedstr);
@@ -1899,6 +1994,7 @@ const char *midend_solve(midend *me)
 	    msg = "Solve operation failed";   /* _shouldn't_ happen, but can */
 	return msg;
     }
+    assert_printable_ascii(movestr);
     s = me->ourgame->execute_move(me->states[me->statepos-1].state, movestr);
     assert(s);
 
@@ -2005,7 +2101,9 @@ void midend_serialise(midend *me,
     char lbuf[9];                               \
     copy_left_justified(lbuf, sizeof(lbuf), h); \
     sprintf(hbuf, "%s:%d:", lbuf, (int)strlen(str)); \
+    assert_printable_ascii(hbuf); \
     write(wctx, hbuf, strlen(hbuf)); \
+    assert_printable_ascii(str); \
     write(wctx, str, strlen(str)); \
     write(wctx, "\n", 1); \
 } while (0)
@@ -2030,7 +2128,7 @@ void midend_serialise(midend *me,
      * The current long-term parameters structure, in full.
      */
     if (me->params) {
-        char *s = me->ourgame->encode_params(me->params, true);
+        char *s = encode_params(me, me->params, true);
         wr("PARAMS", s);
         sfree(s);
     }
@@ -2039,7 +2137,7 @@ void midend_serialise(midend *me,
      * The current short-term parameters structure, in full.
      */
     if (me->curparams) {
-        char *s = me->ourgame->encode_params(me->curparams, true);
+        char *s = encode_params(me, me->curparams, true);
         wr("CPARAMS", s);
         sfree(s);
     }
@@ -2047,8 +2145,27 @@ void midend_serialise(midend *me,
     /*
      * The current game description, the privdesc, and the random seed.
      */
-    if (me->seedstr)
-        wr("SEED", me->seedstr);
+    if (me->seedstr) {
+        /*
+         * Random seeds are not necessarily printable ASCII.
+         * Hex-encode the seed if necessary.  Printable ASCII seeds
+         * are emitted unencoded for compatibility with older
+         * versions.
+         */
+        int i;
+
+        for (i = 0; me->seedstr[i]; i++)
+            if (me->seedstr[i] < 32 || me->seedstr[i] >= 127)
+                break;
+        if (me->seedstr[i]) {
+            char *hexseed = bin2hex((unsigned char *)me->seedstr,
+                                    strlen(me->seedstr));
+
+            wr("HEXSEED", hexseed);
+            sfree(hexseed);
+        } else
+            wr("SEED", me->seedstr);
+    }
     if (me->desc)
         wr("DESC", me->desc);
     if (me->privdesc)
@@ -2104,6 +2221,7 @@ void midend_serialise(midend *me,
         char buf[80];
         sprintf(buf, "%d", me->nstates);
         wr("NSTATES", buf);
+        assert(me->statepos >= 1 && me->statepos <= me->nstates);
         sprintf(buf, "%d", me->statepos);
         wr("STATEPOS", buf);
     }
@@ -2248,6 +2366,15 @@ static const char *midend_deserialise_internal(
                 sfree(data.cparstr);
                 data.cparstr = val;
                 val = NULL;
+            } else if (!strcmp(key, "HEXSEED")) {
+                unsigned char *tmp;
+                int len = strlen(val) / 2;   /* length in bytes */
+                tmp = hex2bin(val, len);
+                sfree(data.seed);
+                data.seed = snewn(len + 1, char);
+                memcpy(data.seed, tmp, len);
+                data.seed[len] = '\0';
+                sfree(tmp);
             } else if (!strcmp(key, "SEED")) {
                 sfree(data.seed);
                 data.seed = val;
@@ -2278,13 +2405,13 @@ static const char *midend_deserialise_internal(
             } else if (!strcmp(key, "TIME")) {
                 data.elapsed = (float)atof(val);
             } else if (!strcmp(key, "NSTATES")) {
+                if (data.states) {
+                    ret = "Two state counts provided in save file";
+                    goto cleanup;
+                }
                 data.nstates = atoi(val);
                 if (data.nstates <= 0) {
                     ret = "Number of states in save file was negative";
-                    goto cleanup;
-                }
-                if (data.states) {
-                    ret = "Two state counts provided in save file";
                     goto cleanup;
                 }
                 data.states = snewn(data.nstates, struct midend_state_entry);
@@ -2295,19 +2422,20 @@ static const char *midend_deserialise_internal(
                 }
             } else if (!strcmp(key, "STATEPOS")) {
                 data.statepos = atoi(val);
-            } else if (!strcmp(key, "MOVE")) {
+            } else if (!strcmp(key, "MOVE") ||
+                       !strcmp(key, "SOLVE") ||
+                       !strcmp(key, "RESTART")) {
+                if (!data.states) {
+                    ret = "No state count provided in save file";
+                    goto cleanup;
+                }
                 gotstates++;
-                data.states[gotstates].movetype = MOVE;
-                data.states[gotstates].movestr = val;
-                val = NULL;
-            } else if (!strcmp(key, "SOLVE")) {
-                gotstates++;
-                data.states[gotstates].movetype = SOLVE;
-                data.states[gotstates].movestr = val;
-                val = NULL;
-            } else if (!strcmp(key, "RESTART")) {
-                gotstates++;
-                data.states[gotstates].movetype = RESTART;
+                if (!strcmp(key, "MOVE"))
+                    data.states[gotstates].movetype = MOVE;
+                else if (!strcmp(key, "SOLVE"))
+                    data.states[gotstates].movetype = SOLVE;
+                else
+                    data.states[gotstates].movetype = RESTART;
                 data.states[gotstates].movestr = val;
                 val = NULL;
             }
@@ -2318,12 +2446,20 @@ static const char *midend_deserialise_internal(
     }
 
     data.params = me->ourgame->default_params();
+    if (!data.parstr) {
+        ret = "Long-term parameters in save file are missing";
+        goto cleanup;
+    }
     me->ourgame->decode_params(data.params, data.parstr);
     if (me->ourgame->validate_params(data.params, true)) {
         ret = "Long-term parameters in save file are invalid";
         goto cleanup;
     }
     data.cparams = me->ourgame->default_params();
+    if (!data.cparstr) {
+        ret = "Short-term parameters in save file are missing";
+        goto cleanup;
+    }
     me->ourgame->decode_params(data.cparams, data.cparstr);
     if (me->ourgame->validate_params(data.cparams, false)) {
         ret = "Short-term parameters in save file are invalid";
@@ -2349,10 +2485,15 @@ static const char *midend_deserialise_internal(
         ret = "Game private description in save file is invalid";
         goto cleanup;
     }
-    if (data.statepos < 0 || data.statepos >= data.nstates) {
+    if (data.statepos < 1 || data.statepos > data.nstates) {
         ret = "Game position in save file is out of range";
+        goto cleanup;
     }
 
+    if (!data.states) {
+        ret = "No state count provided in save file";
+        goto cleanup;
+    }
     data.states[0].state = me->ourgame->new_game(
         me, data.cparams, data.privdesc ? data.privdesc : data.desc);
 

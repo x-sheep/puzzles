@@ -34,8 +34,8 @@ enum {
 #else
 #define BORDER (TILE_SIZE * 3 / 2)
 #endif
-#define HIGHLIGHT_WIDTH (TILE_SIZE / 10)
-#define OUTER_HIGHLIGHT_WIDTH (BORDER / 10)
+#define HIGHLIGHT_WIDTH (TILE_SIZE / 10 ? TILE_SIZE / 10 : 1)
+#define OUTER_HIGHLIGHT_WIDTH (BORDER / 10 ? BORDER / 10 : 1)
 #define COORD(x)  ( (x) * TILE_SIZE + BORDER )
 #define FROMCOORD(x)  ( ((x) - BORDER + TILE_SIZE) / TILE_SIZE - 1 )
 
@@ -250,7 +250,7 @@ static const char *validate_params(const game_params *params, bool full)
      * blocking the way and no idea what's behind them, or one mine
      * and no way to know which of the two rows it's in. If the
      * mine count is even you can create a soluble grid by packing
-     * all the mines at one end (so what when you hit a two-mine
+     * all the mines at one end (so that when you hit a two-mine
      * wall there are only as many covered squares left as there
      * are mines); but if it's odd, you are doomed, because you
      * _have_ to have a gap somewhere which you can't determine the
@@ -2400,6 +2400,35 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 	ui->completed = true;
 }
 
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    int cx = ui->cur_x, cy = ui->cur_y;
+    int v = state->grid[cy * state->w + cx];
+
+    if (state->dead || state->won || !ui->cur_visible) return "";
+    if (button == CURSOR_SELECT2) {
+        if (v == -2) return "Mark";
+        if (v == -1) return "Unmark";
+        return "";
+    }
+    if (button == CURSOR_SELECT) {
+        int dy, dx, n = 0;
+        if (v == -2 || v == -3) return "Uncover";
+        if (v == 0) return "";
+        /* Count mine markers. */
+        for (dy = -1; dy <= +1; dy++)
+            for (dx = -1; dx <= +1; dx++)
+                if (cx+dx >= 0 && cx+dx < state->w &&
+			cy+dy >= 0 && cy+dy < state->h) {
+			if (state->grid[(cy+dy)*state->w+(cx+dx)] == -1)
+			    n++;
+		    }
+        if (n == v) return "Clear";
+    }
+    return "";
+}
+
 struct game_drawstate {
     int w, h, tilesize, bg;
     bool started;
@@ -3208,6 +3237,7 @@ const struct game thegame = {
     decode_ui,
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,

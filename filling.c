@@ -1,4 +1,4 @@
-/* -*- tab-width: 8; indent-tabs-mode: t -*-
+/*
  * filling.c: An implementation of the Nikoli game fillomino.
  * Copyright (C) 2007 Jonas Kölker.  See LICENSE for the license.
  */
@@ -1439,6 +1439,23 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
     ui->keydragging = false;
 }
 
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    const int w = state->shared->params.w;
+
+    if (IS_CURSOR_SELECT(button) && ui->cur_visible) {
+        if (button == CURSOR_SELECT) {
+            if (ui->keydragging) return "Stop";
+            return "Multiselect";
+        }
+        if (button == CURSOR_SELECT2 &&
+            !state->shared->clues[w*ui->cur_y + ui->cur_x])
+	    return (ui->sel[w*ui->cur_y + ui->cur_x]) ? "Deselect" : "Select";
+    }
+    return "";
+}
+
 #define PREFERRED_TILE_SIZE 32
 #define TILE_SIZE (ds->tilesize)
 #define BORDER (TILE_SIZE / 2)
@@ -1669,9 +1686,9 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_GRID * 3 + 1] = 0.0F;
     ret[COL_GRID * 3 + 2] = 0.0F;
 
-    ret[COL_HIGHLIGHT * 3 + 0] = 0.85F * ret[COL_BACKGROUND * 3 + 0];
-    ret[COL_HIGHLIGHT * 3 + 1] = 0.85F * ret[COL_BACKGROUND * 3 + 1];
-    ret[COL_HIGHLIGHT * 3 + 2] = 0.85F * ret[COL_BACKGROUND * 3 + 2];
+    ret[COL_HIGHLIGHT * 3 + 0] = 0.7F * ret[COL_BACKGROUND * 3 + 0];
+    ret[COL_HIGHLIGHT * 3 + 1] = 0.7F * ret[COL_BACKGROUND * 3 + 1];
+    ret[COL_HIGHLIGHT * 3 + 2] = 0.7F * ret[COL_BACKGROUND * 3 + 2];
 
     ret[COL_CORRECT * 3 + 0] = 0.9F * ret[COL_BACKGROUND * 3 + 0];
     ret[COL_CORRECT * 3 + 1] = 0.9F * ret[COL_BACKGROUND * 3 + 1];
@@ -2176,6 +2193,7 @@ const struct game thegame = {
     decode_ui,
     game_request_keys,
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,

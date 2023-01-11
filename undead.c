@@ -1681,6 +1681,20 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
     }
 }
 
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    int xi;
+
+    if (ui->hshow && button == CURSOR_SELECT)
+        return ui->hpencil ? "Ink" : "Pencil";
+    if (button == CURSOR_SELECT2) {
+        xi = state->common->xinfo[ui->hx + ui->hy*(state->common->params.w+2)];
+        if (xi >= 0 && !state->common->fixed[xi]) return "Clear";
+    }
+    return "";
+}
+
 struct game_drawstate {
     int tilesize;
     bool started, solved;
@@ -1766,22 +1780,30 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (xi >= 0 && !state->common->fixed[xi]) {
             if (button == 'g' || button == 'G' || button == '1' || (IS_MOUSE_DOWN(button) && on_ghost)) {
                 if (!ui->hcursor) ui->hshow = false;
+                if (state->guess[xi] == 1)
+                    return ui->hcursor ? NULL : UI_UPDATE;
                 sprintf(buf,"G%d",xi);
                 return dupstr(buf);
             }
             if (button == 'v' || button == 'V' || button == '2' || (IS_MOUSE_DOWN(button) && on_vampire)) {
                 if (!ui->hcursor) ui->hshow = false;
+                if (state->guess[xi] == 2)
+                    return ui->hcursor ? NULL : UI_UPDATE;
                 sprintf(buf,"V%d",xi);
                 return dupstr(buf);
             }
             if (button == 'z' || button == 'Z' || button == '3' || (IS_MOUSE_DOWN(button) && on_zombie)) {
                 if (!ui->hcursor) ui->hshow = false;
+                if (state->guess[xi] == 4)
+                    return ui->hcursor ? NULL : UI_UPDATE;
                 sprintf(buf,"Z%d",xi);
                 return dupstr(buf);
             }
             if (button == 'e' || button == 'E' || button == CURSOR_SELECT2 ||
                 button == '0' || button == '\b' ) {
                 if (!ui->hcursor) ui->hshow = false;
+                if (state->guess[xi] == 7 && state->pencils[xi] == 0)
+                    return ui->hcursor ? NULL : UI_UPDATE;
                 sprintf(buf,"E%d",xi);
                 return dupstr(buf);
             }
@@ -1840,8 +1862,13 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             }
             if (button == 'e' || button == 'E' || button == CURSOR_SELECT2 ||
                 button == '0' || button == '\b') {
+                if (!ui->hcursor) {
+                    ui->hpencil = false;
+                    ui->hshow = false;
+                }
+                if (state->pencils[xi] == 0)
+                    return ui->hcursor ? NULL : UI_UPDATE;
                 sprintf(buf,"E%d",xi);
-				if (!ui->hcursor && !ui->hpencil) ui->hshow = false;
                 return dupstr(buf);
             }
         }       
@@ -2811,6 +2838,7 @@ const struct game thegame = {
     decode_ui,
     game_request_keys,
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,

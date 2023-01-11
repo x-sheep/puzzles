@@ -917,7 +917,7 @@ struct game_drawstate {
 
 #define TILESIZE (ds->tilesize)
 #define MARGIN (ds->tilesize / 2)
-#define WIDTH (1 + (TILESIZE >= 16) + (TILESIZE >= 32) + (TILESIZE >= 64))
+#define WIDTH (3*TILESIZE/32 > 1 ? 3*TILESIZE/32 : 1)
 #define CENTER ((ds->tilesize / 2) + WIDTH/2)
 
 #define FROMCOORD(x) (((x) - MARGIN) / TILESIZE)
@@ -1412,6 +1412,7 @@ const struct game thegame = {
     decode_ui,
     NULL, /* game_request_keys */
     game_changed_state,
+    NULL, /* current_key_label */
     interpret_move,
     execute_move,
     48, game_compute_size, game_set_size,

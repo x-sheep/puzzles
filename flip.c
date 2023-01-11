@@ -928,6 +928,13 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 {
 }
 
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    if (IS_CURSOR_SELECT(button)) return "Flip";
+    return "";
+}
+
 struct game_drawstate {
     int w, h;
     bool started;
@@ -1159,7 +1166,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, const game_state *state,
 	for (j = 0; j < w; j++)
 	    if (state->matrix->matrix[(y*w+x)*wh + i*w+j]) {
 		int ox = j - x, oy = i - y;
-		int td = TILE_SIZE / 16;
+		int td = TILE_SIZE / 16 ? TILE_SIZE / 16 : 1;
 		int cx = (bx + TILE_SIZE/2) + (2 * ox - 1) * td;
 		int cy = (by + TILE_SIZE/2) + (2 * oy - 1) * td;
 		if (ox == 0 && oy == 0)
@@ -1346,6 +1353,7 @@ const struct game thegame = {
     decode_ui,
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,

@@ -552,8 +552,10 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     /*
      * Invent a random grid.
      */
-    for (i = 0; i < wh; i++)
-        scratch->grid[i] = random_upto(rs, params->colours);
+    do {
+        for (i = 0; i < wh; i++)
+            scratch->grid[i] = random_upto(rs, params->colours);
+    } while (completed(w, h, scratch->grid));
 
     /*
      * Run the solver, and count how many moves it uses.
@@ -793,6 +795,18 @@ static void decode_ui(game_ui *ui, const char *encoding)
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
                                const game_state *newstate)
 {
+}
+
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    if (button == CURSOR_SELECT &&
+        state->grid[0] != state->grid[ui->cy*state->w+ui->cx])
+        return "Fill";
+    if (button == CURSOR_SELECT2 &&
+        state->soln && state->solnpos < state->soln->nmoves)
+        return "Advance";
+    return "";
 }
 
 struct game_drawstate {
@@ -1384,6 +1398,7 @@ const struct game thegame = {
     decode_ui,
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILESIZE, game_compute_size, game_set_size,

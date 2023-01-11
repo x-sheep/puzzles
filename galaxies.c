@@ -353,6 +353,8 @@ static bool ok_to_add_assoc_with_opposite_internal(
     int *colors;
     bool toret;
 
+    if (tile->type != s_tile)
+        return false;
     if (tile->flags & F_DOT)
         return false;
     if (opposite == NULL)
@@ -2539,6 +2541,33 @@ static bool edge_placement_legal(const game_state *state, int x, int y)
     return true;
 }
 
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    space *sp;
+
+    if (IS_CURSOR_SELECT(button) && ui->cur_visible) {
+        sp = &SPACE(state, ui->cur_x, ui->cur_y);
+        if (ui->dragging) {
+            if (ui->cur_x == ui->srcx && ui->cur_y == ui->srcy)
+                return "Cancel";
+            if (ok_to_add_assoc_with_opposite(
+                    state, &SPACE(state, ui->cur_x, ui->cur_y),
+                    &SPACE(state, ui->dotx, ui->doty)))
+                return "Place";
+            return (ui->srcx == ui->dotx && ui->srcy == ui->doty) ?
+                "Cancel" : "Remove";
+        } else if (sp->flags & F_DOT)
+            return "New arrow";
+        else if (sp->flags & F_TILE_ASSOC)
+            return "Move arrow";
+        else if (sp->type == s_edge &&
+                 edge_placement_legal(state, ui->cur_x, ui->cur_y))
+            return (sp->flags & F_EDGE_SET) ? "Clear" : "Edge";
+    }
+    return "";
+}
+
 static char *interpret_move(const game_state *state, game_ui *ui,
                             const game_drawstate *ds,
                             int x, int y, int button)
@@ -2647,14 +2676,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dy = y;
         return UI_UPDATE;
     } else if (button == RIGHT_RELEASE && ui->dragging) {
-        ui->dragging = false;
-
         /*
          * Drags are always targeted at a single square.
          */
         px = 2*FROMCOORD(x+TILE_SIZE) - 1;
         py = 2*FROMCOORD(y+TILE_SIZE) - 1;
 
+        dropped: /* We arrive here from the end of a keyboard drag. */
+        ui->dragging = false;
 	/*
 	 * Dragging an arrow on to the same square it started from
 	 * is a null move; just update the ui and finish.
@@ -2712,18 +2741,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
         sp = &SPACE(state, ui->cur_x, ui->cur_y);
         if (ui->dragging) {
-            ui->dragging = false;
-
-            if ((ui->srcx != ui->dotx || ui->srcy != ui->doty) &&
-                SPACE(state, ui->srcx, ui->srcy).flags & F_TILE_ASSOC) {
-                sprintf(buf, "%sU%d,%d", sep, ui->srcx, ui->srcy);
-                sep = ";";
-            }
-            if (sp->type == s_tile && !(sp->flags & F_DOT) && !(sp->flags & F_TILE_ASSOC)) {
-                sprintf(buf + strlen(buf), "%sA%d,%d,%d,%d",
-                        sep, ui->cur_x, ui->cur_y, ui->dotx, ui->doty);
-            }
-            return dupstr(buf);
+            px = ui->cur_x; py = ui->cur_y;
+            goto dropped;
         } else if (sp->flags & F_DOT) {
             ui->dragging = true;
             ui->dx = SCOORD(ui->cur_x);
@@ -3823,6 +3842,11 @@ const struct game thegame = {
     decode_ui,
     NULL, /* game_request_keys */
     game_changed_state,
+#ifdef EDITOR
+    NULL,
+#else
+    current_key_label,
+#endif
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
