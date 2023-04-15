@@ -36,6 +36,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\tree234.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\generated-games.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat-internal.h">
+      <Filter>Source Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PuzzleImageSource.cpp" />
@@ -149,9 +158,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\nullgame.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\obfusc.c">
-      <Filter>Source Code</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\palisade.c">
       <Filter>Source Code</Filter>
     </ClCompile>
@@ -233,6 +239,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\gluefe.c">
       <Filter>Source Code</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\auxiliary\obfusc.c" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml" />

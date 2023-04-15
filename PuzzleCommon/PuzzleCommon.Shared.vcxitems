@@ -24,6 +24,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\resource.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\tree234.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\generated-games.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat-internal.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml.h">
       <DependentUpon>$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml</DependentUpon>
     </ClInclude>
@@ -108,6 +110,10 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\hat.c">
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\inertia.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -181,10 +187,6 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\nullgame.c">
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\obfusc.c">
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
