@@ -578,6 +578,8 @@ void free_combi(combi_ctx *combi);
  */
 /* divides w*h rectangle into pieces of size k. Returns w*h dsf. */
 int *divvy_rectangle(int w, int h, int k, random_state *rs);
+/* Same, but only tries once, and may fail. (Exposed for test program.) */
+int *divvy_rectangle_attempt(int w, int h, int k, random_state *rs);
 
 /*
  * findloop.c
@@ -677,7 +679,8 @@ struct game {
     game_ui *(*new_ui)(const game_state *state);
     void (*free_ui)(game_ui *ui);
     char *(*encode_ui)(const game_ui *ui);
-    void (*decode_ui)(game_ui *ui, const char *encoding);
+    void (*decode_ui)(game_ui *ui, const char *encoding,
+                      const game_state *state);
     key_label *(*request_keys)(const game_params *params, int *nkeys);
     void (*changed_state)(game_ui *ui, const game_state *oldstate,
                           const game_state *newstate);

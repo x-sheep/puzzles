@@ -77,7 +77,11 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 #include "tree234.h"
@@ -285,6 +289,7 @@ static void check_caches(const solver_state* sstate);
     A("Great-Great-Dodecagonal",GREATGREATDODECAGONAL,2,2)      \
     A("Kagome",KAGOME,3,3)                                      \
     A("Compass-Dodecagonal",COMPASSDODECAGONAL,2,2)             \
+    A("Hats",HATS,6,6)                                          \
     /* end of list */
 
 #define GRID_NAME(title,type,amin,omin) title,
@@ -569,6 +574,7 @@ static const game_params loopy_presets_more[] = {
     {  5,  4, DIFF_HARD,   LOOPY_GRID_GREATDODECAGONAL },
     {  5,  3, DIFF_HARD,   LOOPY_GRID_GREATGREATDODECAGONAL },
     {  5,  4, DIFF_HARD,   LOOPY_GRID_COMPASSDODECAGONAL },
+    { 10, 10, DIFF_HARD,   LOOPY_GRID_HATS },
 #endif
 };
 
@@ -875,15 +881,6 @@ static game_ui *new_ui(const game_state *state)
 }
 
 static void free_ui(game_ui *ui)
-{
-}
-
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
 {
 }
 
@@ -2304,7 +2301,7 @@ static int dline_deductions(solver_state *sstate)
      * on that.  We check this with an assertion, in case someone decides to
      * make a grid which has larger faces than this.  Note, this algorithm
      * could get quite expensive if there are many large faces. */
-#define MAX_FACE_SIZE 12
+#define MAX_FACE_SIZE 14
 
     for (i = 0; i < g->num_faces; i++) {
         int maxs[MAX_FACE_SIZE][MAX_FACE_SIZE];
@@ -3205,9 +3202,9 @@ static void face_text_bbox(game_drawstate *ds, grid *g, grid_face *f,
     /* There seems to be a certain amount of trial-and-error involved
      * in working out the correct bounding-box for the text. */
 
-    *x = xx - ds->tilesize/4 - 1;
+    *x = xx - ds->tilesize * 5 / 4 - 1;
     *y = yy - ds->tilesize/4 - 3;
-    *w = ds->tilesize/2 + 2;
+    *w = ds->tilesize * 5 / 2 + 2;
     *h = ds->tilesize/2 + 5;
 }
 
@@ -3680,8 +3677,8 @@ const struct game thegame = {
     true, game_can_format_as_text_now, game_text_format,
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
     NULL, /* current_key_label */
