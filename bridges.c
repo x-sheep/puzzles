@@ -72,6 +72,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -803,6 +804,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 3 || params->h < 3)
         return "Width and height must be at least 3";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
     if (params->maxb < 1 || params->maxb > MAX_BRIDGES)
         return "Too many bridges.";
     if (full) {
@@ -2004,28 +2007,38 @@ generated:
 
 static const char *validate_desc(const game_params *params, const char *desc)
 {
-    int i, wh = params->w * params->h;
+    int i, j, wh = params->w * params->h, nislands = 0;
+    bool *last_row = snewn(params->w, bool);
 
+    memset(last_row, 0, params->w * sizeof(bool));
     for (i = 0; i < wh; i++) {
-        if (*desc >= '1' && *desc <= '9')
-            /* OK */;
-        else if (*desc >= 'a' && *desc <= 'z')
+        if ((*desc >= '1' && *desc <= '9') || (*desc >= 'A' && *desc <= 'G')) {
+            nislands++;
+            /* Look for other islands to the left and above. */
+            if ((i % params->w > 0 && last_row[i % params->w - 1]) ||
+                last_row[i % params->w]) {
+                sfree(last_row);
+                return "Game description contains joined islands";
+            }
+            last_row[i % params->w] = true;
+        } else if (*desc >= 'a' && *desc <= 'z') {
+            for (j = 0; j < *desc - 'a' + 1; j++)
+                last_row[(i + j) % params->w] = false;
             i += *desc - 'a'; /* plus the i++ */
-        else if (*desc >= 'A' && *desc <= 'G')
-            /* OK */;
-        else if (*desc == 'V' || *desc == 'W' ||
-                 *desc == 'X' || *desc == 'Y' ||
-                 *desc == 'H' || *desc == 'I' ||
-                 *desc == 'J' || *desc == 'K')
-            /* OK */;
-        else if (!*desc)
+        } else if (!*desc) {
+            sfree(last_row);
             return "Game description shorter than expected";
-        else
+        } else {
+            sfree(last_row);
             return "Game description contains unexpected character";
+        }
         desc++;
     }
+    sfree(last_row);
     if (*desc || i > wh)
         return "Game description longer than expected";
+    if (nislands < 2)
+        return "Game description has too few islands";
 
     return NULL;
 }
@@ -2114,7 +2127,7 @@ static game_ui *new_ui(const game_state *state)
     ui_cancel_drag(ui);
     ui->cur_x = state->islands[0].x;
     ui->cur_y = state->islands[0].y;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->show_hints = false;
     return ui;
 }
@@ -2571,6 +2584,8 @@ static game_state *execute_move(const game_state *state, const char *move)
                 goto badmove;
             if (!INGRID(ret, x1, y1) || !INGRID(ret, x2, y2))
                 goto badmove;
+            /* Precisely one co-ordinate must differ between islands. */
+            if ((x1 != x2) + (y1 != y2) != 1) goto badmove;
             is1 = INDEX(ret, gridi, x1, y1);
             is2 = INDEX(ret, gridi, x2, y2);
             if (!is1 || !is2) goto badmove;
@@ -2582,6 +2597,7 @@ static game_state *execute_move(const game_state *state, const char *move)
                 goto badmove;
             if (!INGRID(ret, x1, y1) || !INGRID(ret, x2, y2))
                 goto badmove;
+            if ((x1 != x2) + (y1 != y2) != 1) goto badmove;
             is1 = INDEX(ret, gridi, x1, y1);
             is2 = INDEX(ret, gridi, x2, y2);
             if (!is1 || !is2) goto badmove;
@@ -3188,11 +3204,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -3297,7 +3308,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 

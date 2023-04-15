@@ -35,6 +35,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -276,6 +277,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 5) return "Width must be at least five";
     if (params->h < 5) return "Height must be at least five";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
     if (params->difficulty < 0 || params->difficulty >= DIFFCOUNT)
         return "Unknown difficulty level";
     if (params->difficulty >= DIFF_TRICKY && params->w + params->h < 11)
@@ -854,6 +857,35 @@ cleanup:
                         break;
                     }
                if (ret == 1) assert(b < 0xD); /* we should have had a break by now */
+            }
+        }
+
+        /*
+         * Ensure we haven't left the _data structure_ inconsistent,
+         * regardless of the consistency of the _puzzle_. In
+         * particular, we should never have marked one square as
+         * linked to its neighbour if the neighbour is not
+         * reciprocally linked back to the original square.
+         *
+         * This can happen if we get part way through solving an
+         * impossible puzzle and then give up trying to make further
+         * progress. So here we fix it up to avoid confusing the rest
+         * of the game.
+         */
+        for (y = 0; y < h; y++) {
+            for (x = 0; x < w; x++) {
+                for (d = 1; d <= 8; d += d) {
+                    int nx = x + DX(d), ny = y + DY(d);
+                    int rlink;
+                    if (0 <= nx && nx < w && 0 <= ny && ny < h)
+                        rlink = result[ny*w+nx] & F(d);
+                    else
+                        rlink = 0;     /* off-board squares don't link back */
+
+                    /* If other square doesn't link to us, don't link to it */
+                    if (!rlink)
+                        result[y*w+x] &= ~d;
+                }
             }
         }
     }
@@ -1497,25 +1529,30 @@ static char nbits[16] = { 0, 1, 1, 2,
 
 #define ERROR_CLUE 16
 
-static void dsf_update_completion(game_state *state, int ax, int ay, char dir,
+/* Returns false if the state is invalid. */
+static bool dsf_update_completion(game_state *state, int ax, int ay, char dir,
                                  int *dsf)
 {
     int w = state->shared->w /*, h = state->shared->h */;
     int ac = ay*w+ax, bx, by, bc;
 
-    if (!(state->lines[ac] & dir)) return; /* no link */
+    if (!(state->lines[ac] & dir)) return true; /* no link */
     bx = ax + DX(dir); by = ay + DY(dir);
 
-    assert(INGRID(state, bx, by)); /* should not have a link off grid */
+    if (!INGRID(state, bx, by))
+        return false; /* should not have a link off grid */
 
     bc = by*w+bx;
-    assert(state->lines[bc] & F(dir)); /* should have reciprocal link */
-    if (!(state->lines[bc] & F(dir))) return;
+    if (!(state->lines[bc] & F(dir)))
+        return false; /* should have reciprocal link */
+    if (!(state->lines[bc] & F(dir))) return true;
 
     dsf_merge(dsf, ac, bc);
+    return true;
 }
 
-static void check_completion(game_state *state, bool mark)
+/* Returns false if the state is invalid. */
+static bool check_completion(game_state *state, bool mark)
 {
     int w = state->shared->w, h = state->shared->h, x, y, i, d;
     bool had_error = false;
@@ -1543,8 +1580,11 @@ static void check_completion(game_state *state, bool mark)
     /* Build the dsf. */
     for (x = 0; x < w; x++) {
         for (y = 0; y < h; y++) {
-            dsf_update_completion(state, x, y, R, dsf);
-            dsf_update_completion(state, x, y, D, dsf);
+            if (!dsf_update_completion(state, x, y, R, dsf) ||
+                !dsf_update_completion(state, x, y, D, dsf)) {
+                sfree(dsf);
+                return false;
+            }
         }
     }
 
@@ -1699,6 +1739,7 @@ static void check_completion(game_state *state, bool mark)
         if (!had_error)
             state->completed = true;
     }
+    return true;
 }
 
 /* completion check:
@@ -1825,7 +1866,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->ndragcoords = -1;
     ui->dragcoords = snewn(sz, int);
-    ui->cursor_active = false;
+    ui->cursor_active = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->curx = ui->cury = 0;
 
     return ui;
@@ -1892,8 +1933,7 @@ static int get_gui_style(void)
     static int gui_style = -1;
 
     if (gui_style == -1) {
-        char *env = getenv("PEARL_GUI_LOOPY");
-        if (env && (env[0] == 'y' || env[0] == 'Y'))
+        if (getenv_bool("PEARL_GUI_LOOPY", false))
             gui_style = GUI_LOOPY;
         else
             gui_style = GUI_MASYU;
@@ -2295,7 +2335,7 @@ static game_state *execute_move(const game_state *state, const char *move)
             goto badmove;
     }
 
-    check_completion(ret, true);
+    if (!check_completion(ret, true)) goto badmove;
 
     return ret;
 
@@ -2600,11 +2640,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2712,8 +2747,8 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
-    REQUIRE_RBUTTON,  /* flags */
+    false, NULL,                       /* timing_state */
+    REQUIRE_RBUTTON, /* flags */
 };
 
 #ifdef STANDALONE_SOLVER
@@ -2721,7 +2756,7 @@ const struct game thegame = {
 #include <time.h>
 #include <stdarg.h>
 
-const char *quis = NULL;
+static const char *quis = NULL;
 
 static void usage(FILE *out) {
     fprintf(out, "usage: %s <params>\n", quis);

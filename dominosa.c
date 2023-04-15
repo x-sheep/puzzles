@@ -47,6 +47,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -243,6 +244,10 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->n < 1)
         return "Maximum face number must be at least one";
+    if (params->n > INT_MAX - 2 ||
+        params->n + 2 > INT_MAX / (params->n + 1))
+        return "Maximum face number must not be unreasonably large";
+
     if (params->diff >= DIFFCOUNT)
         return "Unknown difficulty rating";
     return NULL;
@@ -254,9 +259,9 @@ static const char *validate_params(const game_params *params, bool full)
 
 #ifdef STANDALONE_SOLVER
 #define SOLVER_DIAGNOSTICS
-bool solver_diagnostics = false;
+static bool solver_diagnostics = false;
 #elif defined SOLVER_DIAGNOSTICS
-const bool solver_diagnostics = true;
+static const bool solver_diagnostics = true;
 #endif
 
 struct solver_domino;
@@ -925,7 +930,7 @@ struct parity_findloop_ctx {
     int i;
 };
 
-int parity_neighbour(int vertex, void *vctx)
+static int parity_neighbour(int vertex, void *vctx)
 {
     struct parity_findloop_ctx *ctx = (struct parity_findloop_ctx *)vctx;
     struct solver_placement *p;
@@ -2726,7 +2731,7 @@ static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->cur_x = ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->highlight_1 = ui->highlight_2 = -1;
     return ui;
 }
@@ -2911,7 +2916,8 @@ static game_state *execute_move(const game_state *state, const char *move)
             move++;
         } else if (move[0] == 'D' &&
                    sscanf(move+1, "%d,%d%n", &d1, &d2, &p) == 2 &&
-                   d1 >= 0 && d1 < wh && d2 >= 0 && d2 < wh && d1 < d2) {
+                   d1 >= 0 && d1 < wh && d2 >= 0 && d2 < wh && d1 < d2 &&
+                   (d2 - d1 == 1 || d2 - d1 == w)) {
 
             /*
              * Toggle domino presence between d1 and d2.
@@ -2979,7 +2985,8 @@ static game_state *execute_move(const game_state *state, const char *move)
         } else if (move[0] == 'E' &&
                    sscanf(move+1, "%d,%d%n", &d1, &d2, &p) == 2 &&
                    d1 >= 0 && d1 < wh && d2 >= 0 && d2 < wh && d1 < d2 &&
-                   ret->grid[d1] == d1 && ret->grid[d2] == d2) {
+                   ret->grid[d1] == d1 && ret->grid[d2] == d2 &&
+                   (d2 - d1 == 1 || d2 - d1 == w)) {
 
             /*
              * Toggle edge presence between d1 and d2.
@@ -3398,11 +3405,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -3492,7 +3494,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

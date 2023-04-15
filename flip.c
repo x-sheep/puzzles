@@ -8,6 +8,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -181,9 +182,16 @@ static game_params *custom_params(const config_item *cfg)
 
 static const char *validate_params(const game_params *params, bool full)
 {
+    int wh;
+
     if (params->w <= 0 || params->h <= 0)
         return "Width and height must both be greater than zero";
-    return NULL;
+    if (params->w > (INT_MAX - 3) / params->h)
+        return "Width times height must not be unreasonably large";
+    wh = params->w * params->h;
+    if (wh > (INT_MAX - 3) / wh)
+        return "Width times height is too large";    
+   return NULL;
 }
 
 static char *encode_bitmap(unsigned char *bmp, int len)
@@ -905,7 +913,7 @@ static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->cx = ui->cy = 0;
-    ui->cdraw = false;
+    ui->cdraw = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -1152,7 +1160,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, const game_state *state,
 	coords[7] = by + TILE_SIZE - (int)((float)TILE_SIZE * animtime);
 
 	colour = (tile & 1 ? COL_WRONG : COL_RIGHT);
-	if (animtime < 0.5)
+	if (animtime < 0.5F)
 	    colour = COL_WRONG + COL_RIGHT - colour;
 
 	draw_polygon(dr, coords, 4, colour, COL_GRID);
@@ -1313,19 +1321,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame flip
 #endif
@@ -1365,8 +1360,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
 	DISABLE_RBUTTON,			       /* flags */
 };

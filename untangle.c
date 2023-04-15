@@ -31,6 +31,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -207,6 +208,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->n < 4)
         return "Number of points must be at least four";
+    if (params->n > INT_MAX / 3)
+        return "Number of points must not be unreasonably large";
     return NULL;
 }
 
@@ -423,7 +426,9 @@ static void addedge(tree234 *edges, int a, int b)
     e->a = min(a, b);
     e->b = max(a, b);
 
-    add234(edges, e);
+    if (add234(edges, e) != e)
+        /* Duplicate edge. */
+        sfree(e);
 }
 
 static bool isedge(tree234 *edges, int a, int b)
@@ -445,8 +450,8 @@ typedef struct vertex {
 
 static int vertcmpC(const void *av, const void *bv)
 {
-    const vertex *a = (vertex *)av;
-    const vertex *b = (vertex *)bv;
+    const vertex *a = (const vertex *)av;
+    const vertex *b = (const vertex *)bv;
 
     if (a->param < b->param)
 	return -1;
@@ -758,6 +763,8 @@ static const char *validate_desc(const game_params *params, const char *desc)
 		return "Expected ',' after number in game description";
 	    desc++;		       /* eat comma */
 	}
+        if (a == b)
+            return "Node linked to itself in game description";
     }
 
     return NULL;
@@ -1027,16 +1034,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     sfree(pts);
 
     return ret;
-}
-
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
 }
 
 struct game_ui {
@@ -1450,19 +1447,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame untangle
 #endif
@@ -1483,7 +1467,7 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
     new_ui,
     free_ui,
     encode_ui,
@@ -1502,8 +1486,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     SOLVE_ANIMATES | DISABLE_RBUTTON,	       /* flags */
 };

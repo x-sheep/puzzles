@@ -67,6 +67,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -285,6 +286,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 1 || params->h < 1)
 	return "Width and height must both be positive";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
 
     if (params->ncols > 9)
 	return "Maximum of 9 colours";
@@ -1013,12 +1016,6 @@ static void free_game(game_state *state)
     sfree(state);
 }
 
-static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, const char **error)
-{
-    return NULL;
-}
-
 static bool game_can_format_as_text_now(const game_params *params)
 {
     return true;
@@ -1066,7 +1063,7 @@ static game_ui *new_ui(const game_state *state)
 	ui->labels = false;
 
     ui->xsel = ui->ysel = 0;
-    ui->displaysel = false;
+    ui->displaysel = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -1351,6 +1348,10 @@ static game_state *execute_move(const game_state *from, const char *move)
 	move++;
 
 	while (*move) {
+            if (!isdigit((unsigned char)*move)) {
+                free_game(ret);
+                return NULL;
+            }
 	    i = atoi(move);
 	    if (i < 0 || i >= ret->n) {
 		free_game(ret);
@@ -1577,7 +1578,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	ds->started = true;
     }
 
-    if (flashtime > 0.0) {
+    if (flashtime > 0.0F) {
 	int frame = (int)(flashtime / FLASH_FRAME);
 	bgcolour = (frame % 2 ? COL_LOWLIGHT : COL_HIGHLIGHT);
     } else
@@ -1674,19 +1675,6 @@ static int game_status(const game_state *state)
     return state->complete ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame samegame
 #endif
@@ -1706,7 +1694,7 @@ const struct game thegame = {
     new_game,
     dup_game,
     free_game,
-    false, solve_game,
+    false, NULL, /* solve */
     true, game_can_format_as_text_now, game_text_format,
     new_ui,
     free_ui,
@@ -1726,8 +1714,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };

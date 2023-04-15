@@ -193,9 +193,9 @@ static game_params *custom_params(const config_item *cfg)
 
 static const char *validate_params(const game_params *params, bool full)
 {
-    if ((params->w * params->h ) > 54)  return "Grid is too big";
     if (params->w < 3)                  return "Width must be at least 3";
     if (params->h < 3)                  return "Height must be at least 3";
+    if (params->w > 54 / params->h)     return "Grid is too big";
     if (params->diff >= DIFFCOUNT)      return "Unknown difficulty rating";
     return NULL;
 }
@@ -1031,7 +1031,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
         /* Monsters / Mirrors ratio should be balanced */
         ratio = (float)new->common->num_total /
             (float)(new->common->params.w * new->common->params.h);
-        if (ratio < 0.48 || ratio > 0.78) {
+        if (ratio < 0.48F || ratio > 0.78F) {
             free_game(new);
             continue;
         }        
@@ -1645,10 +1645,9 @@ struct game_ui {
 static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
-    ui->hx = ui->hy = 0;
     ui->hpencil = false;
-    ui->hshow = false;
-    ui->hcursor = false;
+    ui->hx = ui->hy = ui->hshow = ui->hcursor =
+        getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->ascii = false;
     return ui;
 }
@@ -2093,11 +2092,11 @@ static game_state *execute_move(const game_state *state, const char *move)
         if (c == 'S') {
             move++;
             solver = true;
-        }
-        if (c == 'G' || c == 'V' || c == 'Z' || c == 'E' ||
-            c == 'g' || c == 'v' || c == 'z') {
+        } else if (c == 'G' || c == 'V' || c == 'Z' || c == 'E' ||
+                   c == 'g' || c == 'v' || c == 'z') {
             move++;
-            sscanf(move, "%d%n", &x, &n);
+            if (sscanf(move, "%d%n", &x, &n) != 1) goto badmove;
+            if (x < 0 || x >= ret->common->num_total) goto badmove;
             if (c == 'G') ret->guess[x] = 1;
             if (c == 'V') ret->guess[x] = 2;
             if (c == 'Z') ret->guess[x] = 4;
@@ -2106,23 +2105,26 @@ static game_state *execute_move(const game_state *state, const char *move)
             if (c == 'v') ret->pencils[x] ^= 2;
             if (c == 'z') ret->pencils[x] ^= 4;
             move += n;
-        }
-        if (c == 'D' && sscanf(move + 1, "%d,%d%n", &x, &y, &n) == 2 &&
-            is_clue(ret, x, y)) {
+        } else if (c == 'D' && sscanf(move + 1, "%d,%d%n", &x, &y, &n) == 2 &&
+                   is_clue(ret, x, y)) {
             ret->hints_done[clue_index(ret, x, y)] ^= 1;
             move += n + 1;
-        }
-        if (c == 'M') {
+        } else if (c == 'M') {
             /*
              * Fill in absolutely all pencil marks in unfilled
              * squares, for those who like to play by the rigorous
              * approach of starting off in that state and eliminating
              * things.
              */
-            for (i = 0; i < ret->common->wh; i++)
+            for (i = 0; i < ret->common->num_total; i++)
                 if (ret->guess[i] == 7)
                     ret->pencils[i] = 7;
             move++;
+        } else {
+            /* Unknown move type. */
+        badmove:
+            free_game(ret);
+            return NULL;
         }
         if (*move == ';') move++;
     }
@@ -2442,7 +2444,7 @@ static void draw_monster(drawing *dr, game_drawstate *ds, int x, int y,
 static void draw_monster_count(drawing *dr, game_drawstate *ds,
                                const game_state *state, int c, bool hflash) {
     int dx,dy;
-    char buf[8];
+    char buf[MAX_DIGITS(int) + 1];
     char bufm[8];
     
     dy = TILESIZE/4;
@@ -2498,7 +2500,7 @@ static void draw_path_hint(drawing *dr, game_drawstate *ds,
                            const struct game_params *params,
                            int hint_index, bool hflash, int hint) {
     int x, y, color, dx, dy, text_dx, text_dy, text_size;
-    char buf[4];
+    char buf[MAX_DIGITS(int) + 1];
 
     if (ds->hint_errors[hint_index])
         color = COL_ERROR;
@@ -2798,19 +2800,6 @@ static int game_status(const game_state *state)
     return state->solved;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame undead
 #endif
@@ -2850,8 +2839,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     false,                 /* wants_statusbar */
-    false, game_timing_state,
-    REQUIRE_RBUTTON,  /* flags */
+    false, NULL,                       /* timing_state */
+    REQUIRE_RBUTTON,                     /* flags */
 };

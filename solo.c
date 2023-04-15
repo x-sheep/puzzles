@@ -91,7 +91,7 @@
 
 #ifdef STANDALONE_SOLVER
 #include <stdarg.h>
-int solver_show_working, solver_recurse_depth;
+static int solver_show_working, solver_recurse_depth;
 #endif
 
 #include "puzzles.h"
@@ -4559,8 +4559,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->hx = ui->hy = 0;
     ui->hpencil = false;
-    ui->hshow = false;
-    ui->hcursor = false;
+    ui->hshow = ui->hcursor = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -5145,7 +5144,7 @@ static void draw_number(drawing *dr, game_drawstate *ds,
 		fw = (pr - pl) / (float)pw;
 		fh = (pb - pt) / (float)ph;
 		fs = min(fw, fh);
-		if (fs > bestsize) {
+		if (fs >= bestsize) {
 		    bestsize = fs;
 		    pbest = pw;
 		}
@@ -5347,13 +5346,6 @@ static void game_get_cursor_location(const game_ui *ui,
 static int game_status(const game_state *state)
 {
     return state->completed ? +1 : 0;
-}
-
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    if (state->completed)
-	return false;
-    return true;
 }
 
 static void game_print_size(const game_params *params, float *x, float *y)
@@ -5674,7 +5666,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,  /* flags */
 };
 

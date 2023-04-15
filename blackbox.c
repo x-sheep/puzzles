@@ -192,6 +192,8 @@ static const char *validate_params(const game_params *params, bool full)
      * types, and could be worked around if required. */
     if (params->w > 255 || params->h > 255)
         return "Widths and heights greater than 255 are not supported";
+    if (params->minballs < 0)
+        return "Negative number of balls";
     if (params->minballs > params->maxballs)
         return "Minimum number of balls may not be greater than maximum";
     if (params->minballs >= params->w * params->h)
@@ -305,7 +307,7 @@ struct game_state {
 
 #define GRID(s,x,y) ((s)->grid[(y)*((s)->w+2) + (x)])
 
-#define RANGECHECK(s,x) ((x) >= 0 && (x) <= (s)->nlasers)
+#define RANGECHECK(s,x) ((x) >= 0 && (x) < (s)->nlasers)
 
 /* specify numbers because they must match array indexes. */
 enum { DIR_UP = 0, DIR_RIGHT = 1, DIR_DOWN = 2, DIR_LEFT = 3 };
@@ -466,16 +468,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return dupstr("S");
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 struct game_ui {
     int flash_laserno;
     int errors;
@@ -493,7 +485,7 @@ static game_ui *new_ui(const game_state *state)
     ui->newmove = false;
 
     ui->cur_x = ui->cur_y = 1;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     ui->flash_laser = 0;
 
@@ -1067,9 +1059,9 @@ static game_state *execute_move(const game_state *from, const char *move)
 
     case 'F':
         sscanf(move+1, "%d", &rangeno);
-        if (ret->exits[rangeno] != LASER_EMPTY)
-            goto badmove;
         if (!RANGECHECK(ret, rangeno))
+            goto badmove;
+        if (ret->exits[rangeno] != LASER_EMPTY)
             goto badmove;
         fire_laser(ret, rangeno);
         break;
@@ -1538,19 +1530,6 @@ static int game_status(const game_state *state)
     return 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame blackbox
 #endif
@@ -1571,7 +1550,7 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
     new_ui,
     free_ui,
     encode_ui,
@@ -1590,9 +1569,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 

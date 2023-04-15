@@ -915,8 +915,8 @@ static const char *validate_params(const game_params *params, bool full)
     int const w = params->w, h = params->h;
     if (w < 1) return "Error: width is less than 1";
     if (h < 1) return "Error: height is less than 1";
+    if (w > SCHAR_MAX - (h - 1)) return "Error: w + h is too big";
     if (w * h < 1) return "Error: size is less than 1";
-    if (w + h - 1 > SCHAR_MAX) return "Error: w + h is too big";
     /* I might be unable to store clues in my puzzle_size *grid; */
     if (w == 2 && h == 2) return "Error: can't create 2x2 puzzles";
     if (w == 1 && h == 2) return "Error: can't create 1x2 puzzles";
@@ -1229,7 +1229,7 @@ static game_ui *new_ui(const game_state *state)
 {
     struct game_ui *ui = snew(game_ui);
     ui->r = ui->c = 0;
-    ui->cursor_show = false;
+    ui->cursor_show = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -1326,10 +1326,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	 */
 	{
 	    static int swap_buttons = -1;
-	    if (swap_buttons < 0) {
-		char *env = getenv("RANGE_SWAP_BUTTONS");
-		swap_buttons = (env && (env[0] == 'y' || env[0] == 'Y'));
-	    }
+	    if (swap_buttons < 0)
+                swap_buttons = getenv_bool("RANGE_SWAP_BUTTONS", false);
 	    if (swap_buttons) {
 		if (button == LEFT_BUTTON)
 		    button = RIGHT_BUTTON;
@@ -1496,7 +1494,8 @@ static bool find_errors(const game_state *state, bool *report)
             if (state->grid[r*w+c] != BLACK &&
                 state->grid[r*w+(c+1)] != BLACK)
                 dsf_merge(dsf, r*w+c, r*w+(c+1));
-    if (nblack + dsf_size(dsf, any_white_cell) < n) {
+    if (any_white_cell != -1 &&
+        nblack + dsf_size(dsf, any_white_cell) < n) {
         int biggest, canonical;
 
         if (!report) {
@@ -1770,12 +1769,6 @@ static void draw_cell(drawing *draw, game_drawstate *ds, int r, int c,
     draw_update(draw, x, y, ts + 1, ts + 1);
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    puts("warning: game_timing_state was called (this shouldn't happen)");
-    return false; /* the (non-existing) timer should not be running */
-}
-
 /* ----------------------------------------------------------------------
  * User interface: print
  */
@@ -1854,6 +1847,6 @@ struct game const thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false, /* wants_statusbar */
-    false, game_timing_state,
-    REQUIRE_RBUTTON,  /* flags */
+    false, NULL,                       /* timing_state */
+    REQUIRE_RBUTTON, /* flags */
 };

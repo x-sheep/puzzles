@@ -84,6 +84,7 @@ struct game_params {
 #define ADJ_TO_SPENT(x) ((x) << 9)
 
 #define F_ERROR_MASK (F_ERROR|F_ERROR_UP|F_ERROR_RIGHT|F_ERROR_DOWN|F_ERROR_LEFT)
+#define F_SPENT_MASK (F_SPENT_UP|F_SPENT_RIGHT|F_SPENT_DOWN|F_SPENT_LEFT)
 
 struct game_state {
     int order;
@@ -890,13 +891,14 @@ static int solver_state(game_state *state, int maxdiff)
     struct latin_solver solver;
     int diff;
 
-    latin_solver_alloc(&solver, state->nums, state->order);
-
-    diff = latin_solver_main(&solver, maxdiff,
-			     DIFF_LATIN, DIFF_SET, DIFF_EXTREME,
-			     DIFF_EXTREME, DIFF_RECURSIVE,
-			     unequal_solvers, unequal_valid, ctx,
-                             clone_ctx, free_ctx);
+    if (latin_solver_alloc(&solver, state->nums, state->order))
+        diff = latin_solver_main(&solver, maxdiff,
+                                 DIFF_LATIN, DIFF_SET, DIFF_EXTREME,
+                                 DIFF_EXTREME, DIFF_RECURSIVE,
+                                 unequal_solvers, unequal_valid, ctx,
+                                 clone_ctx, free_ctx);
+    else
+        diff = DIFF_IMPOSSIBLE;
 
     memcpy(state->hints, solver.cube, state->order*state->order*state->order);
 
@@ -1073,7 +1075,7 @@ static int gg_best_clue(game_state *state, int *scratch, digit *latin)
 }
 
 #ifdef STANDALONE_SOLVER
-int maxtries;
+static int maxtries;
 #define MAXTRIES maxtries
 #else
 #define MAXTRIES 50
@@ -1438,8 +1440,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->hx = ui->hy = 0;
     ui->hpencil = false;
-    ui->hshow = false;
-    ui->hcursor = false;
+    ui->hshow = ui->hcursor = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -1579,10 +1580,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		self = (GRID(state, flags, ui->hx, ui->hy) & adjthan[i].f);
 
 	    if (self)
-		sprintf(buf, "F%d,%d,%d", ui->hx, ui->hy,
+		sprintf(buf, "F%d,%d,%u", ui->hx, ui->hy,
 			ADJ_TO_SPENT(adjthan[i].f));
 	    else
-		sprintf(buf, "F%d,%d,%d", nx, ny,
+		sprintf(buf, "F%d,%d,%u", nx, ny,
 			ADJ_TO_SPENT(adjthan[i].fo));
 
 	    return dupstr(buf);
@@ -1662,7 +1663,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 static game_state *execute_move(const game_state *state, const char *move)
 {
     game_state *ret = NULL;
-    int x, y, n, i, rc;
+    int x, y, n, i;
 
     debug(("execute_move: %s", move));
 
@@ -1687,7 +1688,7 @@ static game_state *execute_move(const game_state *state, const char *move)
         const char *p;
 
         ret = dup_game(state);
-        ret->completed = ret->cheated = true;
+        ret->cheated = true;
 
         p = move+1;
         for (i = 0; i < state->order*state->order; i++) {
@@ -1698,8 +1699,8 @@ static game_state *execute_move(const game_state *state, const char *move)
             p++;
         }
         if (*p) goto badmove;
-        rc = check_complete(ret->nums, ret, true);
-	assert(rc > 0);
+        if (!ret->completed && check_complete(ret->nums, ret, true) > 0)
+            ret->completed = true;
         return ret;
     } else if (move[0] == 'M') {
         ret = dup_game(state);
@@ -1716,7 +1717,8 @@ static game_state *execute_move(const game_state *state, const char *move)
         check_complete(ret->nums, ret, true);
         return ret;
     } else if (move[0] == 'F' && sscanf(move+1, "%d,%d,%d", &x, &y, &n) == 3 &&
-	       x >= 0 && x < state->order && y >= 0 && y < state->order) {
+	       x >= 0 && x < state->order && y >= 0 && y < state->order &&
+               (n & ~F_SPENT_MASK) == 0) {
 	ret = dup_game(state);
 	GRID(ret, flags, x, y) ^= n;
 	return ret;
@@ -2097,11 +2099,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2191,7 +2188,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,  /* flags */
 };
 
@@ -2204,7 +2201,7 @@ const struct game thegame = {
 #include <time.h>
 #include <stdarg.h>
 
-const char *quis = NULL;
+static const char *quis = NULL;
 
 #if 0 /* currently unused */
 
@@ -2272,13 +2269,14 @@ static int solve(game_params *p, char *desc, int debug)
     solver_show_working = debug;
     game_debug(state);
 
-    latin_solver_alloc(&solver, state->nums, state->order);
-
-    diff = latin_solver_main(&solver, DIFF_RECURSIVE,
-			     DIFF_LATIN, DIFF_SET, DIFF_EXTREME,
-			     DIFF_EXTREME, DIFF_RECURSIVE,
-			     unequal_solvers, unequal_valid, ctx,
-                             clone_ctx, free_ctx);
+    if (latin_solver_alloc(&solver, state->nums, state->order))
+        diff = latin_solver_main(&solver, DIFF_RECURSIVE,
+                                 DIFF_LATIN, DIFF_SET, DIFF_EXTREME,
+                                 DIFF_EXTREME, DIFF_RECURSIVE,
+                                 unequal_solvers, unequal_valid, ctx,
+                                 clone_ctx, free_ctx);
+    else
+        diff = DIFF_IMPOSSIBLE;
 
     free_ctx(ctx);
 

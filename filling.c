@@ -198,6 +198,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 1) return "Width must be at least one";
     if (params->h < 1) return "Height must be at least one";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
 
     return NULL;
 }
@@ -1120,8 +1122,6 @@ static bool solver(const int *orig, int w, int h, char **solution) {
         **solution = 's';
         for (i = 0; i < sz; ++i) (*solution)[i + 1] = ss.board[i] + '0';
         (*solution)[sz + 1] = '\0';
-        /* We don't need the \0 for execute_move (the only user)
-         * I'm just being printf-friendly in case I wanna print */
     }
 
     sfree(ss.dsf);
@@ -1406,7 +1406,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->sel = NULL;
     ui->cur_x = ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->keydragging = false;
 
     return ui;
@@ -1601,6 +1601,7 @@ static game_state *execute_move(const game_state *state, const char *move)
 
     if (*move == 's') {
         int i = 0;
+        if (strlen(move) != sz + 1) return NULL;
         new_state = dup_game(state);
         for (++move; i < sz; ++i) new_state->board[i] = move[i] - '0';
         new_state->cheated = true;
@@ -2102,11 +2103,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2207,7 +2203,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,				   /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,		       /* flags */
 };
 

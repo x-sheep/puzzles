@@ -52,7 +52,7 @@
 #include "puzzles.h"
 
 #ifdef STANDALONE_SOLVER
-bool solver_verbose = false;
+static bool solver_verbose = false;
 #endif
 
 enum {
@@ -286,6 +286,8 @@ static const char *validate_params(const game_params *params, bool full)
         return "Width and height must both be even";
     if (params->w2 < 6 || params->h2 < 6)
         return "Width and height must be at least 6";
+    if (params->w2 > INT_MAX / params->h2)
+        return "Width times height must not be unreasonably large";
     if (params->unique) {
         static const long A177790[] = {
             /*
@@ -1511,7 +1513,7 @@ static game_ui *new_ui(const game_state *state)
     game_ui *ret = snew(game_ui);
 
     ret->cx = ret->cy = 0;
-    ret->cursor = false;
+    ret->cursor = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ret;
 }
@@ -1968,11 +1970,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2056,7 +2053,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,                      /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,                          /* flags */
 };
 
@@ -2070,7 +2067,7 @@ const struct game thegame = {
 
 /* Most of the standalone solver code was copied from unequal.c and singles.c */
 
-const char *quis;
+static const char *quis;
 
 static void usage_exit(const char *msg)
 {

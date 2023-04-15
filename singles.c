@@ -64,7 +64,7 @@
 #include "latin.h"
 
 #ifdef STANDALONE_SOLVER
-bool verbose = false;
+static bool verbose = false;
 #endif
 
 #define PREFERRED_TILE_SIZE 32
@@ -1446,7 +1446,7 @@ static game_ui *new_ui(const game_state *state)
     game_ui *ui = snew(game_ui);
 
     ui->cx = ui->cy = 0;
-    ui->cshow = false;
+    ui->cshow = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->show_black_nums = false;
 
     return ui;
@@ -1811,11 +1811,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -1903,7 +1898,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -313,6 +314,8 @@ static const char *validate_params(const game_params *params, bool full)
 	return "Width and height must both be greater than zero";
     if (params->width <= 1 && params->height <= 1)
 	return "At least one of width and height must be greater than one";
+    if (params->width > INT_MAX / params->height)
+        return "Width times height must not be unreasonably large";
     if (params->barrier_probability < 0)
 	return "Barrier probability may not be negative";
     if (params->barrier_probability > 1)
@@ -1845,16 +1848,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return ret;
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 /* ----------------------------------------------------------------------
  * Utility routine.
  */
@@ -2017,7 +2010,7 @@ static game_ui *new_ui(const game_state *state)
     ui->org_x = ui->org_y = 0;
     ui->cur_x = ui->cx = state->width / 2;
     ui->cur_y = ui->cy = state->height / 2;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     get_random_seed(&seed, &seedsize);
     ui->rs = random_new(seed, seedsize);
     sfree(seed);
@@ -2471,6 +2464,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 static void game_free_drawstate(drawing *dr, game_drawstate *ds)
 {
     sfree(ds->visible);
+    sfree(ds->to_draw);
     sfree(ds);
 }
 
@@ -2612,8 +2606,8 @@ static void draw_wires(drawing *dr, int cx, int cy, int radius,
 
     for (i = 0; i < npoints; i++) {
         rotated_coords(&xf, &yf, matrix, cx, cy, fpoints[2*i], fpoints[2*i+1]);
-        points[2*i] = 0.5 + xf;
-        points[2*i+1] = 0.5 + yf;
+        points[2*i] = 0.5F + xf;
+        points[2*i+1] = 0.5F + yf;
     }
 
     draw_polygon(dr, points, npoints, colour, colour);
@@ -2753,8 +2747,8 @@ static void draw_tile(drawing *dr, game_drawstate *ds, int x, int y,
      * rotated by an arbitrary angle about that centre point.
      */
     if (tile & TILE_ROTATING) {
-        matrix[0] = (float)cos(angle * PI / 180.0);
-        matrix[2] = (float)sin(angle * PI / 180.0);
+        matrix[0] = (float)cos(angle * (float)PI / 180.0F);
+        matrix[2] = (float)sin(angle * (float)PI / 180.0F);
     } else {
         matrix[0] = 1.0F;
         matrix[2] = 0.0F;
@@ -2793,8 +2787,8 @@ static void draw_tile(drawing *dr, game_drawstate *ds, int x, int y,
                 float x, y;
                 rotated_coords(&x, &y, matrix, cx, cy,
                                boxr * points[i], boxr * points[i+1]);
-                points[i] = x + 0.5;
-                points[i+1] = y + 0.5;
+                points[i] = x + 0.5F;
+                points[i+1] = y + 0.5F;
             }
 
             draw_polygon(dr, points, 4, col, COL_WIRE);
@@ -3099,11 +3093,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -3259,7 +3248,7 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
     new_ui,
     free_ui,
     encode_ui,
@@ -3280,6 +3269,6 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };

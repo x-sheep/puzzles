@@ -47,6 +47,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -58,7 +59,7 @@
  */
 #if defined STANDALONE_SOLVER
 #define SOLVER_DIAGNOSTICS
-int verbose = 0;
+static int verbose = 0;
 #undef debug
 #define debug(x) printf x
 #elif defined SOLVER_DIAGNOSTICS
@@ -347,6 +348,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 2 || params->h < 2)
         return "Width and height must be at least 2";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
     if (full) {
         if (params->blackpc < 5 || params->blackpc > 100)
             return "Percentage of black squares must be between 5% and 100%";
@@ -413,6 +416,8 @@ static void debug_state(game_state *state)
 {
     int x, y;
     char c = '?';
+
+    (void)c; /* placate -Wunused-but-set-variable if debug() does nothing */
 
     for (y = 0; y < state->h; y++) {
         for (x = 0; x < state->w; x++) {
@@ -1831,7 +1836,7 @@ static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->cur_x = ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -2164,11 +2169,8 @@ static void tile_redraw(drawing *dr, game_drawstate *ds,
                         lcol, COL_BLACK);
         } else if ((ds_flags & DF_IMPOSSIBLE)) {
             static int draw_blobs_when_lit = -1;
-            if (draw_blobs_when_lit < 0) {
-		char *env = getenv("LIGHTUP_LIT_BLOBS");
-		draw_blobs_when_lit = (!env || (env[0] == 'y' ||
-                                                env[0] == 'Y'));
-            }
+            if (draw_blobs_when_lit < 0)
+		draw_blobs_when_lit = getenv_bool("LIGHTUP_LIT_BLOBS", true);
             if (!(ds_flags & DF_LIT) || draw_blobs_when_lit) {
                 int rlen = TILE_SIZE / 4;
                 draw_rect(dr, dx + TILE_SIZE/2 - rlen/2,
@@ -2251,11 +2253,6 @@ static void game_get_cursor_location(const game_ui *ui,
 static int game_status(const game_state *state)
 {
     return state->completed ? +1 : 0;
-}
-
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
 }
 
 static void game_print_size(const game_params *params, float *x, float *y)
@@ -2361,8 +2358,8 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
-    REQUIRE_RBUTTON,  /* flags */
+    false, NULL,                       /* timing_state */
+    REQUIRE_RBUTTON,				       /* flags */
 };
 
 #ifdef STANDALONE_SOLVER

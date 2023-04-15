@@ -11,6 +11,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -202,6 +203,8 @@ static const char *validate_params(const game_params *params, bool full)
      */
     if (params->w < 2 || params->h < 2)
 	return "Width and height must both be at least two";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
 
     /*
      * The grid construction algorithm creates 1/5 as many gems as
@@ -1602,7 +1605,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	     * end up the right way round. */
 	    angle = atan2(dx, -dy);
 
-	    angle = (angle + (PI/8)) / (PI/4);
+	    angle = (angle + (float)(PI/8)) / (float)(PI/4);
 	    assert(angle > -16.0F);
 	    dir = (int)(angle + 16.0F) & 7;
 	}
@@ -1694,6 +1697,7 @@ static game_state *execute_move(const game_state *state, const char *move)
 	 * This is a solve move, so we don't actually _change_ the
 	 * grid but merely set up a stored solution path.
 	 */
+        if (move[1] == '\0') return NULL; /* Solution must be non-empty. */
 	ret = dup_game(state);
 	install_new_solution(ret, move);
 	return ret;
@@ -1738,11 +1742,10 @@ static game_state *execute_move(const game_state *state, const char *move)
     if (ret->soln) {
 	if (ret->dead || ret->gems == 0)
 	    discard_solution(ret);
-	else if (ret->soln->list[ret->solnpos] == dir) {
+	else if (ret->soln->list[ret->solnpos] == dir &&
+            ret->solnpos+1 < ret->soln->len)
 	    ++ret->solnpos;
-	    assert(ret->solnpos < ret->soln->len); /* or gems == 0 */
-	    assert(!ret->dead); /* or not a solution */
-	} else {
+	else {
 	    const char *error = NULL;
             char *soln = solve_game(NULL, ret, NULL, &error);
 	    if (!error) {
@@ -2204,19 +2207,6 @@ static int game_status(const game_state *state)
     return state->gems == 0 && !state->dead ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame inertia
 #endif
@@ -2256,8 +2246,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
-	DISABLE_RBUTTON,			       /* flags */
+    false, NULL,                       /* timing_state */
+    DISABLE_RBUTTON,				       /* flags */
 };

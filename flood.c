@@ -31,6 +31,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -140,13 +141,13 @@ static void decode_params(game_params *ret, char const *string)
         if (*string == 'c') {
             string++;
 	    ret->colours = atoi(string);
-            while (string[1] && isdigit((unsigned char)string[1])) string++;
+            while (*string && isdigit((unsigned char)*string)) string++;
 	} else if (*string == 'm') {
             string++;
 	    ret->leniency = atoi(string);
-            while (string[1] && isdigit((unsigned char)string[1])) string++;
-	}
-	string++;
+            while (*string && isdigit((unsigned char)*string)) string++;
+	} else
+            string++;
     }
 }
 
@@ -209,6 +210,10 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 2 && params->h < 2)
         return "Grid must contain at least two squares";
+    if (params->w < 1 || params->h < 1)
+        return "Width and height must be at least one";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
     if (params->colours < 3 || params->colours > 10)
         return "Must have between 3 and 10 colours";
     if (params->leniency < 0)
@@ -771,7 +776,7 @@ struct game_ui {
 static game_ui *new_ui(const game_state *state)
 {
     struct game_ui *ui = snew(struct game_ui);
-    ui->cursor_visible = false;
+    ui->cursor_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->cx = FILLX;
     ui->cy = FILLY;
 	ui->labels = false;
@@ -887,7 +892,8 @@ static game_state *execute_move(const game_state *state, const char *move)
 
     if (move[0] == 'M' &&
         sscanf(move+1, "%d", &c) == 1 &&
-        c >= 0 &&
+        c >= 0 && c < state->colours &&
+        c != state->grid[FILLY * state->w + FILLX] &&
         !state->complete) {
         int *queue = snewn(state->w * state->h, int);
 	ret = dup_game(state);
@@ -938,11 +944,23 @@ static game_state *execute_move(const game_state *state, const char *move)
 
         sol->moves = snewn(sol->nmoves, char);
         for (i = 0, p = move; i < sol->nmoves; i++) {
-            assert(*p);
+            if (!*p) {
+              badsolve:
+                sfree(sol->moves);
+                sfree(sol);
+                return NULL;
+            };
             sol->moves[i] = atoi(p);
+            if (sol->moves[i] < 0 || sol->moves[i] >= state->colours ||
+                (i == 0 ?
+                 sol->moves[i] == state->grid[FILLY * state->w + FILLX] :
+                 sol->moves[i] == sol->moves[i-1]))
+                /* Solution contains a fill with an invalid colour or
+                 * the current colour. */
+                goto badsolve;
             p += strspn(p, "0123456789");
             if (*p) {
-                assert(*p == ',');
+                if (*p != ',') goto badsolve;
                 p++;
             }
         }
@@ -1358,19 +1376,6 @@ static float game_flash_length(const game_state *oldstate,
     return 0.0F;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame flood
 #endif
@@ -1410,8 +1415,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
-	DISABLE_RBUTTON,			       /* flags */
+    false, NULL,                       /* timing_state */
+    DISABLE_RBUTTON,				       /* flags */
 };

@@ -51,7 +51,7 @@ enum {
  */
 #if defined STANDALONE_SOLVER
 #define SOLVER_DIAGNOSTICS
-bool verbose = false;
+static bool verbose = false;
 #elif defined SOLVER_DIAGNOSTICS
 #define verbose true
 #endif
@@ -231,6 +231,8 @@ static const char *validate_params(const game_params *params, bool full)
 
     if (params->w < 2 || params->h < 2)
 	return "Width and height must both be at least two";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
 
     return NULL;
 }
@@ -1585,7 +1587,7 @@ static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->cur_x = ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -1684,10 +1686,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	 */
 	{
 	    static int swap_buttons = -1;
-	    if (swap_buttons < 0) {
-		char *env = getenv("SLANT_SWAP_BUTTONS");
-		swap_buttons = (env && (env[0] == 'y' || env[0] == 'Y'));
-	    }
+	    if (swap_buttons < 0)
+                swap_buttons = getenv_bool("SLANT_SWAP_BUTTONS", false);
 	    if (swap_buttons) {
 		if (button == LEFT_BUTTON)
 		    button = RIGHT_BUTTON;
@@ -2093,11 +2093,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2210,7 +2205,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

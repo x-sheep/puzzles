@@ -8,6 +8,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -307,6 +308,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->width <= 1 || params->height <= 1)
 	return "Width and height must both be greater than one";
+    if (params->width > INT_MAX / params->height)
+        return "Width times height must not be unreasonably large";
     if (params->barrier_probability < 0)
 	return "Barrier probability may not be negative";
     if (params->barrier_probability > 1)
@@ -890,16 +893,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return dupstr(aux);
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 /* ----------------------------------------------------------------------
  * Utility routine.
  */
@@ -976,7 +969,7 @@ static game_ui *new_ui(const game_state *state)
     game_ui *ui = snew(game_ui);
     ui->cur_x = 0;
     ui->cur_y = -1;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -1004,7 +997,9 @@ static void slide_row_int(int w, int h, unsigned char *tiles, int dir, int row)
     int x = dir > 0 ? -1 : w;
     int tx = x + dir;
     int n = w - 1;
-    unsigned char endtile = tiles[row * w + tx];
+    unsigned char endtile;
+    assert(0 <= tx && tx < w);
+    endtile = tiles[row * w + tx];
     do {
         x = tx;
         tx = (x + dir + w) % w;
@@ -1018,7 +1013,9 @@ static void slide_col_int(int w, int h, unsigned char *tiles, int dir, int col)
     int y = dir > 0 ? -1 : h;
     int ty = y + dir;
     int n = h - 1;
-    unsigned char endtile = tiles[ty * w + col];
+    unsigned char endtile;
+    assert(0 <= ty && ty < h);
+    endtile = tiles[ty * w + col];
     do {
         y = ty;
         ty = (y + dir + h) % h;
@@ -1139,7 +1136,9 @@ static game_state *execute_move(const game_state *from, const char *move)
 
     if ((move[0] == 'C' || move[0] == 'R') &&
 	sscanf(move+1, "%d,%d", &c, &d) == 2 &&
-	c >= 0 && c < (move[0] == 'C' ? from->width : from->height)) {
+	c >= 0 && c < (move[0] == 'C' ? from->width : from->height) &&
+        d <= (move[0] == 'C' ? from->height : from->width) &&
+        d >= -(move[0] == 'C' ? from->height : from->width) && d != 0) {
 	col = (move[0] == 'C');
     } else if (move[0] == 'S' &&
 	       strlen(move) == from->width * from->height + 1) {
@@ -1493,7 +1492,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, const game_state *state,
         vx = (dy ? 1 : 0);
         vy = (dx ? 1 : 0);
 
-        if (xshift == 0.0 && yshift == 0.0 && (tile & dir)) {
+        if (xshift == 0.0F && yshift == 0.0F && (tile & dir)) {
             /*
              * If we are fully connected to the other tile, we must
              * draw right across the tile border. (We can use our
@@ -1697,7 +1696,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     /*
      * Draw any tile which differs from the way it was last drawn.
      */
-    if (xshift != 0.0 || yshift != 0.0) {
+    if (xshift != 0.0F || yshift != 0.0F) {
         active = compute_active(state,
                                 state->last_move_row, state->last_move_col);
     } else {
@@ -1843,19 +1842,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return false;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame netslide
 #endif
@@ -1876,7 +1862,7 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
     new_ui,
     free_ui,
     encode_ui,
@@ -1895,9 +1881,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

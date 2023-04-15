@@ -359,16 +359,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return dupstr("S");
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 static bool is_markable(const game_params *params, pegrow pegs)
 {
     int i, nset = 0, nrequired;
@@ -380,6 +370,7 @@ static bool is_markable(const game_params *params, pegrow pegs)
     for (i = 0; i < params->npegs; i++) {
         int c = pegs->pegs[i];
         if (c > 0) {
+            assert(c <= params->ncolours);
             colcount->pegs[c-1]++;
             nset++;
         }
@@ -419,6 +410,7 @@ static game_ui *new_ui(const game_state *state)
     ui->params = state->params;        /* structure copy */
     ui->curr_pegs = new_pegrow(state->params.npegs);
     ui->holds = snewn(state->params.npegs, bool);
+    ui->display_cur = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     memset(ui->holds, 0, sizeof(bool)*state->params.npegs);
     ui->drag_opeg = -1;
     return ui;
@@ -462,6 +454,9 @@ static void decode_ui(game_ui *ui, const char *encoding)
     const char *p = encoding;
     for (i = 0; i < ui->curr_pegs->npegs; i++) {
         ui->curr_pegs->pegs[i] = atoi(p);
+        if (ui->curr_pegs->pegs[i] < 0 ||
+            ui->curr_pegs->pegs[i] > ui->params.ncolours)
+            ui->curr_pegs->pegs[i] = 0; /* Remove invalid pegs. */
         while (*p && isdigit((unsigned char)*p)) p++;
         if (*p == '_') {
             /* NB: old versions didn't store holds */
@@ -947,6 +942,8 @@ static game_state *execute_move(const game_state *from, const char *move)
 	ret->solved = -1;
 	return ret;
     } else if (move[0] == 'G') {
+        /* No guesses are allowed once the game is solved. */
+        if (from->solved) return NULL;
 	p = move+1;
 
 	ret = dup_game(from);
@@ -1494,19 +1491,6 @@ static int game_status(const game_state *state)
     return state->solved;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame guess
 #endif
@@ -1527,7 +1511,7 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
     new_ui,
     free_ui,
     encode_ui,
@@ -1546,9 +1530,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

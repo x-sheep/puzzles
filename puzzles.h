@@ -385,6 +385,8 @@ char *fgetline(FILE *fp);
 char *bin2hex(const unsigned char *in, int inlen);
 unsigned char *hex2bin(const char *in, int outlen);
 
+bool getenv_bool(const char *name, bool dflt);
+
 /* Mixes two colours in specified proportions. */
 void colour_mix(const float src1[3], const float src2[3], float p,
                 float dst[3]);
@@ -765,6 +767,10 @@ struct drawing_api {
 #ifdef COMBINED
 extern const game *gamelist[];
 extern const int gamecount;
+/* Also pre-declare every individual 'struct game' we expect */
+#define GAME(x) extern const game x;
+#include "generated-games.h"
+#undef GAME
 #else
 extern const game thegame;
 #endif

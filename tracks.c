@@ -20,6 +20,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -203,6 +204,8 @@ static const char *validate_params(const game_params *params, bool full)
      */
     if (params->w < 4 || params->h < 4)
         return "Width and height must both be at least four";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
     return NULL;
 }
 
@@ -929,8 +932,8 @@ static int solve_set_sflag(game_state *state, int x, int y,
     if (state->sflags[i] & (f == S_TRACK ? S_NOTRACK : S_TRACK)) {
         solverdebug(("opposite flag already set there, marking IMPOSSIBLE"));
         state->impossible = true;
-    }
-    state->sflags[i] |= f;
+    } else
+        state->sflags[i] |= f;
     return 1;
 }
 
@@ -947,8 +950,8 @@ static int solve_set_eflag(game_state *state, int x, int y, int d,
     if (sf & (f == E_TRACK ? E_NOTRACK : E_TRACK)) {
         solverdebug(("opposite flag already set there, marking IMPOSSIBLE"));
         state->impossible = true;
-    }
-    S_E_SET(state, x, y, d, f);
+    } else
+        S_E_SET(state, x, y, d, f);
     return 1;
 }
 
@@ -2022,7 +2025,7 @@ static game_ui *new_ui(const game_state *state)
     ui->notrack = false;
     ui->dragging = false;
     ui->drag_sx = ui->drag_sy = ui->drag_ex = ui->drag_ey = -1;
-    ui->cursor_active = false;
+    ui->cursor_active = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->curx = ui->cury = 1;
 
     return ui;
@@ -2271,6 +2274,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         if (!INGRID(state, gx, gy)) {
             /* can't drag from off grid */
+            ui->drag_sx = ui->drag_sy = -1;
             return NULL;
         }
 
@@ -2413,6 +2417,7 @@ static game_state *execute_move(const game_state *state, const char *move)
     int w = state->p.w, x, y, n, i;
     char c, d;
     unsigned f;
+    bool move_is_solve = false;
     game_state *ret = dup_game(state);
 
     /* this is breaking the bank on GTK, which vsprintf's into a fixed-size buffer
@@ -2423,6 +2428,7 @@ static game_state *execute_move(const game_state *state, const char *move)
         c = *move;
         if (c == 'S') {
             ret->used_solve = true;
+            move_is_solve = true;
             move++;
         } else if (c == 'T' || c == 't' || c == 'N' || c == 'n') {
             /* set track, clear track; set notrack, clear notrack */
@@ -2434,6 +2440,9 @@ static game_state *execute_move(const game_state *state, const char *move)
             f = (c == 'T' || c == 't') ? S_TRACK : S_NOTRACK;
 
             if (d == 'S') {
+                if (!ui_can_flip_square(ret, x, y, f == S_NOTRACK) &&
+                    !move_is_solve)
+                    goto badmove;
                 if (c == 'T' || c == 'N')
                     ret->sflags[y*w+x] |= f;
                 else
@@ -2443,6 +2452,9 @@ static game_state *execute_move(const game_state *state, const char *move)
                     unsigned df = 1<<i;
 
                     if (MOVECHAR(df) == d) {
+                        if (!ui_can_flip_edge(ret, x, y, df, f == S_NOTRACK) &&
+                            !move_is_solve)
+                            goto badmove;
                         if (c == 'T' || c == 'N')
                             S_E_SET(ret, x, y, df, f);
                         else
@@ -2629,7 +2641,8 @@ static void draw_thick_circle_outline(drawing *dr, float thickness,
         x2 = cx + r*(float)cos(th2);
         y1 = cy + r*(float)sin(th);
         y2 = cy + r*(float)sin(th2);
-        debug(("circ outline: x=%.2f -> %.2f, thick=%.2f", x1, x2, thickness));
+        debug(("circ outline: x=%.2f -> %.2f, thick=%.2f\n",
+               x1, x2, thickness));
         draw_thick_line(dr, thickness, x1, y1, x2, y2, colour);
     }
 }
@@ -2980,11 +2993,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -3074,8 +3082,8 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
-    REQUIRE_RBUTTON,  /* flags */
+    false, NULL,                       /* timing_state */
+    REQUIRE_RBUTTON, /* flags */
 };
 
 #ifdef STANDALONE_SOLVER

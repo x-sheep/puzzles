@@ -601,7 +601,8 @@ respectively.
 \cfg{winhelp-topic}{games.fifteen}
 
 The old ones are the best: this is the good old \q{\i{15-puzzle}}
-with sliding tiles. You have a 4\by\.4 square grid; 15 squares
+with sliding tiles, which dates from the 1870s.
+You have a 4\by\.4 square grid; 15 squares
 contain numbered tiles, and the sixteenth is empty. Your move is to
 choose a tile next to the empty space, and slide it into the space.
 The aim is to end up with the tiles in numerical order, with the
@@ -879,10 +880,10 @@ Netslide was contributed to this collection by Richard Boulton.
 \cfg{winhelp-topic}{games.pattern}
 
 You have a grid of squares, which must all be filled in either black
-or white. Beside each row of the grid are listed the lengths of the
-runs of black squares on that row; above each column are listed the
-lengths of the runs of black squares in that column. Your aim is to
-fill in the entire grid black or white.
+or white. Beside each row of the grid are listed, in order, the
+lengths of the runs of black squares on that row; above each column
+are listed, in order, the lengths of the runs of black squares in that
+column. Your aim is to fill in the entire grid black or white.
 
 I first saw this puzzle form around 1995, under the name
 \q{\i{nonograms}}. I've seen it in various places since then, under
@@ -1445,8 +1446,9 @@ These parameters are available from the \q{Custom...} option on the
 
 \dd Controls whether you are given a board of a standard shape or a
 randomly generated shape. The two standard shapes currently
-supported are \q{Cross} and \q{Octagon} (also commonly known as the
-English and European traditional board layouts respectively).
+supported are \q{Cross} (in various sizes) and \q{Octagon}.
+The 7\by\.7 Cross is the traditional English board layout.
+The Octagon is the traditional French one.
 Selecting \q{Random} will give you a different board shape every
 time (but always one that is known to have a solution).
 
@@ -3110,12 +3112,13 @@ Undead was contributed to this collection by Steffen Bauer.
 Undead has a similar control system to Solo, Unequal and Keen.
 
 To play Undead, click the mouse in any empty square and then type a
-letter on the keyboard indicating the type of monster: \q{G} for a
-ghost, \q{V} for a vampire, or \q{Z} for a zombie. If you make a
+letter or number on the keyboard indicating the type of monster:
+\q{G} or \q{1} for a ghost, \q{V} or \q{2} for a vampire,
+or \q{Z} or \q{3} for a zombie. If you make a
 mistake, click the mouse in the incorrect square and press Space to
 clear it again (or use the Undo feature).
 
-If you \e{right}-click in a square and then type a letter, the
+If you \e{right}-click in a square and then type a letter or number, the
 corresponding monster will be shown in reduced size in that square, as
 a \q{pencil mark}. You can have pencil marks for multiple monsters in
 the same square. A square containing a full-size monster cannot also
@@ -3128,7 +3131,7 @@ monster, or you can use them as lists of the possible monster in a
 given square, or anything else you feel like.
 
 To erase a single pencil mark, right-click in the square and type
-the same letter again.
+the same letter or number again.
 
 All pencil marks in a square are erased when you left-click and type a
 monster letter, or when you left-click and press Space. Right-clicking
@@ -3136,7 +3139,7 @@ and pressing space will also erase pencil marks.
 
 As for Solo, the cursor keys can be used in conjunction with the letter
 keys to place monsters or pencil marks. Use the cursor keys to move a
-highlight around the grid, and type a monster letter to enter it in
+highlight around the grid, and type a monster letter or number to enter it in
 the highlighted square. Pressing return toggles the highlight into a
 mode in which you can enter or remove pencil marks.
 
@@ -3428,12 +3431,12 @@ so it's not recommended for boards larger than, say, 30\times\.30.
 
 \A{licence} \I{MIT licence}\ii{Licence}
 
-This software is \i{copyright} 2004-2021 Simon Tatham.
+This software is \i{copyright} 2004-2023 Simon Tatham.
 
 Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas
 K\u00F6{oe}lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou,
 Bernd Schmidt, Steffen Bauer, Lennard Sprong, Rogier Goossens, Michael
-Quevillon, Asher Gordon and Didi Kohen.
+Quevillon, Asher Gordon, Didi Kohen, and Ben Harris.
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files

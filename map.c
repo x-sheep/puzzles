@@ -14,6 +14,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -25,7 +26,7 @@
  */
 #if defined STANDALONE_SOLVER
 #define SOLVER_DIAGNOSTICS
-bool verbose = false;
+static bool verbose = false;
 #elif defined SOLVER_DIAGNOSTICS
 #define verbose true
 #endif
@@ -182,7 +183,9 @@ static void decode_params(game_params *params, char const *string)
 	params->n = atoi(p);
 	while (*p && (*p == '.' || isdigit((unsigned char)*p))) p++;
     } else {
-	params->n = params->w * params->h / 8;
+        if (params->h > 0 && params->w > 0 &&
+            params->w <= INT_MAX / params->h)
+            params->n = params->w * params->h / 8;
     }
     if (*p == 'd') {
 	int i;
@@ -254,6 +257,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 2 || params->h < 2)
 	return "Width and height must be at least two";
+    if (params->w > INT_MAX / 2 / params->h)
+        return "Width times height must not be unreasonably large";
     if (params->n < 5)
 	return "Must have at least five regions";
     if (params->n > params->w * params->h)
@@ -2258,16 +2263,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return dupstr(aux);
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 struct game_ui {
     /*
      * drag_colour:
@@ -2296,7 +2291,7 @@ static game_ui *new_ui(const game_state *state)
     ui->drag_pencil = 0;
     ui->show_labels = NO_LABELS;
     ui->cur_x = ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->cur_moved = false;
     ui->cur_lastmove = 0;
     return ui;
@@ -3127,11 +3122,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -3322,7 +3312,7 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
     new_ui,
     free_ui,
     encode_ui,
@@ -3343,8 +3333,8 @@ const struct game thegame = {
     game_status,
     true, true, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
-    REQUIRE_RBUTTON,  /* flags */
+    false, NULL,                       /* timing_state */
+    REQUIRE_RBUTTON,				       /* flags */
 };
 
 #ifdef STANDALONE_SOLVER

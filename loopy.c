@@ -689,6 +689,7 @@ static game_params *custom_params(const config_item *cfg)
 
 static const char *validate_params(const game_params *params, bool full)
 {
+    const char *err;
     if (params->type < 0 || params->type >= NUM_GRID_TYPES)
         return "Illegal grid type";
     if (params->w < grid_size_limits[params->type].amin ||
@@ -697,6 +698,8 @@ static const char *validate_params(const game_params *params, bool full)
     if (params->w < grid_size_limits[params->type].omin &&
 	params->h < grid_size_limits[params->type].omin)
         return grid_size_limits[params->type].oerr;
+    err = grid_validate_params(grid_types[params->type], params->w, params->h);
+    if (err != NULL) return err;
 
     /*
      * This shouldn't be able to happen at all, since decode_params
@@ -779,10 +782,13 @@ static const char *validate_desc(const game_params *params, const char *desc)
      * know is the precise number of faces. */
     grid_desc = extract_grid_desc(&desc);
     ret = grid_validate_desc(grid_types[params->type], params->w, params->h, grid_desc);
-    if (ret) return ret;
+    if (ret) {
+        sfree(grid_desc);
+        return ret;
+    }
 
     g = loopy_generate_grid(params, grid_desc);
-    if (grid_desc) sfree(grid_desc);
+    sfree(grid_desc);
 
     for (; *desc; ++desc) {
         if ((*desc >= '0' && *desc <= '9') || (*desc >= 'A' && *desc <= 'Z')) {
@@ -793,13 +799,18 @@ static const char *validate_desc(const game_params *params, const char *desc)
             count += *desc - 'a' + 1;
             continue;
         }
+        grid_free(g);
         return "Unknown character in description";
     }
 
-    if (count < g->num_faces)
+    if (count < g->num_faces) {
+        grid_free(g);
         return "Description too short for board size";
-    if (count > g->num_faces)
+    }
+    if (count > g->num_faces) {
+        grid_free(g);
         return "Description too long for board size";
+    }
 
     grid_free(g);
 
@@ -980,11 +991,6 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
     sfree(ds->clue_satisfied);
     sfree(ds->lines);
     sfree(ds);
-}
-
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
 }
 
 static float game_anim_length(const game_state *oldstate,
@@ -1369,7 +1375,7 @@ static bool game_has_unique_soln(const game_state *state, int diff)
 {
     bool ret;
     solver_state *sstate_new;
-    solver_state *sstate = new_solver_state((game_state *)state, diff);
+    solver_state *sstate = new_solver_state(state, diff);
 
     sstate_new = solve_game_rec(sstate);
 
@@ -2712,7 +2718,6 @@ static int loop_deductions(solver_state *sstate)
     game_state *state = sstate->state;
     grid *g = state->game_grid;
     int shortest_chainlen = g->num_dots;
-    bool loop_found = false;
     int dots_connected;
     bool progress = false;
     int i;
@@ -2725,7 +2730,7 @@ static int loop_deductions(solver_state *sstate)
      */
     for (i = 0; i < g->num_edges; i++) {
         if (state->lines[i] == LINE_YES) {
-            loop_found |= merge_dots(sstate, i);
+            merge_dots(sstate, i);
             edgecount++;
         }
     }
@@ -3292,11 +3297,8 @@ static void game_redraw_line(drawing *dr, game_drawstate *ds,
 
     if (line_colour == COL_FAINT) {
 	static int draw_faint_lines = -1;
-	if (draw_faint_lines < 0) {
-	    char *env = getenv("LOOPY_FAINT_LINES");
-	    draw_faint_lines = (!env || (env[0] == 'y' ||
-					 env[0] == 'Y'));
-	}
+	if (draw_faint_lines < 0)
+	    draw_faint_lines = getenv_bool("LOOPY_FAINT_LINES", true);
 	if (draw_faint_lines)
 	    draw_line(dr, x1, y1, x2, y2, line_colour);
     } else {
@@ -3674,7 +3676,7 @@ const struct game thegame = {
     new_game,
     dup_game,
     free_game,
-    1, solve_game,
+    true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
     new_ui,
     free_ui,
@@ -3696,8 +3698,8 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false /* wants_statusbar */,
-    false, game_timing_state,
-    REQUIRE_RBUTTON,  /* flags */
+    false, NULL,                       /* timing_state */
+    REQUIRE_RBUTTON,                                       /* mouse_priorities */
 };
 
 #ifdef STANDALONE_SOLVER

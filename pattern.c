@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -181,6 +182,9 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w <= 0 || params->h <= 0)
 	return "Width and height must both be greater than zero";
+    if (params->w > INT_MAX - 1 || params->h > INT_MAX - 1 ||
+        params->w > INT_MAX / params->h)
+        return "Puzzle must not be unreasonably large";
     return NULL;
 }
 
@@ -363,7 +367,7 @@ static int compute_rowdata(int *ret, unsigned char *start, int len, int step)
 #define STILL_UNKNOWN 3
 
 #ifdef STANDALONE_SOLVER
-bool verbose = false;
+static bool verbose = false;
 #endif
 
 static bool do_recurse(unsigned char *known, unsigned char *deduced,
@@ -724,7 +728,7 @@ static unsigned char *generate_soluble(random_state *rs, int w, int h)
 #endif
 
 #ifdef STANDALONE_PICTURE_GENERATOR
-unsigned char *picture;
+static unsigned char *picture;
 #endif
 
 static char *new_game_desc(const game_params *params, random_state *rs,
@@ -913,6 +917,10 @@ static const char *validate_desc(const game_params *params, const char *desc)
                 p = desc;
                 while (*desc && isdigit((unsigned char)*desc)) desc++;
                 n = atoi(p);
+                if (n < 0)
+                    return "at least one clue is negative";
+                if (n > INT_MAX - 1)
+                    return "at least one clue is grossly excessive";
                 rowspace -= n+1;
 
                 if (rowspace < 0) {
@@ -1232,7 +1240,7 @@ static game_ui *new_ui(const game_state *state)
     ret = snew(game_ui);
     ret->dragging = false;
     ret->cur_x = ret->cur_y = 0;
-    ret->cur_visible = false;
+    ret->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ret;
 }
@@ -1734,6 +1742,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 static void game_free_drawstate(drawing *dr, game_drawstate *ds)
 {
     sfree(ds->visible);
+    sfree(ds->numcolours);
     sfree(ds->strbuf);
     sfree(ds);
 }
@@ -1990,11 +1999,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2101,7 +2105,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 

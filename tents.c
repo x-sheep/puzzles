@@ -32,6 +32,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -229,7 +230,7 @@
  */
 #if defined STANDALONE_SOLVER
 #define SOLVER_DIAGNOSTICS
-bool verbose = false;
+static bool verbose = false;
 #elif defined SOLVER_DIAGNOSTICS
 #define verbose true
 #endif
@@ -408,6 +409,8 @@ static const char *validate_params(const game_params *params, bool full)
      */
     if (params->w < 4 || params->h < 4)
 	return "Width and height must both be at least four";
+    if (params->w > (INT_MAX - 1) / params->h)
+        return "Width times height must not be unreasonably large";
     return NULL;
 }
 
@@ -1188,6 +1191,21 @@ static char *new_game_desc(const game_params *params_in, random_state *rs,
     return ret;
 }
 
+/*
+ * Grid description format:
+ * 
+ * _ = tree
+ * a = 1 BLANK then TREE
+ * ...
+ * y = 25 BLANKs then TREE
+ * z = 25 BLANKs
+ * ! = set previous square to TENT
+ * - = set previous square to NONTENT
+ *
+ * Last character must be one that would insert a tree as the first
+ * square after the grid.
+ */
+
 static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, h = params->h;
@@ -1201,9 +1219,10 @@ static const char *validate_desc(const game_params *params, const char *desc)
             area += *desc - 'a' + 2;
 	else if (*desc == 'z')
             area += 25;
-        else if (*desc == '!' || *desc == '-')
-            /* do nothing */;
-        else
+        else if (*desc == '!' || *desc == '-') {
+            if (area == 0 || area > w * h)
+                return "Tent or non-tent placed off the grid";
+        } else
             return "Invalid character in grid specification";
 
 	desc++;
@@ -1436,7 +1455,7 @@ static game_ui *new_ui(const game_state *state)
     ui->drag_button = -1;
     ui->drag_ok = false;
     ui->cx = ui->cy = 0;
-    ui->cdisp = false;
+    ui->cdisp = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -2583,11 +2602,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2659,7 +2673,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 

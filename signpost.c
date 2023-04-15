@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -419,11 +420,14 @@ static game_params *custom_params(const config_item *cfg)
 
 static const char *validate_params(const game_params *params, bool full)
 {
-    if (params->w < 2 || params->h < 2)
-	return "Width and height must both be at least two";
-    if (params->w == 2 && params->h == 2)   /* leads to generation hang */
-	return "Width and height cannot both be two";
-
+    if (params->w < 1) return "Width must be at least one";
+    if (params->h < 1) return "Height must be at least one";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
+    if (full && params->w == 1 && params->h == 1)
+	/* The UI doesn't let us move these from unsolved to solved,
+	 * so we disallow generating (but not playing) them. */
+	return "Width and height cannot both be one";
     return NULL;
 }
 
@@ -1027,8 +1031,8 @@ static void connect_numbers(game_state *state)
 
 static int compare_heads(const void *a, const void *b)
 {
-    struct head_meta *ha = (struct head_meta *)a;
-    struct head_meta *hb = (struct head_meta *)b;
+    const struct head_meta *ha = (const struct head_meta *)a;
+    const struct head_meta *hb = (const struct head_meta *)b;
 
     /* Heads with preferred colours first... */
     if (ha->preference && !hb->preference) return -1;
@@ -1389,7 +1393,7 @@ static game_ui *new_ui(const game_state *state)
      * copy to clone, there's code that needs fixing in game_redraw too. */
 
     ui->cx = ui->cy = 0;
-    ui->cshow = false;
+    ui->cshow = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     ui->dragging = false;
     ui->sx = ui->sy = ui->dx = ui->dy = 0;
@@ -2157,10 +2161,8 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
                      * yourself which is more brain-twisting :-)
                      */
                     static int gear_mode = -1;
-                    if (gear_mode < 0) {
-                        char *env = getenv("SIGNPOST_GEARS");
-                        gear_mode = (env && (env[0] == 'y' || env[0] == 'Y'));
-                    }
+                    if (gear_mode < 0)
+                        gear_mode = getenv_bool("SIGNPOST_GEARS", false);
                     if (gear_mode)
                         sign = 1 - 2 * ((x ^ y) & 1);
                     else
@@ -2221,11 +2223,6 @@ static void game_get_cursor_location(const game_ui *ui,
 static int game_status(const game_state *state)
 {
     return state->completed ? +1 : 0;
-}
-
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
 }
 
 static void game_print_size(const game_params *params, float *x, float *y)
@@ -2310,7 +2307,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 
@@ -2319,10 +2316,9 @@ const struct game thegame = {
 #include <time.h>
 #include <stdarg.h>
 
-const char *quis = NULL;
-int verbose = 0;
+static const char *quis = NULL;
 
-void usage(FILE *out) {
+static void usage(FILE *out) {
     fprintf(out, "usage: %s [--stdin] [--soak] [--seed SEED] <params>|<game id>\n", quis);
 }
 
@@ -2423,7 +2419,7 @@ static void process_desc(char *id)
     thegame.free_params(p);
 }
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
     char *id = NULL, *desc, *aux = NULL;
     const char *err;

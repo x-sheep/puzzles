@@ -95,8 +95,8 @@ float draw_scale(drawing *dr)
 void draw_thick_line(drawing *dr, float thickness,
 		     float x1, float y1, float x2, float y2, int colour)
 {
-    if (thickness < 1.0)
-        thickness = 1.0;
+    if (thickness < 1.0F)
+        thickness = 1.0F;
     if (dr->api->draw_thick_line) {
 	dr->api->draw_thick_line(dr->handle, thickness,
 				 x1, y1, x2, y2, colour);
@@ -106,8 +106,8 @@ void draw_thick_line(drawing *dr, float thickness,
 	 * polygon rendering uses integer coordinates.
 	 */
 	float len = sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
-	float tvhatx = (x2 - x1)/len * (thickness/2 - 0.2);
-	float tvhaty = (y2 - y1)/len * (thickness/2 - 0.2);
+	float tvhatx = (x2 - x1)/len * (thickness/2 - 0.2F);
+	float tvhaty = (y2 - y1)/len * (thickness/2 - 0.2F);
 	int p[8];
 
 	p[0] = x1 - tvhaty;

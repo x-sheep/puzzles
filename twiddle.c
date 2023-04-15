@@ -10,6 +10,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -123,14 +124,16 @@ static void decode_params(game_params *ret, char const *string)
     while (*string) {
 	if (*string == 'r') {
 	    ret->rowsonly = true;
+            string++;
 	} else if (*string == 'o') {
 	    ret->orientable = true;
+            string++;
 	} else if (*string == 'm') {
             string++;
 	    ret->movetarget = atoi(string);
-            while (string[1] && isdigit((unsigned char)string[1])) string++;
-	}
-	string++;
+            while (*string && isdigit((unsigned char)*string)) string++;
+	} else
+            string++;
     }
 }
 
@@ -210,6 +213,8 @@ static const char *validate_params(const game_params *params, bool full)
 	return "Width must be at least the rotating block size";
     if (params->h < params->n)
 	return "Height must be at least the rotating block size";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
     return NULL;
 }
 
@@ -613,7 +618,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->cur_x = 0;
     ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -879,8 +884,8 @@ static void rotate(int *xy, struct rotation *rot)
 	xf2 = rot->c * xf + rot->s * yf;
 	yf2 = - rot->s * xf + rot->c * yf;
 
-	xy[0] = (int)(xf2 + rot->ox + 0.5);   /* round to nearest */
-	xy[1] = (int)(yf2 + rot->oy + 0.5);   /* round to nearest */
+	xy[0] = (int)(xf2 + rot->ox + 0.5F);   /* round to nearest */
+	xy[1] = (int)(yf2 + rot->oy + 0.5F);   /* round to nearest */
     }
 }
 
@@ -1067,7 +1072,7 @@ static int highlight_colour(float angle)
 	COL_LOWLIGHT,
     };
 
-    return colours[(int)((angle + 2*PI) / (PI/16)) & 31];
+    return colours[(int)((angle + 2*(float)PI) / ((float)PI/16)) & 31];
 }
 
 static float game_anim_length_real(const game_state *oldstate,
@@ -1191,7 +1196,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	rot->cw = rot->ch = TILE_SIZE * state->n;
 	rot->ox = rot->cx + rot->cw/2;
 	rot->oy = rot->cy + rot->ch/2;
-	angle = (float)((-PI/2 * lastr) * (1.0 - animtime / anim_max));
+	angle = ((-(float)PI/2 * lastr) * (1.0F - animtime / anim_max));
 	rot->c = (float)cos(angle);
 	rot->s = (float)sin(angle);
 
@@ -1284,19 +1289,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     }
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame twiddle
 #endif
@@ -1336,9 +1328,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

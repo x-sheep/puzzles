@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 
 #include "puzzles.h"
@@ -70,7 +71,11 @@ static game_params *default_params(void)
 }
 
 static const struct game_params pegs_presets[] = {
+    {5, 7, TYPE_CROSS},
     {7, 7, TYPE_CROSS},
+    {5, 9, TYPE_CROSS},
+    {7, 9, TYPE_CROSS},
+    {9, 9, TYPE_CROSS},
     {7, 7, TYPE_OCTAGON},
     {5, 5, TYPE_RANDOM},
     {7, 7, TYPE_RANDOM},
@@ -89,7 +94,7 @@ static bool game_fetch_preset(int i, char **name, game_params **params)
     *ret = pegs_presets[i];
 
     strcpy(str, pegs_titletypes[ret->type]);
-    if (ret->type == TYPE_RANDOM)
+    if (ret->type == TYPE_CROSS || ret->type == TYPE_RANDOM)
 	sprintf(str + strlen(str), " %dx%d", ret->w, ret->h);
 
     *name = dupstr(str);
@@ -182,14 +187,38 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (full && (params->w <= 3 || params->h <= 3))
 	return "Width and height must both be greater than three";
+    if (params->w < 1 || params->h < 1)
+	return "Width and height must both be at least one";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
 
     /*
-     * It might be possible to implement generalisations of Cross
-     * and Octagon, but only if I can find a proof that they're all
-     * soluble. For the moment, therefore, I'm going to disallow
-     * them at any size other than the standard one.
+     * At http://www.gibell.net/pegsolitaire/GenCross/GenCrossBoards0.html
+     * George I. Bell asserts that various generalised cross-shaped
+     * boards are soluble starting (and finishing) with the centre
+     * hole.  We permit the symmetric ones.  Bell's notation for each
+     * soluble board is listed.
      */
-    if (full && (params->type == TYPE_CROSS || params->type == TYPE_OCTAGON)) {
+    if (full && params->type == TYPE_CROSS) {
+        if (!((params->w == 9 && params->h == 5) || /* (3,1,3,1) */
+              (params->w == 5 && params->h == 9) || /* (1,3,1,3) */
+              (params->w == 9 && params->h == 9) || /* (3,3,3,3) */
+              (params->w == 7 && params->h == 5) || /* (2,1,2,1) */
+              (params->w == 5 && params->h == 7) || /* (1,2,1,2) */
+              (params->w == 9 && params->h == 7) || /* (3,2,3,2) */
+              (params->w == 7 && params->h == 9) || /* (2,3,2,3) */
+              (params->w == 7 && params->h == 7)))  /* (2,2,2,2) */
+            return "This board type is only supported at "
+                "5x7, 5x9, 7x7, 7x9, and 9x9";
+    }
+
+    /*
+     * It might be possible to implement generalisations of
+     * Octagon, but only if I can find a proof that they're all
+     * soluble. For the moment, therefore, I'm going to disallow
+     * it at any size other than the standard one.
+     */
+    if (full && params->type == TYPE_OCTAGON) {
 	if (params->w != 7 || params->h != 7)
 	    return "This board type is only supported at 7x7";
     }
@@ -658,12 +687,23 @@ static char *new_game_desc(const game_params *params, random_state *rs,
 
 static const char *validate_desc(const game_params *params, const char *desc)
 {
-    int len = params->w * params->h;
+    int len, i, npeg = 0, nhole = 0;
+
+    len = params->w * params->h;
 
     if (len != strlen(desc))
 	return "Game description is wrong length";
     if (len != strspn(desc, "PHO"))
 	return "Invalid character in game description";
+    for (i = 0; i < len; i++) {
+        npeg += desc[i] == 'P';
+        nhole += desc[i] == 'H';
+    }
+    /* The minimal soluble game has two pegs and a hole: "3x1:PPH". */
+    if (npeg < 2)
+        return "Too few pegs in game description";
+    if (nhole < 1)
+        return "Too few holes in game description";
 
     return NULL;
 }
@@ -706,12 +746,6 @@ static void free_game(game_state *state)
     sfree(state);
 }
 
-static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, const char **error)
-{
-    return NULL;
-}
-
 static bool game_can_format_as_text_now(const game_params *params)
 {
     return true;
@@ -751,7 +785,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->sx = ui->sy = ui->dx = ui->dy = 0;
     ui->dragging = false;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->cur_jumping = false;
 
     /* make sure we start the cursor somewhere on the grid. */
@@ -1311,19 +1345,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame pegs
 #endif
@@ -1343,7 +1364,7 @@ const struct game thegame = {
     new_game,
     dup_game,
     free_game,
-    false, solve_game,
+    false, NULL, /* solve */
     true, game_can_format_as_text_now, game_text_format,
     new_ui,
     free_ui,
@@ -1363,10 +1384,10 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     false,			       /* wants_statusbar */
-    false, game_timing_state,
-	DISABLE_RBUTTON,			       /* flags */
+    false, NULL,                       /* timing_state */
+    DISABLE_RBUTTON,				       /* flags */
 };
 
 /* vim: set shiftwidth=4 tabstop=8: */

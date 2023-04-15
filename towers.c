@@ -893,6 +893,7 @@ static const char *validate_desc(const game_params *params, const char *desc)
 	    return "Too much data to fit in grid";
     }
 
+    if (*p) return "Rubbish at end of game description";
     return NULL;
 }
 
@@ -1162,8 +1163,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->hx = ui->hy = 0;
     ui->hpencil = false;
-    ui->hshow = false;
-    ui->hcursor = false;
+    ui->hshow = ui->hcursor = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -1643,9 +1643,8 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     int i;
 
     ds->tilesize = 0;
-    char *env = getenv("FIXED_PENCIL_MARKS");
-    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
-    ds->three_d = !getenv("TOWERS_2D");
+    ds->fixed_pencil = getenv_bool("FIXED_PENCIL_MARKS", false);
+    ds->three_d = !getenv_bool("TOWERS_2D", false);
     ds->tiles = snewn((w+2)*(w+2), long);
     ds->drawn = snewn((w+2)*(w+2)*4, long);
     for (i = 0; i < (w+2)*(w+2)*4; i++)
@@ -1974,13 +1973,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    if (state->completed)
-	return false;
-    return true;
-}
-
 static void game_print_size(const game_params *params, float *x, float *y)
 {
     int pw, ph;
@@ -2099,7 +2091,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,  /* flags */
 };
 
