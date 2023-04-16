@@ -1781,8 +1781,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->order = state->order;
     ds->mode = state->mode;
 
-    char *env = getenv("FIXED_PENCIL_MARKS");
-    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
+    ds->fixed_pencil = getenv_bool("FIXED_PENCIL_MARKS", false);
     ds->nums = snewn(o2, digit);
     ds->hints = snewn(o3, unsigned char);
     ds->flags = snewn(o2, unsigned int);

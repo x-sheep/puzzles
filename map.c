@@ -2674,8 +2674,7 @@ static const float map_default_colours[FOUR][3] = {
 static float *game_colours(frontend *fe, int *ncolours)
 {
     float *ret = snewn(3 * NCOLOURS, float);
-	char *env = getenv("MAP_VIVID_COLOURS");
-	char vivid = env && (env[0] == 'Y' || env[0] == 'y');
+	bool vivid = getenv_bool("MAP_VIVID_COLOURS", false);
 
     frontend_default_colour(fe, &ret[COL_BACKGROUND * 3]);
 
@@ -3138,8 +3137,7 @@ static void game_print(drawing *dr, const game_state *state, int tilesize)
     int x, y, r;
     int *coords, ncoords, coordsize;
 	char buf[2];
-	char *env = getenv("MAP_VIVID_COLOURS");
-	char vivid = env && (env[0] == 'Y' || env[0] == 'y');
+	bool vivid = getenv_bool("MAP_VIVID_COLOURS", false);
 	buf[1] = '\0';
 	
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */

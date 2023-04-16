@@ -2228,8 +2228,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->h = state->common->params.h;
     ds->ascii = false;
     
-    char *env = getenv("FIXED_PENCIL_MARKS");
-    ds->fixed_pencil = env && (env[0] == 'Y' || env[0] == 'y');
+    ds->fixed_pencil = getenv_bool("FIXED_PENCIL_MARKS", false);
     
     ds->count_errors[0] = false;
     ds->count_errors[1] = false;

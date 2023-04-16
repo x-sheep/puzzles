@@ -239,7 +239,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\gluefe.c">
       <Filter>Source Code</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\auxiliary\obfusc.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\hat.c">
+      <Filter>Source Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml" />
