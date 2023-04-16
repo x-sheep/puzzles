@@ -22,7 +22,7 @@
             <!-- Section 1 body -->
             <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap">
                 UWP version
-                <LineBreak/>&#xA9; 2022 Lennard Sprong
+                <LineBreak/>&#xA9; 2023 Lennard Sprong
                 <LineBreak/>
                 <LineBreak/>Based on Simon Tatham's Portable Puzzle Collection
             </TextBlock>
@@ -41,9 +41,9 @@
 
             <!-- Section 2 body -->
             <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap">
-                This software is copyright 2004-2021 Simon Tatham.
+                This software is copyright 2004-2023 Simon Tatham.
                 <LineBreak/>
-                <LineBreak/>Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas K&#246;lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou, Bernd Schmidt, Steffen Bauer, Lennard Sprong, Rogier Goossens, Michael Quevillon, Chris Boyle, Phil Tunstall, Asher Gordon and Didi Kohen.
+                <LineBreak/>Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas K&#246;lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou, Bernd Schmidt, Steffen Bauer, Lennard Sprong, Rogier Goossens, Michael Quevillon, Chris Boyle, Phil Tunstall, Asher Gordon, Didi Kohen, and Ben Harris. 
                 <LineBreak/>
                 <LineBreak/>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &#8216;Software&#8217;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
                 <LineBreak/>
