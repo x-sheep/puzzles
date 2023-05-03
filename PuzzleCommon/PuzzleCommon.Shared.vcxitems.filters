@@ -39,10 +39,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\generated-games.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\hat.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat-internal.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\hat-internal.h">
       <Filter>Source Headers</Filter>
     </ClInclude>
   </ItemGroup>

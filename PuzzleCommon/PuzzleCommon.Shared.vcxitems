@@ -24,8 +24,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\resource.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\tree234.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\generated-games.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\auxiliary\hat-internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\hat.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\hat-internal.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml.h">
       <DependentUpon>$(MSBuildThisFileDirectory)Direct2DPuzzleCanvas.xaml</DependentUpon>
     </ClInclude>
