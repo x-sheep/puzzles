@@ -1905,7 +1905,7 @@ static game_state *execute_move(const game_state *state, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* fool the macros */
     struct dummy { int tilesize; } dummy, *ds = &dummy;
@@ -2006,7 +2006,8 @@ static int *find_errors(const game_state *state, char *grid)
 {
     int w = state->p.w, h = state->p.h;
     int *ret = snewn(w*h + w + h, int);
-    int *tmp = snewn(w*h*2, int), *dsf = tmp + w*h;
+    int *tmp = snewn(w*h, int);
+    DSF *dsf;
     int x, y;
 
     /*
@@ -2223,7 +2224,7 @@ static int *find_errors(const game_state *state, char *grid)
      * all the tents in any component which has a smaller tree
      * count.
      */
-    dsf_init(dsf, w*h);
+    dsf = dsf_new(w*h);
     /* Construct the equivalence classes. */
     for (y = 0; y < h; y++) {
 	for (x = 0; x < w-1; x++) {
@@ -2266,7 +2267,7 @@ static int *find_errors(const game_state *state, char *grid)
      * start of the game, before the user had done anything wrong!)
      */
 #define TENT(x) ((x)==TENT || (x)==BLANK)
-    dsf_init(dsf, w*h);
+    dsf_reinit(dsf);
     /* Construct the equivalence classes. */
     for (y = 0; y < h; y++) {
 	for (x = 0; x < w-1; x++) {
@@ -2302,6 +2303,7 @@ static int *find_errors(const game_state *state, char *grid)
 #undef TENT
 
     sfree(tmp);
+    dsf_free(dsf);
     return ret;
 }
 
@@ -2597,19 +2599,21 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static void game_print_size(const game_params *params, float *x, float *y)
+static void game_print_size(const game_params *params, const game_ui *ui,
+                            float *x, float *y)
 {
     int pw, ph;
 
     /*
      * I'll use 6mm squares by default.
      */
-    game_compute_size(params, 600, &pw, &ph);
+    game_compute_size(params, 600, ui, &pw, &ph);
     *x = pw / 100.0F;
     *y = ph / 100.0F;
 }
 
-static void game_print(drawing *dr, const game_state *state, int tilesize)
+static void game_print(drawing *dr, const game_state *state, const game_ui *ui,
+                       int tilesize)
 {
     int c;
 
@@ -2648,6 +2652,7 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
     NULL, /* encode_ui */

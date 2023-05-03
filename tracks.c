@@ -921,7 +921,7 @@ static game_state *new_game(midend *me, const game_params *params, const char *d
 }
 
 struct solver_scratch {
-    int *dsf;
+    DSF *dsf;
 };
 
 static int solve_set_sflag(game_state *state, int x, int y,
@@ -1323,7 +1323,7 @@ static int solve_check_neighbours(game_state *state, bool both_ways)
 }
 
 static int solve_check_loop_sub(game_state *state, int x, int y, int dir,
-                                int *dsf, int startc, int endc)
+                                DSF *dsf, int startc, int endc)
 {
     int w = state->p.w, h = state->p.h, i = y*w+x, j, k;
     bool satisfied = true;
@@ -1375,13 +1375,13 @@ static int solve_check_loop_sub(game_state *state, int x, int y, int dir,
 static int solve_check_loop(game_state *state)
 {
     int w = state->p.w, h = state->p.h, x, y, i, j, did = 0;
-    int *dsf, startc, endc;
+    DSF *dsf;
+    int startc, endc;
 
     /* TODO eventually we should pull this out into a solver struct and keep it
        updated as we connect squares. For now we recreate it every time we try
        this particular solver step. */
-    dsf = snewn(w*h, int);
-    dsf_init(dsf, w*h);
+    dsf = dsf_new(w*h);
 
     /* Work out the connectedness of the current loop set. */
     for (x = 0; x < w; x++) {
@@ -1419,7 +1419,7 @@ static int solve_check_loop(game_state *state)
         }
     }
 
-    sfree(dsf);
+    dsf_free(dsf);
 
     return did;
 }
@@ -1472,8 +1472,8 @@ static int solve_bridge_sub(game_state *state, int x, int y, int d,
     assert(d == D || d == R);
 
     if (!sc->dsf)
-        sc->dsf = snew_dsf(wh);
-    dsf_init(sc->dsf, wh);
+        sc->dsf = dsf_new(wh);
+    dsf_reinit(sc->dsf);
 
     for (xi = 0; xi < w; xi++) {
         for (yi = 0; yi < h; yi++) {
@@ -1612,7 +1612,7 @@ static int tracks_solve(game_state *state, int diff, int *max_diff_out)
         break;
     }
 
-    sfree(sc->dsf);
+    dsf_free(sc->dsf);
 
     if (max_diff_out)
         *max_diff_out = max_diff;
@@ -1792,7 +1792,7 @@ static void debug_state(game_state *state, const char *what) {
 }
 
 static void dsf_update_completion(game_state *state, int ax, int ay,
-                                  char dir, int *dsf)
+                                  char dir, DSF *dsf)
 {
     int w = state->p.w, ai = ay*w+ax, bx, by, bi;
 
@@ -1866,7 +1866,8 @@ static bool check_completion(game_state *state, bool mark)
     int w = state->p.w, h = state->p.h, x, y, i, target;
     bool ret = true, pathret;
     int ntrack, nnotrack, ntrackcomplete;
-    int *dsf, pathclass;
+    DSF *dsf;
+    int pathclass;
     struct findloopstate *fls;
     struct tracks_neighbour_ctx ctx;
 
@@ -1885,8 +1886,7 @@ static bool check_completion(game_state *state, bool mark)
         }
     }
 
-    dsf = snewn(w*h, int);
-    dsf_init(dsf, w*h);
+    dsf = dsf_new(w*h);
 
     for (x = 0; x < w; x++) {
         for (y = 0; y < h; y++) {
@@ -2006,7 +2006,7 @@ static bool check_completion(game_state *state, bool mark)
         state->completed = ret;
         if (ret) set_flash_data(state);
     }
-    sfree(dsf);
+    dsf_free(dsf);
     return ret;
 }
 
@@ -2487,7 +2487,7 @@ static game_state *execute_move(const game_state *state, const char *move)
 #define FLASH_TIME 0.5F
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Ick: fake up `ds->sz6' and `ds->border` for macro expansion purposes */
     struct {
@@ -2988,17 +2988,19 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static void game_print_size(const game_params *params, float *x, float *y)
+static void game_print_size(const game_params *params, const game_ui *ui,
+                            float *x, float *y)
 {
     int pw, ph;
 
     /* The Times uses 7mm squares */
-    game_compute_size(params, 700, &pw, &ph);
+    game_compute_size(params, 700, ui, &pw, &ph);
     *x = pw / 100.0F;
     *y = ph / 100.0F;
 }
 
-static void game_print(drawing *dr, const game_state *state, int tilesize)
+static void game_print(drawing *dr, const game_state *state, const game_ui *ui,
+                       int tilesize)
 {
     int w = state->p.w, h = state->p.h;
     int black = print_mono_colour(dr, 0), grey = print_grey_colour(dr, 0.5F);
@@ -3057,6 +3059,7 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
     NULL, /* encode_ui */
