@@ -81,7 +81,7 @@
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
-      <PreprocessorDefinitions>COMBINED;STYLUS_BASED;SMALL_SCREEN;PORTRAIT_SCREEN;SLOW_SYSTEM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>COMBINED;STYLUS_BASED;NO_TGMATH_H;SMALL_SCREEN;PORTRAIT_SCREEN;SLOW_SYSTEM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
