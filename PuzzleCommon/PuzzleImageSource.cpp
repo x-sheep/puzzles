@@ -489,7 +489,7 @@ namespace PuzzleCommon
 			&textLayout
 			)
 			);
-		
+
 		ComPtr<ID2D1SolidColorBrush> textBrush;
 		ThrowIfFailed(
 			m_d2dContext->CreateSolidColorBrush(
@@ -498,13 +498,17 @@ namespace PuzzleCommon
 			)
 			);
 		
-		float fx = x, fy = y, width;
+		float fx = x, fy = y;
 
 		if (valign == GameFontVAlign::VerticalBase)
 			fy -= metrics->ascent * (size / metrics->designUnitsPerEm);
 		else
 			fy -= (metrics->ascent + metrics->descent) * (size / (2*metrics->designUnitsPerEm));
-		textLayout->DetermineMinWidth(&width);
+
+		DWRITE_TEXT_METRICS textMetrics;
+		textLayout->GetMetrics(&textMetrics);
+		float width = textMetrics.widthIncludingTrailingWhitespace;
+
 		if (halign == GameFontHAlign::HorizontalCenter)
 			fx -= width / 2;
 		else if (halign == GameFontHAlign::HorizontalRight)
