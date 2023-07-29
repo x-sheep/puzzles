@@ -1725,7 +1725,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hpencil = false;
             }
             ui->hcursor = false;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
         if (button == RIGHT_BUTTON) {
             /*
@@ -1745,20 +1745,20 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hshow = false;
             }
             ui->hcursor = false;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
     }
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->hx, &ui->hy, w, w, false);
         ui->hshow = true;
         ui->hcursor = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
     if (ui->hshow &&
         (button == CURSOR_SELECT)) {
         ui->hpencil ^= 1;
         ui->hcursor = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (ui->hshow &&
@@ -1784,7 +1784,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             /* ... expect to remove the cursor in mouse mode. */
             if (!ui->hcursor) {
                 ui->hshow = false;
-                return UI_UPDATE;
+                return MOVE_UI_UPDATE;
             }
             return NULL;
         }
@@ -2268,7 +2268,7 @@ static void outline_block_structure(drawing *dr, game_drawstate *ds,
      * Iterate over all the blocks.
      */
     for (i = 0; i < a; i++) {
-	if (dsf_canonify(dsf, i) != i)
+	if (dsf_minimal(dsf, i) != i)
 	    continue;
 
 	/*
@@ -2307,11 +2307,11 @@ static void outline_block_structure(drawing *dr, game_drawstate *ds,
 	    tx = x - dy + dx;
 	    ty = y + dx + dy;
 	    nin += (tx >= 0 && tx < w && ty >= 0 && ty < w &&
-		    dsf_canonify(dsf, ty*w+tx) == i);
+		    dsf_minimal(dsf, ty*w+tx) == i);
 	    tx = x - dy;
 	    ty = y + dx;
 	    nin += (tx >= 0 && tx < w && ty >= 0 && ty < w &&
-		    dsf_canonify(dsf, ty*w+tx) == i);
+		    dsf_minimal(dsf, ty*w+tx) == i);
 	    if (nin == 0) {
 		/*
 		 * Turn right.
@@ -2348,9 +2348,9 @@ static void outline_block_structure(drawing *dr, game_drawstate *ds,
 	     * somewhere sensible.
 	     */
 	    assert(x >= 0 && x < w && y >= 0 && y < w &&
-		   dsf_canonify(dsf, y*w+x) == i);
+		   dsf_minimal(dsf, y*w+x) == i);
 	    assert(x+dx < 0 || x+dx >= w || y+dy < 0 || y+dy >= w ||
-		   dsf_canonify(dsf, (y+dy)*w+(x+dx)) != i);
+		   dsf_minimal(dsf, (y+dy)*w+(x+dx)) != i);
 
 	    /*
 	     * Record the point we just went past at one end of the

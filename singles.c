@@ -1542,7 +1542,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
 #endif
     }
-    if (action == UI) return UI_UPDATE;
+    if (action == UI) return MOVE_UI_UPDATE;
 
     if (action == TOGGLE_BLACK || action == TOGGLE_CIRCLE) {
         i = y * state->w + x;

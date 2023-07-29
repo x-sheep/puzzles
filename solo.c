@@ -2642,6 +2642,7 @@ static void solver(int cr, struct block_structure *blocks,
     sfree(usage->row);
     sfree(usage->col);
     sfree(usage->blk);
+    sfree(usage->diag);
     if (usage->kblocks) {
 	free_block_structure(usage->kblocks);
 	free_block_structure(usage->extra_cages);
@@ -2973,6 +2974,7 @@ static bool gridgen(int cr, struct block_structure *blocks,
     sfree(usage->blk);
     sfree(usage->col);
     sfree(usage->row);
+    sfree(usage->diag);
     sfree(usage);
 
     return ret;
@@ -4637,7 +4639,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hpencil = false;
             }
             ui->hcursor = false;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
         if (button == RIGHT_BUTTON) {
             /*
@@ -4657,20 +4659,20 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hshow = false;
             }
             ui->hcursor = false;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
     }
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->hx, &ui->hy, cr, cr, false);
         ui->hshow = true;
         ui->hcursor = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
     if (ui->hshow &&
         (button == CURSOR_SELECT)) {
         ui->hpencil = !ui->hpencil;
         ui->hcursor = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
 	if (button == BUTTON_MARK_ON && ui->hshow && !ui->hpencil)
@@ -4725,7 +4727,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 /* ... expect to remove the cursor in mouse mode. */
                 if (!ui->hcursor) {
                     ui->hshow = false;
-                    return UI_UPDATE;
+                    return MOVE_UI_UPDATE;
                 }
                 return NULL;
             }

@@ -81,7 +81,6 @@
 
 #include "puzzles.h"
 
-/* Turn this on for hints about which lines are considered possibilities. */
 #undef DRAW_GRID
 
 /* --- structures for params, state, etc. --- */
@@ -2126,18 +2125,42 @@ static char *ui_cancel_drag(game_ui *ui)
     ui->dragx_src = ui->dragy_src = -1;
     ui->dragx_dst = ui->dragy_dst = -1;
     ui->dragging = false;
-    return UI_UPDATE;
+    return MOVE_UI_UPDATE;
 }
 
 static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui_cancel_drag(ui);
-    ui->cur_x = state->islands[0].x;
-    ui->cur_y = state->islands[0].y;
+    if (state != NULL) {
+        ui->cur_x = state->islands[0].x;
+        ui->cur_y = state->islands[0].y;
+    }
     ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->show_hints = false;
     return ui;
+}
+
+static config_item *get_prefs(game_ui *ui)
+{
+    config_item *ret;
+
+    ret = snewn(2, config_item);
+
+    ret[0].name = "Show possible bridge locations";
+    ret[0].kw = "show-hints";
+    ret[0].type = C_BOOLEAN;
+    ret[0].u.boolean.bval = ui->show_hints;
+
+    ret[1].name = NULL;
+    ret[1].type = C_END;
+
+    return ret;
+}
+
+static void set_prefs(game_ui *ui, const config_item *cfg)
+{
+    ui->show_hints = cfg[0].u.boolean.bval;
 }
 
 static void free_ui(game_ui *ui)
@@ -2333,7 +2356,7 @@ static char *update_drag_dst(const game_state *state, game_ui *ui,
     /*debug(("update_drag src (%d,%d) d(%d,%d) dst (%d,%d)\n",
            ui->dragx_src, ui->dragy_src, dx, dy,
            ui->dragx_dst, ui->dragy_dst));*/
-    return UI_UPDATE;
+    return MOVE_UI_UPDATE;
 }
 
 static char *finish_drag(const game_state *state, game_ui *ui)
@@ -2371,12 +2394,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     button &= ~MOD_MASK;
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
-        if (!INGRID(state, gx, gy)) return NULL;
+        if (!INGRID(state, gx, gy)) return MOVE_UNUSED;
         ui->cur_visible = false;
         if (ggrid & G_ISLAND) {
             ui->dragx_src = gx;
             ui->dragy_src = gy;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         } else
             return ui_cancel_drag(ui);
     } else if (button == LEFT_DRAG || button == RIGHT_DRAG) {
@@ -2390,7 +2413,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             /* cancel a drag when we go back to the starting point */
             ui->dragx_dst = -1;
             ui->dragy_dst = -1;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
     } else if (button == LEFT_RELEASE || button == RIGHT_RELEASE) {
         if (ui->dragging) {
@@ -2401,8 +2424,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 return ui_cancel_drag(ui);
             }
             ui_cancel_drag(ui);
-            if (!INGRID(state, gx, gy)) return NULL;
-            if (!(GRID(state, gx, gy) & G_ISLAND)) return NULL;
+            if (!INGRID(state, gx, gy)) return MOVE_UNUSED;
+            if (!(GRID(state, gx, gy) & G_ISLAND)) return MOVE_NO_EFFECT;
             sprintf(buf, "M%d,%d", gx, gy);
             return dupstr(buf);
         }
@@ -2425,7 +2448,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
             move_cursor(button, &nx, &ny, state->w, state->h, false);
             if (nx == ui->cur_x && ny == ui->cur_y)
-                return NULL;
+                return MOVE_NO_EFFECT;
             update_drag_dst(state, ui, ds,
                              COORD(nx)+TILE_SIZE/2,
                              COORD(ny)+TILE_SIZE/2);
@@ -2477,19 +2500,19 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
                     if (!dingrid) break;
                 }
-                if (!oingrid) return UI_UPDATE;
+                if (!oingrid) return MOVE_UI_UPDATE;
             }
             /* not reached */
 
 found:
             ui->cur_x = nx;
             ui->cur_y = ny;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
     } else if (IS_CURSOR_SELECT(button)) {
         if (!ui->cur_visible) {
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
         if (ui->dragging || button == CURSOR_SELECT2) {
             ui_cancel_drag(ui);
@@ -2497,7 +2520,7 @@ found:
                 sprintf(buf, "M%d,%d", ui->cur_x, ui->cur_y);
                 return dupstr(buf);
             } else
-                return UI_UPDATE;
+                return MOVE_UI_UPDATE;
         } else {
             grid_type v = GRID(state, ui->cur_x, ui->cur_y);
             if (v & G_ISLAND) {
@@ -2506,7 +2529,7 @@ found:
                 ui->dragy_src = ui->cur_y;
                 ui->dragx_dst = ui->dragy_dst = -1;
                 ui->drag_is_noline = (button == CURSOR_SELECT2);
-                return UI_UPDATE;
+                return MOVE_UI_UPDATE;
             }
         }
     } else if ((button >= '0' && button <= '9') ||
@@ -2524,7 +2547,7 @@ found:
 
         if (!ui->cur_visible) {
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
 
         for (i = 0; i < state->n_islands; ++i) {
@@ -2551,15 +2574,15 @@ found:
         if (best_x != -1 && best_y != -1) {
             ui->cur_x = best_x;
             ui->cur_y = best_y;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         } else
-            return NULL;
+            return MOVE_NO_EFFECT;
     } else if (button == 'g' || button == 'G') {
         ui->show_hints = !ui->show_hints;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
-    return NULL;
+    return MOVE_UNUSED;
 }
 
 static game_state *execute_move(const game_state *state, const char *move)
@@ -3289,7 +3312,7 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
-    NULL, NULL, /* get_prefs, set_prefs */
+    get_prefs, set_prefs,
     new_ui,
     free_ui,
     NULL, /* encode_ui */

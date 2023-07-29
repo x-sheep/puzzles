@@ -950,7 +950,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                             int x, int y, int button)
 {
     int w = state->w, h = state->h, wh = w * h;
-    char buf[80], *nullret = NULL;
+    char buf[80], *nullret = MOVE_UNUSED;
 
     if (button == LEFT_BUTTON || IS_CURSOR_SELECT(button)) {
         int tx, ty;
@@ -961,7 +961,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             tx = ui->cx; ty = ui->cy;
             ui->cdraw = true;
         }
-        nullret = UI_UPDATE;
+        nullret = MOVE_UI_UPDATE;
 
         if (tx >= 0 && tx < w && ty >= 0 && ty < h) {
             /*
@@ -979,7 +979,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 sprintf(buf, "M%d,%d", tx, ty);
                 return dupstr(buf);
             } else {
-                return NULL;
+                return MOVE_NO_EFFECT;
             }
         }
     }
@@ -996,7 +996,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->cx = min(max(ui->cx, 0), state->w - 1);
         ui->cy = min(max(ui->cy, 0), state->h - 1);
         ui->cdraw = true;
-        nullret = UI_UPDATE;
+        nullret = MOVE_UI_UPDATE;
     }
 
     return nullret;

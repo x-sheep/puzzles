@@ -984,9 +984,9 @@ static int pearl_loopgen_bias(void *vctx, char *board, int face)
              * to reprocess the edges for this boundary.
              */
             if (oldface == c || newface == c) {
-                grid_face *f = &g->faces[face];
+                grid_face *f = g->faces[face];
                 for (k = 0; k < f->order; k++)
-                    tdq_add(b->edges_todo, f->edges[k] - g->edges);
+                    tdq_add(b->edges_todo, f->edges[k]->index);
             }
         }
     }
@@ -1002,15 +1002,15 @@ static int pearl_loopgen_bias(void *vctx, char *board, int face)
          * the vertextypes_todo list.
          */
         while ((j = tdq_remove(b->edges_todo)) >= 0) {
-            grid_edge *e = &g->edges[j];
-            int fc1 = e->face1 ? board[e->face1 - g->faces] : FACE_BLACK;
-            int fc2 = e->face2 ? board[e->face2 - g->faces] : FACE_BLACK;
+            grid_edge *e = g->edges[j];
+            int fc1 = e->face1 ? board[e->face1->index] : FACE_BLACK;
+            int fc2 = e->face2 ? board[e->face2->index] : FACE_BLACK;
             bool oldedge = b->edges[j];
             bool newedge = (fc1==c) ^ (fc2==c);
             if (oldedge != newedge) {
                 b->edges[j] = newedge;
-                tdq_add(b->vertextypes_todo, e->dot1 - g->dots);
-                tdq_add(b->vertextypes_todo, e->dot2 - g->dots);
+                tdq_add(b->vertextypes_todo, e->dot1->index);
+                tdq_add(b->vertextypes_todo, e->dot2->index);
             }
         }
 
@@ -1025,7 +1025,7 @@ static int pearl_loopgen_bias(void *vctx, char *board, int face)
          * old neighbours.
          */
         while ((j = tdq_remove(b->vertextypes_todo)) >= 0) {
-            grid_dot *d = &g->dots[j];
+            grid_dot *d = g->dots[j];
             int neighbours[2], type = 0, n = 0;
             
             for (k = 0; k < d->order; k++) {
@@ -1033,10 +1033,10 @@ static int pearl_loopgen_bias(void *vctx, char *board, int face)
                 grid_dot *d2 = (e->dot1 == d ? e->dot2 : e->dot1);
                 /* dir == 0,1,2,3 for an edge going L,U,R,D */
                 int dir = (d->y == d2->y) + 2*(d->x+d->y > d2->x+d2->y);
-                int ei = e - g->edges;
+                int ei = e->index;
                 if (b->edges[ei]) {
                     type |= 1 << dir;
-                    neighbours[n] = d2 - g->dots; 
+                    neighbours[n] = d2->index;
                     n++;
                 }
             }
@@ -1145,7 +1145,7 @@ static void pearl_loopgen(int w, int h, char *lines, random_state *rs)
     }
 
     for (i = 0; i < g->num_edges; i++) {
-        grid_edge *e = g->edges + i;
+        grid_edge *e = g->edges[i];
         enum face_colour c1 = FACE_COLOUR(e->face1);
         enum face_colour c2 = FACE_COLOUR(e->face2);
         assert(c1 != FACE_GREY);
@@ -2148,11 +2148,11 @@ static char *mark_in_direction(const game_state *state, int x, int y, int dir,
 
     char ch = primary ? 'F' : 'M', *other;
 
-    if (!INGRID(state, x, y) || !INGRID(state, x2, y2)) return UI_UPDATE;
+    if (!INGRID(state, x, y) || !INGRID(state, x2, y2)) return MOVE_UI_UPDATE;
 
     /* disallow laying a mark over a line, or vice versa. */
     other = primary ? state->marks : state->lines;
-    if (other[y*w+x] & dir || other[y2*w+x2] & dir2) return UI_UPDATE;
+    if (other[y*w+x] & dir || other[y2*w+x2] & dir2) return MOVE_UI_UPDATE;
     
     sprintf(buf, "%c%d,%d,%d;%c%d,%d,%d", ch, dir, x, y, ch, dir2, x2, y2);
     return dupstr(buf);
@@ -2179,19 +2179,19 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         if (!INGRID(state, gx, gy)) {
             ui->ndragcoords = -1;
-            return NULL;
+            return MOVE_UI_UPDATE;
         }
 
         ui->clickx = x; ui->clicky = y;
         ui->dragcoords[0] = gy * w + gx;
         ui->ndragcoords = 0;           /* will be 1 once drag is confirmed */
 
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (button == LEFT_DRAG && ui->ndragcoords >= 0) {
         update_ui_drag(state, ui, gx, gy);
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (IS_MOUSE_RELEASE(button)) release = true;
@@ -2201,7 +2201,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    ui->cursor_active = true;
 	} else if (control || shift) {
 	    char *move;
-	    if (ui->ndragcoords > 0) return NULL;
+	    if (ui->ndragcoords > 0) return MOVE_NO_EFFECT;
 	    ui->ndragcoords = -1;
 	    move = mark_in_direction(state, ui->curx, ui->cury,
 				     KEY_DIRECTION(button), control, tmpbuf);
@@ -2213,30 +2213,36 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    if (ui->ndragcoords >= 0)
 		update_ui_drag(state, ui, ui->curx, ui->cury);
 	}
-	return UI_UPDATE;
+	return MOVE_UI_UPDATE;
     }
 
     if (IS_CURSOR_SELECT(button)) {
 	if (!ui->cursor_active) {
 	    ui->cursor_active = true;
-	    return UI_UPDATE;
+	    return MOVE_UI_UPDATE;
 	} else if (button == CURSOR_SELECT) {
 	    if (ui->ndragcoords == -1) {
 		ui->ndragcoords = 0;
 		ui->dragcoords[0] = ui->cury * w + ui->curx;
 		ui->clickx = CENTERED_COORD(ui->curx);
 		ui->clicky = CENTERED_COORD(ui->cury);
-		return UI_UPDATE;
+		return MOVE_UI_UPDATE;
 	    } else release = true;
-	} else if (button == CURSOR_SELECT2 && ui->ndragcoords >= 0) {
-	    ui->ndragcoords = -1;
-	    return UI_UPDATE;
-	}
+	} else if (button == CURSOR_SELECT2) {
+            if (ui->ndragcoords >= 0) {
+                ui->ndragcoords = -1;
+                return MOVE_UI_UPDATE;
+            }
+            return MOVE_NO_EFFECT;
+        }
     }
 
-    if ((button == 27 || button == '\b') && ui->ndragcoords >= 0) {
-        ui->ndragcoords = -1;
-        return UI_UPDATE;
+    if (button == 27 || button == '\b') {
+        if (ui->ndragcoords >= 0) {
+            ui->ndragcoords = -1;
+            return MOVE_UI_UPDATE;
+        }
+        return MOVE_NO_EFFECT;
     }
 
     if (release) {
@@ -2268,7 +2274,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
             ui->ndragcoords = -1;
 
-            return buf ? buf : UI_UPDATE;
+            return buf ? buf : MOVE_UI_UPDATE;
         } else if (ui->ndragcoords == 0) {
             /* Click (or tiny drag). Work out which edge we were
              * closest to. */
@@ -2289,12 +2295,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             cx = CENTERED_COORD(gx);
             cy = CENTERED_COORD(gy);
 
-            if (!INGRID(state, gx, gy)) return UI_UPDATE;
+            if (!INGRID(state, gx, gy)) return MOVE_UI_UPDATE;
 
             if (max(abs(x-cx),abs(y-cy)) < TILE_SIZE/4) {
                 /* TODO closer to centre of grid: process as a cell click not an edge click. */
 
-                return UI_UPDATE;
+                return MOVE_UI_UPDATE;
             } else {
 		int direction;
                 if (abs(x-cx) < abs(y-cy)) {
@@ -2313,7 +2319,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     if (button == 'H' || button == 'h')
         return dupstr("H");
 
-    return NULL;
+    return MOVE_UNUSED;
 }
 
 static game_state *execute_move(const game_state *state, const char *move)

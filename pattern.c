@@ -667,7 +667,7 @@ static bool solve_puzzle(const game_state *state, unsigned char *grid,
 #ifndef STANDALONE_PICTURE_GENERATOR
 static unsigned char *generate_soluble(random_state *rs, int w, int h)
 {
-    int i, j, ntries, max;
+    int i, j, max;
     bool ok;
     unsigned char *grid, *matrix, *workspace;
     unsigned int *changed_h, *changed_w;
@@ -683,11 +683,7 @@ static unsigned char *generate_soluble(random_state *rs, int w, int h)
     changed_w = snewn(max+1, unsigned int);
     rowdata = snewn(max+1, int);
 
-    ntries = 0;
-
     do {
-        ntries++;
-
         generate(rs, w, h, grid);
 
         /*
@@ -1340,7 +1336,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->drag_start_y = ui->drag_end_y = y;
         ui->cur_visible = false;
 
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (ui->dragging && button == ui->drag) {
@@ -1369,7 +1365,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->drag_end_x = x;
         ui->drag_end_y = y;
 
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (ui->dragging && button == ui->release) {
@@ -1397,7 +1393,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		    x1, y1, x2-x1+1, y2-y1+1);
 	    return dupstr(buf);
         } else
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
     }
 
     if (IS_CURSOR_MOVE(button)) {
@@ -1405,12 +1401,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	char buf[80];
         move_cursor(button, &ui->cur_x, &ui->cur_y, state->common->w, state->common->h, false);
         ui->cur_visible = true;
-	if (!control && !shift) return UI_UPDATE;
+	if (!control && !shift) return MOVE_UI_UPDATE;
 
 	newstate = control ? shift ? GRID_UNKNOWN : GRID_FULL : GRID_EMPTY;
 	if (state->grid[y * state->common->w + x] == newstate &&
 	    state->grid[ui->cur_y * state->common->w + ui->cur_x] == newstate)
-	    return UI_UPDATE;
+	    return MOVE_UI_UPDATE;
 
 	sprintf(buf, "%c%d,%d,%d,%d", control ? shift ? 'U' : 'F' : 'E',
 		min(x, ui->cur_x), min(y, ui->cur_y),
@@ -1425,7 +1421,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         if (!ui->cur_visible) {
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
 
         if (button == CURSOR_SELECT2)

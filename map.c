@@ -2341,7 +2341,7 @@ static config_item *get_prefs(game_ui *ui)
 {
     config_item *ret;
 
-    ret = snewn(2, config_item);
+    ret = snewn(3, config_item);
 
     ret[0].name = "Victory flash effect";
     ret[0].kw = "flash-type";
@@ -2350,8 +2350,13 @@ static config_item *get_prefs(game_ui *ui)
     ret[0].u.choices.choicekws = ":cyclic:each-white:all-white";
     ret[0].u.choices.selected = ui->flash_type;
 
-    ret[1].name = NULL;
-    ret[1].type = C_END;
+    ret[1].name = "Number regions";
+    ret[1].kw = "show-numbers";
+    ret[1].type = C_BOOLEAN;
+    ret[1].u.boolean.bval = ui->show_numbers;
+
+    ret[2].name = NULL;
+    ret[2].type = C_END;
 
     return ret;
 }
@@ -2359,6 +2364,7 @@ static config_item *get_prefs(game_ui *ui)
 static void set_prefs(game_ui *ui, const config_item *cfg)
 {
     ui->flash_type = cfg[0].u.choices.selected;
+    ui->show_numbers = cfg[1].u.boolean.bval;
 }
 
 static void free_ui(game_ui *ui)
@@ -2482,7 +2488,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	/*
     if (button == 'l' || button == 'L') {
         ui->show_labels = (ui->show_labels == REGION_LABELS) ? NO_LABELS : REGION_LABELS;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 	*/
 	
@@ -2498,7 +2504,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->cur_moved = true;
         ui->cur_lastmove = button;
         ui->last_tilesize = TILESIZE;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
     if (IS_CURSOR_SELECT(button)) {
         if (!ui->cur_visible || ui->dragx < 0 || ui->last_tilesize != TILESIZE) {
@@ -2506,7 +2512,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
         if (!ui->cur_visible) {
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
         if (ui->drag_colour == -2) { /* not currently cursor-dragging, start. */
             int r = region_from_ui_cursor(state, ui);
@@ -2518,7 +2524,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->drag_pencil = 0;
             }
             ui->cur_moved = false;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         } else { /* currently cursor-dragging; drop the colour in the new region. */
             alt_button = (button == CURSOR_SELECT2);
             /* Double-select removes current colour. */
@@ -2544,7 +2550,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dragy = y;
         ui->last_tilesize = TILESIZE;
         ui->cur_visible = false;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if ((button == LEFT_DRAG || button == RIGHT_DRAG) &&
@@ -2552,7 +2558,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dragx = x;
         ui->dragy = y;
         ui->last_tilesize = TILESIZE;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if ((button == LEFT_RELEASE || button == RIGHT_RELEASE) &&
@@ -2577,18 +2583,18 @@ drag_dropped:
         ui->drag_colour = -2;
 
 	if (r < 0)
-            return UI_UPDATE;          /* drag into border; do nothing else */
+            return MOVE_UI_UPDATE;          /* drag into border; do nothing else */
 
 	if (state->map->immutable[r])
-	    return UI_UPDATE;          /* can't change this region */
+	    return MOVE_UI_UPDATE;          /* can't change this region */
 
         if (state->colouring[r] == c && state->pencil[r] == p)
-            return UI_UPDATE;          /* don't _need_ to change this region */
+            return MOVE_UI_UPDATE;          /* don't _need_ to change this region */
 
 	if (alt_button) {
 	    if (state->colouring[r] >= 0) {
 		/* Can't pencil on a coloured region */
-		return UI_UPDATE;
+		return MOVE_UI_UPDATE;
 	    } else if (c >= 0) {
 		/* Right-dragging from colour to blank toggles one pencil */
 		p = state->pencil[r] ^ (1 << c);
