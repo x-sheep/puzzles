@@ -993,8 +993,7 @@ bool midend_just_performed_redo(midend *me)
     return me->just_performed_redo;
 }
 
-static bool midend_really_process_key(midend *me, int x, int y, int button,
-                                      bool *handled)
+static bool midend_really_process_key(midend *me, int x, int y, int button)
 {
     game_state *oldstate =
         me->ourgame->dup_game(me->states[me->statepos - 1].state);

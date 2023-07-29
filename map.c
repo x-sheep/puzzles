@@ -2341,7 +2341,7 @@ static config_item *get_prefs(game_ui *ui)
 {
     config_item *ret;
 
-    ret = snewn(3, config_item);
+    ret = snewn(2, config_item);
 
     ret[0].name = "Victory flash effect";
     ret[0].kw = "flash-type";
@@ -2350,13 +2350,8 @@ static config_item *get_prefs(game_ui *ui)
     ret[0].u.choices.choicekws = ":cyclic:each-white:all-white";
     ret[0].u.choices.selected = ui->flash_type;
 
-    ret[1].name = "Number regions";
-    ret[1].kw = "show-numbers";
-    ret[1].type = C_BOOLEAN;
-    ret[1].u.boolean.bval = ui->show_numbers;
-
-    ret[2].name = NULL;
-    ret[2].type = C_END;
+    ret[1].name = NULL;
+    ret[1].type = C_END;
 
     return ret;
 }
@@ -2364,7 +2359,6 @@ static config_item *get_prefs(game_ui *ui)
 static void set_prefs(game_ui *ui, const config_item *cfg)
 {
     ui->flash_type = cfg[0].u.choices.selected;
-    ui->show_numbers = cfg[1].u.boolean.bval;
 }
 
 static void free_ui(game_ui *ui)
@@ -2494,7 +2488,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	
     if (button == 'l' || button == 'L') {
         ui->show_labels = (ui->show_labels == COLOUR_LABELS) ? NO_LABELS : COLOUR_LABELS;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 	
     if (IS_CURSOR_MOVE(button)) {

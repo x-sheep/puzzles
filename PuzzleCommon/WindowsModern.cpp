@@ -684,7 +684,7 @@ namespace PuzzleCommon
 
 	void WindowsModern::Undo()
 	{
-		midend_process_key(me, 0, 0, UI_UNDO, NULL);
+		midend_process_key(me, 0, 0, UI_UNDO);
 	}
 
 	void WindowsModern::CheckGameCompletion()
@@ -711,7 +711,7 @@ namespace PuzzleCommon
 
 	void WindowsModern::Redo()
 	{
-		midend_process_key(me, 0, 0, UI_REDO, NULL);
+		midend_process_key(me, 0, 0, UI_REDO);
 	}
 
 	bool WindowsModern::HasStatusbar()
@@ -756,7 +756,7 @@ namespace PuzzleCommon
 		if (control)
 			button |= MOD_CTRL;
 
-		midend_process_key(me, 0, 0, button, NULL);
+		midend_process_key(me, 0, 0, button);
 		CheckGameCompletion();
 	}
 
@@ -773,27 +773,27 @@ namespace PuzzleCommon
 		{
 		case ButtonType::LEFT:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
-				midend_process_key(me, x, y, LEFT_BUTTON, NULL);
+				midend_process_key(me, x, y, LEFT_BUTTON);
 			if (state == ButtonState::DRAG)
-				midend_process_key(me, x, y, LEFT_DRAG, NULL);
+				midend_process_key(me, x, y, LEFT_DRAG);
 			if (state == ButtonState::UP || state == ButtonState::TAP)
-				midend_process_key(me, x, y, LEFT_RELEASE, NULL);
+				midend_process_key(me, x, y, LEFT_RELEASE);
 			break;
 		case ButtonType::MIDDLE:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
-				midend_process_key(me, x, y, MIDDLE_BUTTON, NULL);
+				midend_process_key(me, x, y, MIDDLE_BUTTON);
 			if (state == ButtonState::DRAG)
-				midend_process_key(me, x, y, MIDDLE_DRAG, NULL);
+				midend_process_key(me, x, y, MIDDLE_DRAG);
 			if (state == ButtonState::UP || state == ButtonState::TAP)
-				midend_process_key(me, x, y, MIDDLE_RELEASE, NULL);
+				midend_process_key(me, x, y, MIDDLE_RELEASE);
 			break;
 		case ButtonType::RIGHT:
 			if (state == ButtonState::DOWN || state == ButtonState::TAP)
-				midend_process_key(me, x, y, RIGHT_BUTTON, NULL);
+				midend_process_key(me, x, y, RIGHT_BUTTON);
 			if (state == ButtonState::DRAG)
-				midend_process_key(me, x, y, RIGHT_DRAG, NULL);
+				midend_process_key(me, x, y, RIGHT_DRAG);
 			if (state == ButtonState::UP || state == ButtonState::TAP)
-				midend_process_key(me, x, y, RIGHT_RELEASE, NULL);
+				midend_process_key(me, x, y, RIGHT_RELEASE);
 			break;
 		}
 
