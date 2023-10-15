@@ -41,6 +41,10 @@ var ctx;
 // by js_canvas_end_draw.
 var update_xmin, update_xmax, update_ymin, update_ymax;
 
+// Colour strings to use when drawing, to save converting them from C
+// every time.
+var colours = [];
+
 // Module object for Emscripten. We fill in these parameters to ensure
 // that when main() returns nothing will get cleaned up so we remain
 // able to call the puzzle's various callbacks.
@@ -81,14 +85,14 @@ var update_xmin, update_xmax, update_ymin, update_ymax;
 
 var Module = {
     'preRun': function() {
-        // Merge environment variables from HTML script element.
+        // Merge environment variables from HTML script elements.
         // This means you can add something like this to the HTML:
         // <script id="environment" type="application/json">
         //   { "LOOPY_DEFAULT": "20x10t11dh" }
         // </script>
-        var envscript = document.getElementById("environment");
-        var k, v;
-        if (envscript !== null)
+        var envscript, k, v;
+        for (envscript of document.querySelectorAll(
+            "script#environment, script.environment"))
             for ([k, v] of
                  Object.entries(JSON.parse(envscript.textContent)))
                 ENV[k] = v;

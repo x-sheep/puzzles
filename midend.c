@@ -1278,7 +1278,7 @@ key_label *midend_request_keys(midend *me, int *n)
 
     if(me->ourgame->request_keys)
     {
-        keys = me->ourgame->request_keys(midend_get_params(me), &nkeys);
+        keys = me->ourgame->request_keys(me->params, &nkeys);
         for(i = 0; i < nkeys; ++i)
         {
             if(!keys[i].label)
@@ -2938,7 +2938,9 @@ static config_item *midend_get_prefs(midend *me, game_ui *ui)
     all_prefs[pos].type = C_END;
 
     if (be_prefs)
-        free_cfg(be_prefs);
+        /* We already copied each element, so don't free those with
+           free_cfg(). */
+        sfree(be_prefs);
 
     return all_prefs;
 }

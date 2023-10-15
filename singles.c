@@ -258,7 +258,7 @@ static game_params *custom_params(const config_item *cfg)
 static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 2 || params->h < 2)
-	return "Width and neight must be at least two";
+	return "Width and height must be at least two";
     if (params->w > 10+26+26 || params->h > 10+26+26)
         return "Puzzle is too large";
     if (full) {
@@ -1308,9 +1308,10 @@ found:
     return j;
 }
 
-static char *new_game_desc(const game_params *params, random_state *rs,
+static char *new_game_desc(const game_params *params_orig, random_state *rs,
 			   char **aux, bool interactive)
 {
+    game_params *params = dup_params(params_orig);
     game_state *state = blank_game(params->w, params->h);
     game_state *tosolve = blank_game(params->w, params->h);
     int i, j, *scratch, *rownums, *colnums, x, y, ntries;
@@ -1318,6 +1319,12 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     char *ret;
     digit *latin;
     struct solver_state *ss = solver_state_new(state);
+
+    /* Downgrade difficulty to Easy for puzzles so tiny that they aren't
+     * possible to generate at Tricky. These are 2x2, 2x3 and 3x3, i.e.
+     * any puzzle that doesn't have one dimension at least 4. */
+    if ((w < 4 || h < 4) && params->diff > DIFF_EASY)
+        params->diff = DIFF_EASY;
 
     scratch = snewn(state->n, int);
     rownums = snewn(h*o, int);
@@ -1412,6 +1419,7 @@ randomise:
 
     free_game(tosolve);
     free_game(state);
+    free_params(params);
     solver_state_free(ss);
     sfree(scratch);
     sfree(rownums);
@@ -1454,6 +1462,28 @@ static game_ui *new_ui(const game_state *state)
     ui->show_black_nums = false;
 
     return ui;
+}
+
+static config_item *get_prefs(game_ui *ui)
+{
+    config_item *ret;
+
+    ret = snewn(2, config_item);
+
+    ret[0].name = "Show numbers on black squares";
+    ret[0].kw = "show-black-nums";
+    ret[0].type = C_BOOLEAN;
+    ret[0].u.boolean.bval = ui->show_black_nums;
+
+    ret[1].name = NULL;
+    ret[1].type = C_END;
+
+    return ret;
+}
+
+static void set_prefs(game_ui *ui, const config_item *cfg)
+{
+    ui->show_black_nums = cfg[0].u.boolean.bval;
 }
 
 static void free_ui(game_ui *ui)
@@ -1504,11 +1534,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     int i, x = FROMCOORD(mx), y = FROMCOORD(my);
     enum { NONE, TOGGLE_BLACK, TOGGLE_CIRCLE, CYCLE_FORWARD, CYCLE_BACKWARD, UI } action = NONE;
 
-    if (IS_CURSOR_MOVE(button)) {
-        move_cursor(button, &ui->cx, &ui->cy, state->w, state->h, true);
-        ui->cshow = true;
-        action = UI;
-    } else if (IS_CURSOR_SELECT(button)) {
+    if (IS_CURSOR_MOVE(button))
+        return move_cursor(button, &ui->cx, &ui->cy, state->w, state->h, true,
+                           &ui->cshow);
+    else if (IS_CURSOR_SELECT(button)) {
         x = ui->cx; y = ui->cy;
         if (!ui->cshow) {
             action = UI;
@@ -1526,7 +1555,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
         if (!INGRID(state, x, y)) {
             ui->show_black_nums = !ui->show_black_nums;
-            action = UI; /* this wants to be a per-game option. */
+            action = UI;
         } 
 #ifdef STYLUS_BASED
 		else if (button == LEFT_BUTTON) {
@@ -1875,7 +1904,7 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
-    NULL, NULL, /* get_prefs, set_prefs */
+    get_prefs, set_prefs,
     new_ui,
     free_ui,
     NULL, /* encode_ui */

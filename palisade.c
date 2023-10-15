@@ -983,13 +983,13 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     }
 
     if (IS_CURSOR_MOVE(button)) {
-        ui->show = true;
         if (control || shift) {
             borderflag flag = 0, newflag;
             int dir, i =  ui->y * w + ui->x;
+            ui->show = true;
             x = ui->x;
             y = ui->y;
-            move_cursor(button, &x, &y, w, h, false);
+            move_cursor(button, &x, &y, w, h, false, NULL);
             if (OUT_OF_BOUNDS(x, y, w, h)) return NULL;
 
             for (dir = 0; dir < 4; ++dir)
@@ -1008,10 +1008,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             if (shift) newflag |= DISABLED(BORDER(FLIP(dir)));
             return string(80, "F%d,%d,%dF%d,%d,%d",
                           ui->x, ui->y, flag, x, y, newflag);
-        } else {
-            move_cursor(button, &ui->x, &ui->y, w, h, false);
-            return MOVE_UI_UPDATE;
-        }
+        } else
+            return move_cursor(button, &ui->x, &ui->y, w, h, false, &ui->show);
     }
 
     return NULL;
