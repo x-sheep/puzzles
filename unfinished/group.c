@@ -1275,7 +1275,7 @@ static game_ui *new_ui(const game_state *state)
     ui->hcursor = false;
     ui->drag = 0;
 
-    ui->pencil_keep_highlight = false;
+    ui->pencil_keep_highlight = true;
 
     return ui;
 }

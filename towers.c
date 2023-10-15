@@ -1210,7 +1210,7 @@ static game_ui *new_ui(const game_state *state)
     ui->hshow = ui->hcursor = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     ui->three_d = true;
-    ui->pencil_keep_highlight = false;
+    ui->pencil_keep_highlight = true;
     legacy_prefs_override(ui);
 
     return ui;

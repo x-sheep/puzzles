@@ -1665,7 +1665,7 @@ static game_ui *new_ui(const game_state *state)
         getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->ascii = false;
 
-    ui->pencil_keep_highlight = false;
+    ui->pencil_keep_highlight = true;
 
     return ui;
 }
