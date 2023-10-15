@@ -218,9 +218,20 @@ namespace PuzzleModern.UWP
 
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
+            var cfgs = fe.GetPreferences();
             _isFlyoutOpen = true;
-            var flyout = new GeneralSettingsFlyout();
+            var flyout = new GeneralSettingsFlyout(_puzzleName, cfgs.ToArray());
             flyout.Unloaded += (s, a) => { _isFlyoutOpen = false; };
+            flyout.PreferencesChanged += (s, a) =>
+            {
+                a.Error = fe.SetPreferences(a.NewConfig);
+                if (_isLoaded)
+                {
+                    if (_puzzleName == "Pearl")
+                        ResizeGame();
+                    ForceRedraw();
+                }
+            };
             flyout.ShowIndependent();
         }
 

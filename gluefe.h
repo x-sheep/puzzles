@@ -9,6 +9,7 @@ struct frontend {
 
 	float scale;
 	config_item *configs;
+	config_item *prefs;
 	void *canvas;
 	void *statusbar;
 	void *timer;

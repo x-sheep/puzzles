@@ -422,28 +422,6 @@ static game_ui *new_ui(const game_state *state)
     return ui;
 }
 
-static config_item *get_prefs(game_ui *ui)
-{
-    config_item *ret;
-
-    ret = snewn(2, config_item);
-
-    ret[0].name = "Label colours with numbers";
-    ret[0].kw = "show-labels";
-    ret[0].type = C_BOOLEAN;
-    ret[0].u.boolean.bval = ui->show_labels;
-
-    ret[1].name = NULL;
-    ret[1].type = C_END;
-
-    return ret;
-}
-
-static void set_prefs(game_ui *ui, const config_item *cfg)
-{
-    ui->show_labels = cfg[0].u.boolean.bval;
-}
-
 static void free_ui(game_ui *ui)
 {
     if (ui->hint)
@@ -1543,7 +1521,7 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     false, NULL, NULL, /* can_format_as_text_now, text_format */
-    get_prefs, set_prefs,
+    NULL, NULL, /* get_prefs, set_prefs, */
     new_ui,
     free_ui,
     encode_ui,

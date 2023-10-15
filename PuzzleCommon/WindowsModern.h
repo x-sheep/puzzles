@@ -75,6 +75,17 @@ namespace PuzzleCommon
 		Platform::String^ SetConfiguration(Windows::Foundation::Collections::IVector<ConfigItem^>^ input);
 
 		/// <summary>
+		/// Get the current game-specific preferences.
+		/// </summary>
+		/// <returns>A new instance, with the currently active values set.</returns>
+		Windows::Foundation::Collections::IVector<ConfigItem^>^ GetPreferences();
+		/// <summary>
+		/// Set the current game-specific preferences and persist them.
+		/// </summary>
+		/// <returns>When not null, a validation error has occured. Display this message to the user.</returns>
+		Platform::String^ SetPreferences(Windows::Foundation::Collections::IVector<ConfigItem^>^ input);
+
+		/// <summary>
 		/// Get the Random Seed used to generate this game.
 		/// </summary>
 		Platform::String^ GetRandomSeed();
@@ -248,7 +259,6 @@ namespace PuzzleCommon
 		std::atomic_bool _generating;
 		bool _wonGame;
 		static Puzzle^ FromConstGame(const game *g);
-		static char *ToChars(Platform::String ^input);
 	
 		void Destroy();
 		void CheckGameCompletion();

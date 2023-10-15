@@ -37,6 +37,19 @@ Platform::String ^FromChars(const char *input)
 	return ret;
 }
 
+
+static char* ToChars(Platform::String^ input)
+{
+	char* ret;
+	auto start = input->Data();
+	int newlen = WideCharToMultiByte(CP_ACP, 0, start, input->Length(), NULL, 0, NULL, NULL);
+	ret = snewn(newlen + 1, char);
+	WideCharToMultiByte(CP_ACP, 0, start, input->Length(), ret, newlen, NULL, NULL);
+	ret[newlen] = '\0';
+
+	return ret;
+}
+
 /// <summary>
 /// Convert an array of chars to a Platform String, using UTF8 encoding.
 /// </summary>
@@ -482,18 +495,6 @@ void winmodern_write_chars(void *vctx, const void *buf, int len)
 
 namespace PuzzleCommon
 {
-	char *WindowsModern::ToChars(Platform::String ^input)
-	{
-		char *ret;
-		auto start = input->Data();
-		int newlen = WideCharToMultiByte(CP_ACP, 0, start, input->Length(), NULL, 0, NULL, NULL);
-		ret = snewn(newlen + 1, char);
-		WideCharToMultiByte(CP_ACP, 0, start, input->Length(), ret, newlen, NULL, NULL);
-		ret[newlen] = '\0';
-
-		return ret;
-	}
-
 	Puzzle^ WindowsModern::FromConstGame(const game *g)
 	{
 		auto p = ref new Puzzle();
@@ -859,6 +860,7 @@ namespace PuzzleCommon
 		this->fe = snew(frontend);
 		this->fe->preset_menu = NULL;
 		this->fe->configs = NULL;
+		this->fe->prefs = NULL;
 		this->fe->scale = 1.0f;
 		this->fe->next_blitter_id = 0;
 		this->canvas = icanvas;
@@ -885,6 +887,16 @@ namespace PuzzleCommon
 		const game *g = gamelist[i];
 		this->me = midend_new(this->fe, g, &winmodern_drawing, this->fe);
 		this->ourgame = g;
+
+		auto settings = ApplicationData::Current->RoamingSettings->Values;
+		auto prefKey = "pref_" + FromChars(g->name);
+		if (settings->HasKey(prefKey)) {
+			auto saved = safe_cast<Platform::String^>(settings->Lookup(prefKey));
+			char* prefs = ToChars(saved);
+			char* p = prefs;
+			const char* err = midend_load_prefs(me, winmodern_read_chars, &p);
+			sfree(prefs);
+		}
 
 		ReloadColors();
 	}
@@ -1090,34 +1102,25 @@ namespace PuzzleCommon
 		return FromChars(midend_get_game_id(me), true);
 	}
 
-	Windows::Foundation::Collections::IVector<ConfigItem^>^ WindowsModern::GetConfiguration()
+	static Windows::Foundation::Collections::IVector<ConfigItem^>^ get_configuration_generic(config_item* configs)
 	{
-		if (!this->ourgame->can_configure)
-			return nullptr;
-
 		auto ret = ref new Vector<ConfigItem^>();
+		config_item* i;
 
-		sfree(fe->configs);
-
-		char *title = NULL;
-		fe->configs = midend_get_config(me, CFG_SETTINGS, &title);
-		sfree(title);
-		config_item *i;
-		
-		for (i = fe->configs; i->type != C_END; i++)
+		for (i = configs; i->type != C_END; i++)
 		{
-			ConfigItem ^item = ref new ConfigItem();
+			ConfigItem^ item = ref new ConfigItem();
 			item->Label = FromChars(i->name);
 
-			item->Field = i->type == C_BOOLEAN ? ConfigField::BOOLEAN : 
-				i->type == C_CHOICES ? ConfigField::ENUM : 
+			item->Field = i->type == C_BOOLEAN ? ConfigField::BOOLEAN :
+				i->type == C_CHOICES ? ConfigField::ENUM :
 				item->Label == "No. of balls" ? ConfigField::TEXT :
 				item->Label == "Barrier probability" ? ConfigField::FLOAT :
 				ConfigField::INTEGER;
 
 			if (i->type == C_STRING)
 				item->StringValue = FromChars(i->u.string.sval);
-			else if(i->type == C_BOOLEAN)
+			else if (i->type == C_BOOLEAN)
 				item->IntValue = i->u.boolean.bval;
 			else if (i->type == C_CHOICES)
 			{
@@ -1126,8 +1129,8 @@ namespace PuzzleCommon
 
 				/* Parse the list of choices. Copied from windows.c */
 				char c = i->u.choices.choicenames[0];
-				char *str;
-				const char *q, *p = i->u.choices.choicenames + 1;
+				char* str;
+				const char* q, * p = i->u.choices.choicenames + 1;
 				while (*p) {
 					q = p;
 					while (*q && *q != c) q++;
@@ -1146,11 +1149,35 @@ namespace PuzzleCommon
 		return ret;
 	}
 
-	Platform::String^ WindowsModern::SetConfiguration(Windows::Foundation::Collections::IVector<ConfigItem^>^ input)
+	Windows::Foundation::Collections::IVector<ConfigItem^>^ WindowsModern::GetConfiguration()
 	{
+		if (!this->ourgame->can_configure)
+			return nullptr;
+
+		sfree(fe->configs);
+
+		char *title = NULL;
+		fe->configs = midend_get_config(me, CFG_SETTINGS, &title);
+		sfree(title);
+		
+		return get_configuration_generic(fe->configs);
+	}
+
+	Windows::Foundation::Collections::IVector<ConfigItem^>^ WindowsModern::GetPreferences()
+	{
+		sfree(fe->prefs);
+
+		char* title = NULL;
+		fe->prefs = midend_get_config(me, CFG_PREFS, &title);
+		sfree(title);
+
+		return get_configuration_generic(fe->prefs);
+	}
+
+	static const char* set_configuration_generic(Windows::Foundation::Collections::IVector<ConfigItem^>^ input, midend* me, config_item* configs, int whichcfg) {
 		int idx = 0;
-		config_item *i;
-		for (i = fe->configs; i->type != C_END; i++, idx++)
+		config_item* i;
+		for (i = configs; i->type != C_END; i++, idx++)
 		{
 			if (i->type == C_BOOLEAN)
 				i->u.boolean.bval = input->GetAt(idx)->IntValue != 0;
@@ -1159,10 +1186,36 @@ namespace PuzzleCommon
 			else if (i->type == C_STRING)
 				i->u.string.sval = ToChars(input->GetAt(idx)->StringValue);
 		}
-		const char *err = midend_set_config(me, CFG_SETTINGS, fe->configs);
-		if (err)
-			return FromChars(err);
-		return nullptr;
+		return midend_set_config(me, whichcfg, configs);
+	}
+
+	Platform::String^ WindowsModern::SetConfiguration(Windows::Foundation::Collections::IVector<ConfigItem^>^ input)
+	{
+		return FromChars(set_configuration_generic(input, me, fe->configs, CFG_SETTINGS));
+	}
+
+	Platform::String^ WindowsModern::SetPreferences(Windows::Foundation::Collections::IVector<ConfigItem^>^ input)
+	{
+		auto err = FromChars(set_configuration_generic(input, me, fe->prefs, CFG_PREFS));
+		if (!err) {
+			auto settings = Windows::Storage::ApplicationData::Current->RoamingSettings->Values;
+
+			write_save_context* ctx = snew(write_save_context);
+			ctx->len = 1024;
+			ctx->buf = snewn(ctx->len, char);
+			ctx->pos = 0;
+
+			midend_save_prefs(me, winmodern_write_chars, ctx);
+
+			ctx->buf[ctx->pos] = '\0';
+
+			Platform::String^ save = FromChars(ctx->buf);
+			sfree(ctx->buf);
+			sfree(ctx);
+
+			settings->Insert("pref_" + FromChars(ourgame->name), save);
+		}
+		return err;
 	}
 
 	void WindowsModern::Redraw(IPuzzleCanvas ^icanvas, IPuzzleStatusBar ^ibar, IPuzzleTimer ^timer, bool force)

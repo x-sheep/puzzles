@@ -18,6 +18,109 @@ using Windows.UI.Xaml.Navigation;
 
 namespace PuzzleModern.UWP
 {
+    public static class ConfigItemExtensions
+    {
+        public static void RenderIntoPanel(this ConfigItem[] config, Panel panel, DataTemplate template, bool useSwitches)
+        {
+            for (var i = 0; i < config.Length; i++)
+            {
+                var item = config[i];
+                switch (item.Field)
+                {
+                    case ConfigField.BOOLEAN:
+                        if (useSwitches)
+                        {
+                            var toggle = new ToggleSwitch
+                            {
+                                Name = "ConfigItem" + i,
+                                IsOn = item.IntValue != 0,
+                                Header = item.Label,
+                                Width = panel.Width,
+                                HeaderTemplate = template,
+                                Margin = new Thickness(0, 0, 0, 10)
+                            };
+
+                            panel.Children.Add(toggle);
+                        }
+                        else
+                        {
+                            var toggle = new CheckBox
+                            {
+                                Name = "ConfigItem" + i,
+                                IsChecked = item.IntValue != 0,
+                                Content = item.Label,
+                                Width = panel.Width,
+                                ContentTemplate = template,
+                                Margin = new Thickness(0, 0, 0, 10)
+                            };
+
+                            panel.Children.Add(toggle);
+                        }
+                        break;
+                    case ConfigField.ENUM:
+                        var box = new ComboBox
+                        {
+                            Name = "ConfigItem" + i,
+                            HeaderTemplate = template,
+                            Header = item.Label,
+                            Width = panel.Width,
+                            Margin = new Thickness(0, 0, 0, 10)
+                        };
+
+                        foreach (var s in item.StringValues)
+                        {
+                            box.Items.Add(new ComboBoxItem
+                            {
+                                Content = s
+                            });
+                        }
+                        box.SelectedIndex = item.IntValue;
+
+                        panel.Children.Add(box);
+                        break;
+                    case ConfigField.TEXT:
+                    case ConfigField.INTEGER:
+                        var txt = new TextBox
+                        {
+                            Name = "ConfigItem" + i,
+                            HeaderTemplate = template,
+                            Header = item.Label,
+                            Text = item.StringValue,
+                            Margin = new Thickness(0, 0, 0, 10)
+                        };
+
+                        // Use the numeric keyboard.
+                        if (item.Field == ConfigField.INTEGER)
+                        {
+                            var scope = new InputScope();
+                            scope.Names.Add(new InputScopeName(InputScopeNameValue.Number));
+                            txt.InputScope = scope;
+                        }
+
+                        panel.Children.Add(txt);
+                        break;
+                    case ConfigField.FLOAT:
+                        var slider = new Slider
+                        {
+                            Name = "ConfigItem" + i,
+                            Minimum = 0,
+                            Maximum = 1,
+                            StepFrequency = 0.05,
+                            TickFrequency = 0.25,
+                            TickPlacement = TickPlacement.BottomRight,
+                            Header = item.Label,
+                            HeaderTemplate = template
+                        };
+                        if (double.TryParse(item.StringValue, out var d))
+                            slider.Value = d;
+
+                        panel.Children.Add(slider);
+                        break;
+                }
+            }
+        }
+    }
+
     public sealed partial class ParamsDialog
     {
         private readonly ConfigItem[] configItems = null;
@@ -30,85 +133,7 @@ namespace PuzzleModern.UWP
 
             if (config != null && config.Length > 0)
             {
-                for (var i = 0; i < config.Length; i++)
-                {
-                    var item = config[i];
-                    switch (item.Field)
-                    {
-                        case ConfigField.BOOLEAN:
-                            var toggle = new CheckBox
-                            {
-                                Name = "ConfigItem" + i,
-                                IsChecked = item.IntValue != 0,
-                                Content = item.Label,
-                                Width = ItemsPanel.Width,
-                                ContentTemplate = LabelTemplate,
-                                Margin = new Thickness(0, 0, 0, 10)
-                            };
-
-                            ItemsPanel.Children.Add(toggle);
-                            break;
-                        case ConfigField.ENUM:
-                            var box = new ComboBox
-                            {
-                                Name = "ConfigItem" + i,
-                                HeaderTemplate = LabelTemplate,
-                                Header = item.Label,
-                                Width = ItemsPanel.Width,
-                                Margin = new Thickness(0, 0, 0, 10)
-                            };
-
-                            foreach (var s in item.StringValues)
-                            {
-                                box.Items.Add(new ComboBoxItem
-                                {
-                                    Content = s
-                                });
-                            }
-                            box.SelectedIndex = item.IntValue;
-
-                            ItemsPanel.Children.Add(box);
-                            break;
-                        case ConfigField.TEXT:
-                        case ConfigField.INTEGER:
-                            var txt = new TextBox
-                            {
-                                Name = "ConfigItem" + i,
-                                HeaderTemplate = LabelTemplate,
-                                Header = item.Label,
-                                Text = item.StringValue,
-                                Margin = new Thickness(0, 0, 0, 10)
-                            };
-
-                            // Use the numeric keyboard.
-                            if (item.Field == ConfigField.INTEGER)
-                            {
-                                var scope = new InputScope();
-                                scope.Names.Add(new InputScopeName(InputScopeNameValue.Number));
-                                txt.InputScope = scope;
-                            }
-
-                            ItemsPanel.Children.Add(txt);
-                            break;
-                        case ConfigField.FLOAT:
-                            var slider = new Slider
-                            {
-                                Name = "ConfigItem" + i,
-                                Minimum = 0,
-                                Maximum = 1,
-                                StepFrequency = 0.05,
-                                TickFrequency = 0.25,
-                                TickPlacement = TickPlacement.BottomRight,
-                                Header = item.Label,
-                                HeaderTemplate = LabelTemplate
-                            };
-                            if (double.TryParse(item.StringValue, out var d))
-                                slider.Value = d;
-
-                            ItemsPanel.Children.Add(slider);
-                            break;
-                    }
-                }
+                config.RenderIntoPanel(ItemsPanel, LabelTemplate, false);
             }
             else
             {

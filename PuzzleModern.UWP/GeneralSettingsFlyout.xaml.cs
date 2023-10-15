@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PuzzleCommon;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace PuzzleModern.UWP
 {
     public sealed partial class GeneralSettingsFlyout
     {
+        private readonly ConfigItem[] configItems = new ConfigItem[0];
+
         public IObservableMap<string, object> DefaultViewModel
         {
             get { return (IObservableMap<string, object>)GetValue(_DefaultViewModel); }
@@ -70,6 +73,74 @@ namespace PuzzleModern.UWP
             DefaultViewModel["PencilColour"] = PresetColours[PencilColourBox.SelectedIndex];
 
             _loaded = true;
+        }
+
+        public GeneralSettingsFlyout(string name, ConfigItem[] config)
+            : this()
+        {
+            if (name == "Map")
+                MapColorContainer.Visibility = Visibility.Visible;
+
+            if (config != null && config.Length > 0)
+            {
+                SpecificHeader.Text = name + " - Preferences";
+                SpecificHeader.Visibility = Visibility.Visible;
+                configItems = config;
+                config.RenderIntoPanel(ItemsPanel, LabelTemplate, true);
+
+                for (var i = 0; i < configItems.Length; i++)
+                {
+                    var idx = i;
+                    var item = configItems[i];
+                    var itemObj = FindName("ConfigItem" + i);
+                    switch (item.Field)
+                    {
+                        case ConfigField.BOOLEAN:
+                            var toggle = (ToggleSwitch)itemObj;
+                            toggle.Toggled += (sender, args) =>
+                            {
+                                item.IntValue = toggle.IsOn ? 1 : 0;
+                                ApplyGameSpecificPreferences();
+                            };
+                            break;
+                        case ConfigField.ENUM:
+                            var box = (ComboBox)itemObj;
+                            box.SelectionChanged += (sender, args) =>
+                            {
+                                item.IntValue = box.SelectedIndex;
+                                ApplyGameSpecificPreferences();
+                            };
+                            break;
+                        case ConfigField.TEXT:
+                        case ConfigField.INTEGER:
+                            var text = (TextBox)itemObj;
+                            text.TextChanged += (sender, args) =>
+                            {
+                                item.StringValue = text.Text;
+                                ApplyGameSpecificPreferences();
+                            };
+                            break;
+                        case ConfigField.FLOAT:
+                            var slider = (Slider)itemObj;
+                            slider.ValueChanged += (sender, args) =>
+                            {
+                                item.StringValue = slider.Value.ToString();
+                                ApplyGameSpecificPreferences();
+                            };
+                            break;
+                    }
+                }
+            }
+        }
+
+        public event EventHandler<NewConfigurationEventArgs> PreferencesChanged;
+
+        private void ApplyGameSpecificPreferences()
+        {
+            PreferencesChanged?.Invoke(this, new NewConfigurationEventArgs
+            {
+                NewConfig = configItems
+            });
         }
 
         private void NewGameSwitch_Toggled(object sender, RoutedEventArgs e)

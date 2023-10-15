@@ -28,50 +28,6 @@
                 <ColumnDefinition Width="96" />
             </Grid.ColumnDefinitions>
 
-            <ComboBox Grid.Column="0" x:Name="MapPaletteBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="MapPaletteBox_SelectionChanged" Header="Map - Color palette" SelectedIndex="0">
-                <ComboBoxItem>Default</ComboBoxItem>
-                <ComboBoxItem>Vivid</ComboBoxItem>
-            </ComboBox>
-
-            <Border x:Name="VividPalettePreview" Visibility="Collapsed" Grid.Column="1" Height="36" Margin="9,26,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#c04040" />
-                    <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#4db34d" />
-                    <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#4d4db3" />
-                    <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#d9d91a" />
-                </Grid>
-            </Border>
-
-            <Border x:Name="DefaultPalettePreview" Grid.Column="1" Height="36" Margin="9,26,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#b38066" />
-                    <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#cdb366" />
-                    <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#809a66" />
-                    <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#8d735a" />
-                </Grid>
-            </Border>
-        </Grid>
-
-        <Grid Margin="4,0,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="96" />
-            </Grid.ColumnDefinitions>
-
             <ComboBox Grid.Column="0" x:Name="EntryColourBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="EntryColourBox_SelectionChanged" Header="Entry number colour" SelectedIndex="0" Margin="0,10,0,0">
                 <ComboBoxItem>Green</ComboBoxItem>
                 <ComboBoxItem>Blue</ComboBoxItem>
@@ -137,6 +93,54 @@
                     <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">3</TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">6</TextBlock>
                     <TextBlock Grid.Row="2"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding PencilColour}" FontSize="16">7</TextBlock>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <TextBlock Text="Game-specific settings" x:Name="SpecificHeader" Margin="0,24,0,0" FontWeight="SemiBold" Visibility="Collapsed"/>
+
+        <StackPanel x:Name="ItemsPanel" Margin="4,10,0,0" />
+
+        <Grid Margin="4,0,0,0" x:Name="MapColorContainer" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="96" />
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Column="0" x:Name="MapPaletteBox" HeaderTemplate="{StaticResource LabelTemplate}" SelectionChanged="MapPaletteBox_SelectionChanged" Header="Color palette" SelectedIndex="0">
+                <ComboBoxItem>Default</ComboBoxItem>
+                <ComboBoxItem>Vivid</ComboBoxItem>
+            </ComboBox>
+
+            <Border x:Name="VividPalettePreview" Visibility="Collapsed" Grid.Column="1" Height="36" Margin="9,26,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#c04040" />
+                    <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#4db34d" />
+                    <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#4d4db3" />
+                    <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#d9d91a" />
+                </Grid>
+            </Border>
+
+            <Border x:Name="DefaultPalettePreview" Grid.Column="1" Height="36" Margin="9,26,3,0" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle Grid.Column="0" Stroke="Black" StrokeThickness="1" Fill="#b38066" />
+                    <Rectangle Grid.Column="1" Stroke="Black" StrokeThickness="1" Fill="#cdb366" />
+                    <Rectangle Grid.Column="2" Stroke="Black" StrokeThickness="1" Fill="#809a66" />
+                    <Rectangle Grid.Column="3" Stroke="Black" StrokeThickness="1" Fill="#8d735a" />
                 </Grid>
             </Border>
         </Grid>
