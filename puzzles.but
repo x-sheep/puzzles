@@ -36,7 +36,7 @@
 
 This is a collection of small one-player puzzle games.
 
-\copyright This manual is copyright 2004-2023 Simon Tatham. All rights
+\copyright This manual is copyright 2004-2024 Simon Tatham. All rights
 reserved. You may distribute this documentation under the MIT licence.
 See \k{licence} for the licence text in full.
 
@@ -1586,6 +1586,11 @@ I originally saw this in the form of a Flash game called \i{Planarity}
 To move a point, click on it with the left mouse button and drag it
 into a new position.
 
+The cursor keys may also be used to navigate amongst the
+points. Pressing the Enter key will toggle dragging the
+currently-highlighted point. Pressing Tab or Space will cycle through
+all the points.
+
 (All the actions described in \k{common-actions} are also available.)
 
 \H{untangle-parameters} \I{parameters, for Untangle}Untangle parameters
@@ -1679,7 +1684,9 @@ computer's. So in the above example, you could put the fifth ball at
 \e{any} of the locations marked with an \cw{x}, and you would still
 win.
 
-Black Box was contributed to this collection by James Harvey.
+Acornsoft published versions of Black Box for the Acorn Atom and the
+BBC Microcomputer in the early 1980s.  The puzzle was contributed to
+this collection by James Harvey.
 
 \H{blackbox-controls} \i{Black Box controls}
 
@@ -1923,7 +1930,7 @@ You are given a map consisting of a number of regions. Your task is
 to colour each region with one of four colours, in such a way that
 no two regions sharing a boundary have the same colour. You are
 provided with some regions already coloured, sufficient to make the
-remainder of the solution unique.
+remainder of the solution unique, and these cannot be changed.
 
 Only regions which share a length of border are required to be
 different colours. Two regions which meet at only one \e{point}
@@ -3514,10 +3521,15 @@ Palisade was contributed to this collection by Jonas K\u00F6{oe}lker.
 \H{palisade-controls} \I{controls, for Palisade}Palisade controls
 
 Left-click to place an edge.  Right-click to indicate \q{no edge}.
-Alternatively, the arrow keys will move a keyboard cursor.  Holding
-Control while pressing an arrow key will place an edge.  Press
-Shift-arrowkey to switch off an edge.  Repeat an action to perform
-its inverse.
+
+Alternatively, the arrow keys will move a keyboard cursor. Depending
+on the \q{Cursor mode} preference (see \k{palisade-prefs}), the cursor
+will either navigate among the grid squares, or along their
+borders. In \q{Full-grid} mode, hold Control while pressing an arrow
+key to place an edge, and press Shift-arrowkey to switch off an
+edge. In \q{Half-grid} mode, press Enter to place an edge, and Space
+to switch off an edge. In either mode, you can repeat an action to
+perform its inverse.
 
 (All the actions described in \k{common-actions} are also available.)
 
@@ -3533,6 +3545,13 @@ These parameters are available from the \q{Custom...} option on the
 \dt \e{Region size}
 
 \dd The size of the regions into which the grid must be subdivided.
+
+\H{palisade-prefs} \I{preferences, for Palisade}Palisade user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure the behavior of the cursor
+keys to either navigate among full grid squares, or along the borders
+of the grid squares.
 
 \C{mosaic} \i{Mosaic}
 
@@ -3586,7 +3605,7 @@ so it's not recommended for boards larger than, say, 30\times\.30.
 
 \A{licence} \I{MIT licence}\ii{Licence}
 
-This software is \i{copyright} 2004-2023 Simon Tatham.
+This software is \i{copyright} 2004-2024 Simon Tatham.
 
 Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas
 K\u00F6{oe}lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou,

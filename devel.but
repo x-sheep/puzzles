@@ -1145,9 +1145,9 @@ the \c{button} parameter:
 
 \dt \cw{MOD_CTRL}, \cw{MOD_SHFT}
 
-\dd These indicate that the Control or Shift key was pressed
-alongside the key. They only apply to the cursor keys, not to mouse
-buttons or anything else.
+\dd These indicate that the Control or Shift key was pressed alongside
+the key. They only apply to the cursor keys and the ASCII horizontal
+tab character \cw{\\t}, not to mouse buttons or anything else.
 
 \dt \cw{MOD_NUM_KEYPAD}
 
@@ -1161,8 +1161,10 @@ input probably just wants to treat the numeric keypad as numbers).
 \dt \cw{MOD_MASK}
 
 \dd This mask is the bitwise OR of all the available modifiers; you
-can bitwise-AND with \cw{~MOD_MASK} to strip all the modifiers off
-any input value.
+can bitwise-AND with \cw{~MOD_MASK} to strip all the modifiers off any
+input value; as this is a common operation, the
+\cw{STRIP_BUTTON_MODIFIERS()} macro can do this for you (see
+\k{utils-strip-button-modifiers}).
 
 \S{backend-execute-move} \cw{execute_move()}
 
@@ -1795,10 +1797,10 @@ structures conveniently.
 The backend should set \cw{*nkeys} to the number of elements in the
 returned array.
 
-The field for this function point in the \cw{game} structure might be
-set to \cw{NULL} (and indeed it is for the majority of the games) to
-indicate that no additional buttons (apart from the cursor keys) are
-required to play the game.
+The field for this function pointer in the \cw{game} structure might
+be set to \cw{NULL} (and indeed it is for the majority of the games)
+to indicate that no additional buttons (apart from the cursor keys)
+are required to play the game.
 
 This function should not be called directly by frontends. Instead,
 frontends should use \cw{midend_request_keys()}
@@ -1973,18 +1975,19 @@ In fact these global functions are not implemented directly by the
 front end; instead, they are implemented centrally in \c{drawing.c}
 and form a small piece of middleware. The drawing API as supplied by
 the front end is a structure containing a set of function pointers,
-plus a \cq{void *} handle which is passed to each of those
-functions. This enables a single front end to switch between
-multiple implementations of the drawing API if necessary. For
-example, the Windows API supplies a printing mechanism integrated
-into the same GDI which deals with drawing in windows, and therefore
-the same API implementation can handle both drawing and printing;
-but on Unix, the most common way for applications to print is by
-producing PostScript output directly, and although it would be
-\e{possible} to write a single (say) \cw{draw_rect()} function which
-checked a global flag to decide whether to do GTK drawing operations
-or output PostScript to a file, it's much nicer to have two separate
-functions and switch between them as appropriate.
+plus a \cq{void *} handle which is indirectly passed to each of those
+functions as a member of the same drawing object as used by the
+backend. This enables a single front end to switch between multiple
+implementations of the drawing API if necessary. For example, the
+Windows API supplies a printing mechanism integrated into the same GDI
+which deals with drawing in windows, and therefore the same API
+implementation can handle both drawing and printing; but on Unix, the
+most common way for applications to print is by producing PostScript
+output directly, and although it would be \e{possible} to write a
+single (say) \cw{draw_rect()} function which checked a global flag to
+decide whether to do GTK drawing operations or output PostScript to a
+file, it's much nicer to have two separate functions and switch
+between them as appropriate.
 
 When drawing, the puzzle window is indexed by pixel coordinates,
 with the top left pixel defined as \cw{(0,0)} and the bottom right
@@ -2160,7 +2163,11 @@ This function may be used for both drawing and printing.
 Draws an outlined or filled polygon in the puzzle window.
 
 \c{coords} is an array of \cw{(2*npoints)} integers, containing the
-\c{x} and \c{y} coordinates of \c{npoints} vertices.
+\c{x} and \c{y} coordinates of \c{npoints} vertices. The \c{x} and
+\c{y} coordinates are stored in interleaved order, with each vertex's
+\c{x} coordinate before its \c{y} coordinate. For example, the first
+vertex's \c{x} and \c{y} coordinates are \c{coords[0]} and
+\c{coords[1]}, respectively.
 
 \c{fillcolour} and \c{outlinecolour} are integer indices into the
 colours array returned by the back end function \cw{colours()}
@@ -2683,17 +2690,38 @@ API; the platform-independent module \c{ps.c} also provides an
 implementation of it which outputs PostScript. Thus, any platform
 which wants to do PS printing can do so with minimum fuss.)
 
-The following entries all describe function pointer fields in a
-structure called \c{drawing_api}. Each of the functions takes a
-\cq{void *} context pointer, which it should internally cast back to
-a more useful type. Thus, a drawing \e{object} (\c{drawing *)}
-suitable for passing to the back end redraw or printing functions
-is constructed by passing a \c{drawing_api} and a \cq{void *} to the
-function \cw{drawing_new()} (see \k{drawing-new}).
+The following entries (with the exception of the \cw{version} field)
+all describe function pointer fields in a structure called
+\c{drawing_api}. Each of the functions takes a \cq{drawing *} pointer,
+which in turn contains a \cq{void *handle} member that the front end
+can access and internally cast back to a more useful type. Since this
+is a fairly common thing for front ends to do, the
+\cw{GET_HANDLE_AS_TYPE()} macro is provided to do this for you (see
+\k{utils-get-handle-as-type}).
+
+A drawing \e{object} (\c{drawing *)} suitable for passing to the back
+end redraw or printing functions is constructed by passing a
+\c{drawing_api} and a \cq{void *} to the function \cw{drawing_new()}
+(see \k{drawing-new}).
+
+\S{drawingapi-version} \cw{version}
+
+\c int version;
+
+This is an integer giving the version of the drawing API implemented
+by the front end. For the version of the API described in this
+document, this field should be \cw{1}.
+
+On occasion, there may be a breaking change to the drawing API, such
+as the introduction of a new function or a change to the semantics of
+an existing function. The intent of this version field is to signal to
+front end authors when such a breaking change occurs. As such changes
+can be disruptive to downstream front ends, they should be done
+sparingly.
 
 \S{drawingapi-draw-text} \cw{draw_text()}
 
-\c void (*draw_text)(void *handle, int x, int y, int fonttype,
+\c void (*draw_text)(drawing *dr, int x, int y, int fonttype,
 \c                   int fontsize, int align, int colour,
 \c                   const char *text);
 
@@ -2702,7 +2730,7 @@ function; see \k{drawing-draw-text}.
 
 \S{drawingapi-draw-rect} \cw{draw_rect()}
 
-\c void (*draw_rect)(void *handle, int x, int y, int w, int h,
+\c void (*draw_rect)(drawing *dr, int x, int y, int w, int h,
 \c                   int colour);
 
 This function behaves exactly like the back end \cw{draw_rect()}
@@ -2710,7 +2738,7 @@ function; see \k{drawing-draw-rect}.
 
 \S{drawingapi-draw-line} \cw{draw_line()}
 
-\c void (*draw_line)(void *handle, int x1, int y1, int x2, int y2,
+\c void (*draw_line)(drawing *dr, int x1, int y1, int x2, int y2,
 \c                   int colour);
 
 This function behaves exactly like the back end \cw{draw_line()}
@@ -2718,15 +2746,23 @@ function; see \k{drawing-draw-line}.
 
 \S{drawingapi-draw-polygon} \cw{draw_polygon()}
 
-\c void (*draw_polygon)(void *handle, const int *coords, int npoints,
+\c void (*draw_polygon)(drawing *dr, const int *coords, int npoints,
 \c                      int fillcolour, int outlinecolour);
 
 This function behaves exactly like the back end \cw{draw_polygon()}
 function; see \k{drawing-draw-polygon}.
 
+An implementation of this API which doesn't have a native polygon fill
+primitive is permitted to define this function pointer to point to the
+middleware's \c{draw_polygon_fallback()} (see
+\k{drawing-draw-polygon-fallback}), which is a fallback polygon
+rasterizer that produces a series of \c{draw_line()} calls to fill and
+outline the polygon. However, it is explicitly \e{not} permitted for
+this function pointer to be \cw{NULL}.
+
 \S{drawingapi-draw-circle} \cw{draw_circle()}
 
-\c void (*draw_circle)(void *handle, int cx, int cy, int radius,
+\c void (*draw_circle)(drawing *dr, int cx, int cy, int radius,
 \c                     int fillcolour, int outlinecolour);
 
 This function behaves exactly like the back end \cw{draw_circle()}
@@ -2748,7 +2784,7 @@ and provide a low-quality alternative using \cw{draw_polygon()}.
 
 \S{drawingapi-draw-update} \cw{draw_update()}
 
-\c void (*draw_update)(void *handle, int x, int y, int w, int h);
+\c void (*draw_update)(drawing *dr, int x, int y, int w, int h);
 
 This function behaves exactly like the back end \cw{draw_update()}
 function; see \k{drawing-draw-update}.
@@ -2760,21 +2796,21 @@ than bothering to define an empty function. The middleware in
 
 \S{drawingapi-clip} \cw{clip()}
 
-\c void (*clip)(void *handle, int x, int y, int w, int h);
+\c void (*clip)(drawing *dr, int x, int y, int w, int h);
 
 This function behaves exactly like the back end \cw{clip()}
 function; see \k{drawing-clip}.
 
 \S{drawingapi-unclip} \cw{unclip()}
 
-\c void (*unclip)(void *handle);
+\c void (*unclip)(drawing *dr);
 
 This function behaves exactly like the back end \cw{unclip()}
 function; see \k{drawing-unclip}.
 
 \S{drawingapi-start-draw} \cw{start_draw()}
 
-\c void (*start_draw)(void *handle);
+\c void (*start_draw)(drawing *dr);
 
 This function is called at the start of drawing. It allows the front
 end to initialise any temporary data required to draw with, such as
@@ -2786,7 +2822,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-end-draw} \cw{end_draw()}
 
-\c void (*end_draw)(void *handle);
+\c void (*end_draw)(drawing *dr);
 
 This function is called at the end of drawing. It allows the front
 end to do cleanup tasks such as deallocating device contexts and
@@ -2798,7 +2834,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-status-bar} \cw{status_bar()}
 
-\c void (*status_bar)(void *handle, const char *text);
+\c void (*status_bar)(drawing *dr, const char *text);
 
 This function behaves exactly like the back end \cw{status_bar()}
 function; see \k{drawing-status-bar}.
@@ -2813,7 +2849,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-blitter-new} \cw{blitter_new()}
 
-\c blitter *(*blitter_new)(void *handle, int w, int h);
+\c blitter *(*blitter_new)(drawing *dr, int w, int h);
 
 This function behaves exactly like the back end \cw{blitter_new()}
 function; see \k{drawing-blitter-new}.
@@ -2824,7 +2860,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-blitter-free} \cw{blitter_free()}
 
-\c void (*blitter_free)(void *handle, blitter *bl);
+\c void (*blitter_free)(drawing *dr, blitter *bl);
 
 This function behaves exactly like the back end \cw{blitter_free()}
 function; see \k{drawing-blitter-free}.
@@ -2835,7 +2871,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-blitter-save} \cw{blitter_save()}
 
-\c void (*blitter_save)(void *handle, blitter *bl, int x, int y);
+\c void (*blitter_save)(drawing *dr, blitter *bl, int x, int y);
 
 This function behaves exactly like the back end \cw{blitter_save()}
 function; see \k{drawing-blitter-save}.
@@ -2846,7 +2882,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-blitter-load} \cw{blitter_load()}
 
-\c void (*blitter_load)(void *handle, blitter *bl, int x, int y);
+\c void (*blitter_load)(drawing *dr, blitter *bl, int x, int y);
 
 This function behaves exactly like the back end \cw{blitter_load()}
 function; see \k{drawing-blitter-load}.
@@ -2857,7 +2893,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-begin-doc} \cw{begin_doc()}
 
-\c void (*begin_doc)(void *handle, int pages);
+\c void (*begin_doc)(drawing *dr, int pages);
 
 This function is called at the beginning of a printing run. It gives
 the front end an opportunity to initialise any required printing
@@ -2869,7 +2905,7 @@ called unless printing is attempted.
 
 \S{drawingapi-begin-page} \cw{begin_page()}
 
-\c void (*begin_page)(void *handle, int number);
+\c void (*begin_page)(drawing *dr, int number);
 
 This function is called during printing, at the beginning of each
 page. It gives the page number (numbered from 1 rather than 0, so
@@ -2881,7 +2917,7 @@ called unless printing is attempted.
 
 \S{drawingapi-begin-puzzle} \cw{begin_puzzle()}
 
-\c void (*begin_puzzle)(void *handle, float xm, float xc,
+\c void (*begin_puzzle)(drawing *dr, float xm, float xc,
 \c                      float ym, float yc, int pw, int ph, float wmm);
 
 This function is called during printing, just before printing a
@@ -2924,7 +2960,7 @@ called unless printing is attempted.
 
 \S{drawingapi-end-puzzle} \cw{end_puzzle()}
 
-\c void (*end_puzzle)(void *handle);
+\c void (*end_puzzle)(drawing *dr);
 
 This function is called after the printing of a specific puzzle is
 complete.
@@ -2935,7 +2971,7 @@ called unless printing is attempted.
 
 \S{drawingapi-end-page} \cw{end_page()}
 
-\c void (*end_page)(void *handle, int number);
+\c void (*end_page)(drawing *dr, int number);
 
 This function is called after the printing of a page is finished.
 
@@ -2945,7 +2981,7 @@ called unless printing is attempted.
 
 \S{drawingapi-end-doc} \cw{end_doc()}
 
-\c void (*end_doc)(void *handle);
+\c void (*end_doc)(drawing *dr);
 
 This function is called after the printing of the entire document is
 finished. This is the moment to close files, send things to the
@@ -2957,7 +2993,7 @@ called unless printing is attempted.
 
 \S{drawingapi-line-width} \cw{line_width()}
 
-\c void (*line_width)(void *handle, float width);
+\c void (*line_width)(drawing *dr, float width);
 
 This function is called to set the line thickness, during printing
 only. Note that the width is a \cw{float} here, where it was an
@@ -2973,7 +3009,7 @@ called unless printing is attempted.
 
 \S{drawingapi-line-dotted} \cw{line_dotted()}
 
-\c void (*line_dotted)(void *handle, bool dotted);
+\c void (*line_dotted)(drawing *dr, bool dotted);
 
 This function is called to toggle drawing of dotted lines, during
 printing only.
@@ -2984,7 +3020,7 @@ called unless printing is attempted.
 
 \S{drawingapi-text-fallback} \cw{text_fallback()}
 
-\c char *(*text_fallback)(void *handle, const char *const *strings,
+\c char *(*text_fallback)(drawing *dr, const char *const *strings,
 \c                        int nstrings);
 
 This function behaves exactly like the back end \cw{text_fallback()}
@@ -3007,9 +3043,10 @@ implement. They are described in this section.
 \c                      void *handle);
 
 This function creates a drawing object. It is passed a
-\c{drawing_api}, which is a structure containing nothing but
-function pointers; and also a \cq{void *} handle. The handle is
-passed back to each function pointer when it is called.
+\c{drawing_api}, which is a structure containing function pointers and
+a version field; and also a \cq{void *} handle. The handle is stored
+in the drawing object, from where it may be accessed by each function
+pointer when it is called.
 
 The \c{midend} parameter is used for rewriting the status bar
 contents: \cw{status_bar()} (see \k{drawing-status-bar}) has to call
@@ -3017,6 +3054,10 @@ a function in the mid-end which might rewrite the status bar text.
 If the drawing object is to be used only for printing, or if the
 game is known not to call \cw{status_bar()}, this parameter may be
 \cw{NULL}.
+
+A fatal error is produced if the \cw{version} field of the
+\c{drawing_api} does not match the expected version (see
+\k{drawingapi-version} for the expected version number).
 
 \S{drawing-free} \cw{drawing_free()}
 
@@ -3050,6 +3091,36 @@ given a negative value, and \c{*r}, \c{*g} and \c{*b} are filled
 with the RGB values of the desired colour (if printing in colour),
 or all filled with the grey-scale value (if printing in black and
 white).
+
+\S{drawing-draw-polygon-fallback} \cw{draw_polygon_fallback()}
+
+\c void draw_polygon_fallback(drawing *dr,
+\c                            const int *coords, int npoints,
+\c                            int fillcolour, int outlinecolour);
+
+This function is intended for use by front ends which do not have a
+native polygon fill primitive. Its signature and semantics are exactly
+the same as \cw{draw_polygon()} (\k{drawing-draw-polygon}); however,
+instead of being implemented by a front end, it is implemented as a
+piece of middleware that uses a scanline algorithm to produce a series
+of calls to \cw{draw_line()} that have the effect of filling and
+outlining the desired polygon.
+
+Although a front end may choose to call this function directly (such
+as from a stub implementation of \c{draw_polygon()}), this function is
+intended to be \e{pointed to} by the \c{draw_polygon} field of the
+front end's \c{drawing_api}; that is, a frontend without a polygon
+fill primitive should set \c{drawing_api}'s \c{draw_polygon} field to
+\c{draw_polygon_fallback}.
+
+The motivation for this rather unwieldy method of employing this
+fallback function (instead of simply setting \c{draw_polygon} to
+\c{NULL} in \c{drawing_api}) is that it allows a link-time optimizing
+compiler to prune this function's implementation on platforms that
+provide their own \c{draw_polygon()}, since this function would never
+be referenced on those platforms. (But this function is still
+unconditionally compiled on all platforms, thus protecting it from
+bit-rot.)
 
 \C{midend} The API provided by the mid-end
 
@@ -5321,6 +5392,38 @@ many domino tilings of the same grid.
 \c{list} should have space for \c{2*w*h} ints.
 
 The returned array is delivered in \c{grid}.
+
+\S{utils-strip-button-modifiers} \cw{STRIP_BUTTON_MODIFIERS()}
+
+This macro, defined in the main Puzzles header file, strips the
+modifier flags from the key code passed as an argument. It is
+equivalent to a bitwise-AND with \cw{~MOD_MASK}.
+
+\S{utils-swap-regions} \cw{swap_regions()}
+
+\c void swap_regions(void *av, void *bv, size_t size);
+
+Swap two regions of memory of \cw{size} bytes. The two regions must
+not overlap.
+
+\S{utils-compare-integers} \cw{compare_integers()}
+
+\c int compare_integers(const void *av, const void *bv);
+
+Compare the ints pointed to by \c{av} and \c{bv}. It returns an
+integer less than, equal to, or greater than zero if the first
+argument is respectively less than, equal to, or greater than the
+second. This function is intended to be passed to \c{qsort()} for
+sorting ints in ascending order.
+
+\S{utils-get-handle-as-type} \cw{GET_HANDLE_AS_TYPE()}
+
+\c #define GET_HANDLE_AS_TYPE(dr, type) ((type*)((dr)->handle))
+
+This macro, defined in the main Puzzles header file, retrieves the
+\c{handle} field from a \c{drawing *} pointer and casts it to \c{type
+*}. It is intended for use in implementations of drawing API
+functions, where this operation is idiomatic.
 
 \C{writing} How to write a new puzzle
 

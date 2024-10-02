@@ -2286,6 +2286,7 @@ struct game_ui {
     int dragx, dragy;
     int last_tilesize;
     int show_labels;
+    bool large_stipples;
 
     int cur_x, cur_y, cur_lastmove;
     bool cur_visible, cur_moved;
@@ -2333,6 +2334,7 @@ static game_ui *new_ui(const game_state *state)
     ui->cur_moved = false;
     ui->cur_lastmove = 0;
     ui->flash_type = FLASH_CYCLIC;
+    ui->large_stipples = false;
     legacy_prefs_override(ui);
     return ui;
 }
@@ -2819,7 +2821,7 @@ static void draw_error(drawing *dr, game_drawstate *ds, int x, int y)
 
 static void draw_square(drawing *dr, game_drawstate *ds,
 			const game_params *params, struct map *map,
-			int x, int y, unsigned long v)
+			int x, int y, unsigned long v, bool large_stipples)
 {
     int w = params->w, h = params->h, wh = w*h;
     int tv, bv, xo, yo, i, j, oldj;
@@ -2892,7 +2894,8 @@ static void draw_square(drawing *dr, game_drawstate *ds,
 
 	    draw_circle(dr, COORD(x) + (xo+1)*TILESIZE/5,
 			COORD(y) + (yo+1)*TILESIZE/5,
-			TILESIZE/7, COL_0 + c, COL_0 + c);
+			large_stipples ? TILESIZE/4 : TILESIZE/7,
+			COL_0 + c, COL_0 + c);
 	}
 
     /*
@@ -3092,7 +3095,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	for (x = 0; x < w; x++) {
 	    unsigned long v = ds->todraw[y*w+x];
 	    if (ds->drawn[y*w+x] != v) {
-		draw_square(dr, ds, &state->p, state->map, x, y, v);
+		draw_square(dr, ds, &state->p, state->map, x, y, v, ui->large_stipples);
 		ds->drawn[y*w+x] = v;
 	    }
 	}

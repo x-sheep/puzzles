@@ -324,7 +324,37 @@ void game_colour_preset(frontend* fe, float* ret, enum colourpreset_type preset)
     }
 }
 
-static void memswap(void *av, void *bv, int size)
+void game_colour_preset(frontend* fe, float* ret, enum colourpreset_type preset)
+{
+    const char* envkey = NULL, *e;
+
+    switch (preset) {
+    case COLOURPRESET_ENTRY:
+        envkey = "COLOURPRESET_ENTRY";
+        frontend_default_colour(fe, ret);
+        ret[0] = 0.0F;
+        ret[1] *= 0.6F;
+        ret[2] = 0.0F;
+        break;
+    case COLOURPRESET_PENCIL:
+        envkey = "COLOURPRESET_PENCIL";
+        frontend_default_colour(fe, ret);
+        ret[0] *= 0.5F;
+        ret[1] *= 0.5F;
+        break;
+    default: return;
+    }
+
+    unsigned int r, g, b;
+    if ((e = getenv(envkey)) != NULL &&
+        sscanf(e, "%2x%2x%2x", &r, &g, &b) == 3) {
+        ret[0] = r / 255.0F;
+        ret[1] = g / 255.0F;
+        ret[2] = b / 255.0F;
+    }
+}
+
+void swap_regions(void *av, void *bv, size_t size)
 {
     char tmpbuf[512];
     char *a = av, *b = bv;
@@ -348,7 +378,7 @@ void shuffle(void *array, int nelts, int eltsize, random_state *rs)
     for (i = nelts; i-- > 1 ;) {
         int j = random_upto(rs, i+1);
         if (j != i)
-            memswap(carray + eltsize * i, carray + eltsize * j, eltsize);
+            swap_regions(carray + eltsize * i, carray + eltsize * j, eltsize);
     }
 }
 
@@ -379,6 +409,17 @@ void draw_rect_corners(drawing *dr, int cx, int cy, int r, int col)
     draw_line(dr, cx + r, cy - r, cx + r/2, cy - r, col);
     draw_line(dr, cx + r, cy + r, cx + r, cy + r/2, col);
     draw_line(dr, cx + r, cy + r, cx + r/2, cy + r, col);
+}
+
+int compare_integers(const void *av, const void *bv) {
+    const int *a = (const int *)av;
+    const int *b = (const int *)bv;
+    if (*a < *b)
+	return -1;
+    else if (*a > *b)
+	return +1;
+    else
+	return 0;
 }
 
 char *move_cursor(int button, int *x, int *y, int maxw, int maxh, bool wrap,
