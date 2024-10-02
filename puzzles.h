@@ -820,7 +820,7 @@ struct drawing_api {
 			 int fillcolour, int outlinecolour);
     void (*draw_circle)(drawing *dr, int cx, int cy, int radius,
 			int fillcolour, int outlinecolour);
-	float (*draw_scale)(void *handle);
+	float (*draw_scale)(drawing *dr);
     void (*draw_update)(drawing *dr, int x, int y, int w, int h);
     void (*clip)(drawing *dr, int x, int y, int w, int h);
     void (*unclip)(drawing *dr);
@@ -831,7 +831,7 @@ struct drawing_api {
     void (*blitter_free)(drawing *dr, blitter *bl);
     void (*blitter_save)(drawing *dr, blitter *bl, int x, int y);
     void (*blitter_load)(drawing *dr, blitter *bl, int x, int y);
-	void (*add_print_colour)(void *handle, int colour);
+	void (*add_print_colour)(drawing *dr, int colour);
 	void (*begin_doc)(drawing *dr, int pages);
     void (*begin_page)(drawing *dr, int number);
     void (*begin_puzzle)(drawing *dr, float xm, float xc,

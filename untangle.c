@@ -1936,10 +1936,10 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	    if (c == thisc) {
                 if (ui->vertex_numbers) {
                     char buf[80];
-                    draw_circle(dr, ds->x[i], ds->y[i], DRAG_THRESHOLD, COL_BACKGROUND, COL_BACKGROUND);
+                    draw_circle(dr, ds->x[i], ds->y[i], radius*2, COL_BACKGROUND, COL_BACKGROUND);
                     sprintf(buf, "%d", i);
                     draw_text(dr, ds->x[i], ds->y[i], FONT_VARIABLE,
-                              DRAG_THRESHOLD*3/2,
+                              radius*3,
                               ALIGN_VCENTRE|ALIGN_HCENTRE, c, buf);
                 } else {
                     draw_circle(dr, ds->x[i], ds->y[i], radius,

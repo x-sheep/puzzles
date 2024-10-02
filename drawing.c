@@ -113,7 +113,7 @@ void draw_line(drawing *dr, int x1, int y1, int x2, int y2, int colour)
 float draw_scale(drawing *dr)
 {
     drawing_internal *dri = PRIVATE_CAST(dr);
-	return dri->pub.api->draw_scale(dr->handle);
+	return dri->pub.api->draw_scale(dr);
 }
 
 void draw_thick_line(drawing *dr, float thickness,

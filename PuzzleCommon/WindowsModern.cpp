@@ -65,50 +65,50 @@ Platform::String ^FromChars(char *input, bool kill)
 	return ret;
 }
 
-void winmodern_status_bar(void *handle, const char *text)
+void winmodern_status_bar(drawing *dr, const char *text)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleStatusBar ^bar = *((IPuzzleStatusBar^*)fe->statusbar);
 
 	bar->UpdateStatusBar(FromChars(text));
 }
 
-int winmodern_start_draw(void *handle)
+int winmodern_start_draw(drawing *dr)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	return canvas->StartDraw();
 }
 
-void winmodern_draw_update(void *handle, int x, int y, int w, int h)
+void winmodern_draw_update(drawing *dr, int x, int y, int w, int h)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	canvas->UpdateArea(x, y, w, h);
 }
 
-void winmodern_clip(void *handle, int x, int y, int w, int h)
+void winmodern_clip(drawing *dr, int x, int y, int w, int h)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	canvas->StartClip(x, y, w, h);
 }
 
-void winmodern_unclip(void *handle)
+void winmodern_unclip(drawing *dr)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	canvas->EndClip();
 }
 
-void winmodern_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
+void winmodern_draw_text(drawing *dr, int x, int y, int fonttype, int fontsize,
 	int align, int colour, const char *text)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	GameFontType gamefont = fonttype == FONT_VARIABLE ?
@@ -128,27 +128,27 @@ void winmodern_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
 	canvas->DrawText(x, y, gamefont, halign, valign, fontsize, colour, FromChars(text));
 }
 
-void winmodern_draw_rect(void *handle, int x, int y, int w, int h, int colour)
+void winmodern_draw_rect(drawing *dr, int x, int y, int w, int h, int colour)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->DrawRect(x, y, w, h, colour);
 }
 
-void winmodern_draw_line(void *handle, int x1, int y1, int x2, int y2,
+void winmodern_draw_line(drawing *dr, int x1, int y1, int x2, int y2,
 	int colour)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->DrawLine(x1, y1, x2, y2, colour);
 }
 
-void winmodern_draw_poly(void *handle, const int *coords, int npoints,
+void winmodern_draw_poly(drawing *dr, const int *coords, int npoints,
 	int fillcolour, int outlinecolour)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	auto pc = ref new Vector<Point>();
@@ -162,24 +162,24 @@ void winmodern_draw_poly(void *handle, const int *coords, int npoints,
 	canvas->DrawPolygon(pc, fillcolour, outlinecolour);
 }
 
-void winmodern_draw_circle(void *handle, int cx, int cy, int radius,
+void winmodern_draw_circle(drawing *dr, int cx, int cy, int radius,
 	int fillcolour, int outlinecolour)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->DrawCircle(cx, cy, radius, fillcolour, outlinecolour);
 }
 
-float winmodern_draw_scale(void *handle)
+float winmodern_draw_scale(drawing *dr)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	return fe->scale;
 }
 
-blitter *winmodern_blitter_new(void *handle, int w, int h)
+blitter *winmodern_blitter_new(drawing *dr, int w, int h)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 
 	blitter *bl = snew(blitter);
 	bl->handle = fe->next_blitter_id++;
@@ -195,9 +195,9 @@ blitter *winmodern_blitter_new(void *handle, int w, int h)
 	return bl;
 }
 
-void winmodern_blitter_free(void *handle, blitter *bl)
+void winmodern_blitter_free(drawing *dr, blitter *bl)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 
 	if (fe->canvas)
 	{
@@ -208,9 +208,9 @@ void winmodern_blitter_free(void *handle, blitter *bl)
 	sfree(bl);
 }
 
-void winmodern_blitter_save(void *handle, blitter *bl, int x, int y)
+void winmodern_blitter_save(drawing *dr, blitter *bl, int x, int y)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	/* Resize the blitter rectangle to never use a negative x or y */
@@ -238,9 +238,9 @@ void winmodern_blitter_save(void *handle, blitter *bl, int x, int y)
 	canvas->BlitterSave(bl->handle, bl->x, bl->y, bl->rw, bl->rh);
 }
 
-void winmodern_blitter_load(void *handle, blitter *bl, int x, int y)
+void winmodern_blitter_load(drawing *dr, blitter *bl, int x, int y)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 	
 	if (x == BLITTER_FROMSAVED)
@@ -251,40 +251,40 @@ void winmodern_blitter_load(void *handle, blitter *bl, int x, int y)
 	canvas->BlitterLoad(bl->handle, max(x, 0), max(y, 0), bl->rw, bl->rh);
 }
 
-void winmodern_end_draw(void *handle)
+void winmodern_end_draw(drawing *dr)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->EndDraw();
 }
 
-static char *winmodern_text_fallback(void *handle, const char *const *strings,
+static char *winmodern_text_fallback(drawing *dr, const char *const *strings,
 	int nstrings)
 {
 	/* Any UTF-8 string is accepted. */
 	return dupstr(strings[0]);
 }
 
-void winmodern_line_width(void *handle, float width)
+void winmodern_line_width(drawing *dr, float width)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->SetLineWidth(width);
 }
 
-void winmodern_line_dotted(void *handle, bool dotted)
+void winmodern_line_dotted(drawing *dr, bool dotted)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	canvas->SetLineDotted(dotted);
 }
 
-void winmodern_add_print_colour(void *handle, int id)
+void winmodern_add_print_colour(drawing *dr, int id)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	IPuzzleCanvas ^canvas = *((IPuzzleCanvas^*)fe->canvas);
 
 	int hatch = 0;
@@ -295,30 +295,31 @@ void winmodern_add_print_colour(void *handle, int id)
 	// All puzzles which use the hatch brush have been edited.
 	canvas->AddColor(r, g, b);
 }
-void winmodern_begin_doc(void *handle, int pages)
+void winmodern_begin_doc(drawing *dr, int pages)
 {
 }
-void winmodern_begin_page(void *handle, int number)
+void winmodern_begin_page(drawing *dr, int number)
 {
 }
-void winmodern_begin_puzzle(void *handle, float xm, float xc,
+void winmodern_begin_puzzle(drawing *dr, float xm, float xc,
 	float ym, float yc, int pw, int ph, float wmm)
 {
-	frontend *fe = (frontend *)handle;
+	frontend *fe = (frontend *)dr->handle;
 	fe->printw = pw;
 	fe->printh = ph;
 }
-void winmodern_end_puzzle(void *handle)
+void winmodern_end_puzzle(drawing *dr)
 {
 }
-void winmodern_end_page(void *handle, int page)
+void winmodern_end_page(drawing *dr, int page)
 {
 }
-void winmodern_end_doc(void *handle)
+void winmodern_end_doc(drawing *dr)
 {
 }
 
 const struct drawing_api winmodern_drawing = {
+	1,
 	winmodern_draw_text,
 	winmodern_draw_rect,
 	winmodern_draw_line,

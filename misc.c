@@ -324,36 +324,6 @@ void game_colour_preset(frontend* fe, float* ret, enum colourpreset_type preset)
     }
 }
 
-void game_colour_preset(frontend* fe, float* ret, enum colourpreset_type preset)
-{
-    const char* envkey = NULL, *e;
-
-    switch (preset) {
-    case COLOURPRESET_ENTRY:
-        envkey = "COLOURPRESET_ENTRY";
-        frontend_default_colour(fe, ret);
-        ret[0] = 0.0F;
-        ret[1] *= 0.6F;
-        ret[2] = 0.0F;
-        break;
-    case COLOURPRESET_PENCIL:
-        envkey = "COLOURPRESET_PENCIL";
-        frontend_default_colour(fe, ret);
-        ret[0] *= 0.5F;
-        ret[1] *= 0.5F;
-        break;
-    default: return;
-    }
-
-    unsigned int r, g, b;
-    if ((e = getenv(envkey)) != NULL &&
-        sscanf(e, "%2x%2x%2x", &r, &g, &b) == 3) {
-        ret[0] = r / 255.0F;
-        ret[1] = g / 255.0F;
-        ret[2] = b / 255.0F;
-    }
-}
-
 void swap_regions(void *av, void *bv, size_t size)
 {
     char tmpbuf[512];
