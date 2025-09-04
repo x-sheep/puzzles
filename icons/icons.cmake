@@ -97,7 +97,7 @@ set(border_32 2)
 set(border_24 1)
 set(border_16 1)
 
-set(icon_srcdir ${CMAKE_SOURCE_DIR}/icons)
+set(icon_srcdir ${PUZZLES_ROOT_DIR}/icons)
 set(icon_bindir ${CMAKE_BINARY_DIR}/icons)
 
 # We'll need to point $SGT_PUZZLES_DIR at an empty directory, to avoid
@@ -110,7 +110,7 @@ function(build_icon name)
   # Compile the GTK puzzle binary without an icon, so that we can run
   # it to generate a screenshot to make the icon out of.
   add_executable(${NAME}-icon-maker ${NAME}.c
-    ${CMAKE_SOURCE_DIR}/no-icon.c)
+    ${PUZZLES_ROOT_DIR}/no-icon.c)
   target_link_libraries(${NAME}-icon-maker
     common ${platform_gui_libs} ${platform_libs})
   set_target_properties(${NAME}-icon-maker PROPERTIES

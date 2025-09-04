@@ -91,8 +91,8 @@ function(set_platform_gui_target_properties TARGET)
 endfunction()
 
 function(set_platform_puzzle_target_properties NAME TARGET)
-  em_link_pre_js(${TARGET} ${CMAKE_SOURCE_DIR}/emccpre.js)
-  em_link_js_library(${TARGET} ${CMAKE_SOURCE_DIR}/emcclib.js)
+  em_link_pre_js(${TARGET} ${PUZZLES_ROOT_DIR}/emccpre.js)
+  em_link_js_library(${TARGET} ${PUZZLES_ROOT_DIR}/emcclib.js)
 endfunction()
 
 function(build_platform_extras)

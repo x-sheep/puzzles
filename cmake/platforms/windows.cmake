@@ -35,7 +35,7 @@ endif()
 
 function(get_platform_puzzle_extra_source_files OUTVAR NAME AUXILIARY)
   if(NOT AUXILIARY)
-    set(${OUTVAR} ${CMAKE_SOURCE_DIR}/puzzles.rc PARENT_SCOPE)
+    set(${OUTVAR} ${PUZZLES_ROOT_DIR}/puzzles.rc PARENT_SCOPE)
   endif()
 endfunction()
 
@@ -61,7 +61,7 @@ else()
 endif()
 
 # Get the first line of LICENCE to put into VERSIONINFO resources.
-file(READ "${CMAKE_SOURCE_DIR}/LICENCE" LICENCE_TEXT)
+file(READ "${PUZZLES_ROOT_DIR}/LICENCE" LICENCE_TEXT)
 set(copyright_regex "This software is copyright ([^\n]*[^\n.])\\.?\n")
 string(REGEX MATCH "${copyright_regex}" COPYRIGHT_NOTICE "${LICENCE_TEXT}")
 string(REGEX REPLACE "${copyright_regex}" "\\1"

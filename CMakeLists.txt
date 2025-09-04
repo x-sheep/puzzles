@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(puzzles
   LANGUAGES C)
 
+set(PUZZLES_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}")
 include(cmake/setup.cmake)
 
 add_library(core_obj OBJECT

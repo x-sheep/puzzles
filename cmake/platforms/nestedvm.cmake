@@ -9,8 +9,8 @@ add_custom_target(nvm-puzzle-applet
   BYPRODUCTS ${CMAKE_BINARY_DIR}/PuzzleApplet.class
   COMMAND ${Java_JAVAC_EXECUTABLE}
     -source 1.8 -target 1.8 -d . -cp ${NESTEDVM}/build
-    ${CMAKE_SOURCE_DIR}/PuzzleApplet.java
-  DEPENDS ${CMAKE_SOURCE_DIR}/PuzzleApplet.java)
+    ${PUZZLES_ROOT_DIR}/PuzzleApplet.java
+  DEPENDS ${PUZZLES_ROOT_DIR}/PuzzleApplet.java)
 
 function(get_platform_puzzle_extra_source_files OUTVAR NAME AUXILIARY)
   set(${OUTVAR} PARENT_SCOPE)
@@ -25,7 +25,7 @@ function(set_platform_gui_target_properties TARGET)
 
   add_custom_target(${TARGET}-nvm-symlinks
     BYPRODUCTS ${build_subdir}/PuzzleApplet.class
-    COMMAND ${CMAKE_SOURCE_DIR}/cmake/glob-symlinks.py
+    COMMAND ${PUZZLES_ROOT_DIR}/cmake/glob-symlinks.py
       ${CMAKE_BINARY_DIR} applet.manifest
       ${CMAKE_BINARY_DIR} PuzzleApplet\\*.class
       ${NESTEDVM}/build org/ibex/nestedvm/Registers.class
@@ -37,7 +37,7 @@ function(set_platform_gui_target_properties TARGET)
     DEPENDS
       ${TARGET}-nvm-build-subdir
       nvm-puzzle-applet
-      ${CMAKE_SOURCE_DIR}/cmake/glob-symlinks.py)
+      ${PUZZLES_ROOT_DIR}/cmake/glob-symlinks.py)
 
   add_custom_target(${TARGET}-nvm-engine
     BYPRODUCTS ${build_subdir}/PuzzleEngine.class

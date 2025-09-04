@@ -2,7 +2,7 @@ puzzle(group
   DISPLAYNAME "Group"
   DESCRIPTION "Group theory puzzle"
   OBJECTIVE "Complete the unfinished Cayley table of a group.")
-solver(group ${CMAKE_SOURCE_DIR}/latin.c)
+solver(group ${PUZZLES_ROOT_DIR}/latin.c)
 
 puzzle(separate
   DISPLAYNAME "Separate"

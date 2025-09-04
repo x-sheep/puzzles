@@ -64,23 +64,23 @@ endif()
 add_compile_definitions(HELP_DIR="${CMAKE_INSTALL_PREFIX}/share/sgt-puzzles/help")
 
 function(get_platform_puzzle_extra_source_files OUTVAR NAME AUXILIARY)
-  if(build_icons AND EXISTS ${CMAKE_SOURCE_DIR}/icons/${NAME}.sav)
+  if(build_icons AND EXISTS ${PUZZLES_ROOT_DIR}/icons/${NAME}.sav)
     # If we have the equipment to rebuild the puzzles' icon images
     # from scratch, do so. Then changes in the puzzle display code
     # will cause the icon to auto-update.
     build_icon(${NAME})
     set(c_icon_file ${CMAKE_BINARY_DIR}/icons/${NAME}-icon.c)
-  elseif(EXISTS ${CMAKE_SOURCE_DIR}/icons/${NAME}-icon.c)
+  elseif(EXISTS ${PUZZLES_ROOT_DIR}/icons/${NAME}-icon.c)
     # Failing that, use a pre-built icon file in the 'icons'
     # subdirectory, if there is one. (They don't exist in git, but the
     # distribution tarball will have pre-built them and put them in
     # there, so that users building from that can still have icons
     # even if they don't have the wherewithal to rebuild them.)
-    set(c_icon_file ${CMAKE_SOURCE_DIR}/icons/${NAME}-icon.c)
+    set(c_icon_file ${PUZZLES_ROOT_DIR}/icons/${NAME}-icon.c)
   else()
     # Failing even that, include no-icon.c to satisfy the link-time
     # dependencies. The puzzles will build without nice icons.
-    set(c_icon_file ${CMAKE_SOURCE_DIR}/no-icon.c)
+    set(c_icon_file ${PUZZLES_ROOT_DIR}/no-icon.c)
   endif()
 
   set(${OUTVAR} ${c_icon_file} PARENT_SCOPE)
@@ -109,7 +109,7 @@ function(set_platform_puzzle_target_properties NAME TARGET)
       # CMAKE_INSTALL_BINDIR.
       install(TARGETS ${TARGET})
     endif()
-    configure_file(${CMAKE_SOURCE_DIR}/puzzle.desktop.in ${binary_name}.desktop)
+    configure_file(${PUZZLES_ROOT_DIR}/puzzle.desktop.in ${binary_name}.desktop)
     foreach(icon_size ${all_icon_sizes})
       install(
         FILES ${CMAKE_CURRENT_BINARY_DIR}/icons/${NAME}-${icon_size}d24.png

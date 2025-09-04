@@ -84,7 +84,7 @@ function(map_pathname src dst)
       PARENT_SCOPE)
   endif()
 endfunction()
-map_pathname(${CMAKE_SOURCE_DIR} /puzzles)
+map_pathname(${PUZZLES_ROOT_DIR} /puzzles)
 map_pathname(${CMAKE_BINARY_DIR} /build)
 
 include(icons/icons.cmake)
@@ -119,7 +119,7 @@ function(puzzle NAME)
     # collection.
     set(official FALSE)
   endif()
-  if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR}/unfinished)
+  if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${PUZZLES_ROOT_DIR}/unfinished)
     # The same goes for puzzles in the 'unfinished' subdirectory,
     # although we make an exception if configured to on the command
     # line.
@@ -163,7 +163,7 @@ function(cliprogram NAME)
   endif()
 
   if(build_cli_programs AND ((NOT OPT_SDL2_LIB) OR BUILD_SDL_PROGRAMS))
-    add_executable(${NAME} ${CMAKE_SOURCE_DIR}/nullfe.c
+    add_executable(${NAME} ${PUZZLES_ROOT_DIR}/nullfe.c
       ${OPT_UNPARSED_ARGUMENTS})
     target_link_libraries(${NAME} ${lib} ${platform_libs})
     if(OPT_COMPILE_DEFINITIONS)
