@@ -1788,6 +1788,8 @@ struct game_drawstate {
     int count_w;
     int count_gap;
     int count_padding;
+
+    char *minus_sign;
 };
 
 static bool is_clue(const game_state *state, int x, int y)
@@ -2365,6 +2367,8 @@ static float *game_colours(frontend *fe, int *ncolours)
     return ret;
 }
 
+static const char *const minus_signs[] = { "\xE2\x88\x92", "-" };
+
 static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 {
     int i;
@@ -2410,6 +2414,8 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     // TODO: is this initialization necessary? (or should we call calculate_count_layout here?)
     ds->count_w = ds->count_fontsize = ds->count_gap = ds->count_padding = 0;
 
+    ds->minus_sign = text_fallback(dr, minus_signs, lenof(minus_signs));
+
     return ds;
 }
 
@@ -2419,6 +2425,7 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds) {
     sfree(ds->cell_errors);
     sfree(ds->pencils);
     sfree(ds->monsters);
+    sfree(ds->minus_sign);
     sfree(ds);
     return;
 }
@@ -2634,9 +2641,10 @@ static void draw_monster_count(drawing *dr, game_drawstate *ds,
       case COUNT_STYLE_REMAINING:
         if (placed == total)
             sprintf(buf, "0");
+        else if (placed > total)
+            sprintf(buf, "%d", placed - total);
         else
-            /* format as negative to distinguish from COUNT_STYLE_TOTAL */
-            sprintf(buf, "%+d", placed - total);
+            sprintf(buf, "%s%d", ds->minus_sign, total - placed);
         break;
       case COUNT_STYLE_PLACED_TOTAL:
         sprintf(buf, "%d/%d", placed, total);
