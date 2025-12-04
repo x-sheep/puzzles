@@ -1924,11 +1924,6 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         return dupstr("M");
     }
     
-	bool in_row = y > ds->counts_y1 && y < ds->counts_y2;
-	bool on_ghost = in_row && x > ds->counts_ghost_x1 && x < ds->counts_ghost_x2;
-	bool on_vampire = in_row && x > ds->counts_vampire_x1 && x < ds->counts_vampire_x2;
-	bool on_zombie = in_row && x > ds->counts_zombie_x1 && x < ds->counts_zombie_x2;
-
     if (ui->hshow && !ui->hpencil) {
         xi = state->common->xinfo[ui->hx + ui->hy*(state->common->params.w+2)];
         if (xi >= 0 && !state->common->fixed[xi]) {

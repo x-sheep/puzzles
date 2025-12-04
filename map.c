@@ -75,7 +75,6 @@ enum {
 
 enum {
     PREF_FLASH_TYPE,
-    PREF_SHOW_NUMBERS,
     PREF_STIPPLE_STYLE,
     N_PREF_ITEMS
 };
@@ -2360,11 +2359,6 @@ static config_item *get_prefs(game_ui *ui)
     ret[PREF_FLASH_TYPE].u.choices.choicekws = ":cyclic:each-white:all-white";
     ret[PREF_FLASH_TYPE].u.choices.selected = ui->flash_type;
 
-    ret[PREF_SHOW_NUMBERS].name = "Number regions";
-    ret[PREF_SHOW_NUMBERS].kw = "show-numbers";
-    ret[PREF_SHOW_NUMBERS].type = C_BOOLEAN;
-    ret[PREF_SHOW_NUMBERS].u.boolean.bval = ui->show_numbers;
-
     ret[PREF_STIPPLE_STYLE].name = "Display style for stipple marks";
     ret[PREF_STIPPLE_STYLE].kw = "stipple-style";
     ret[PREF_STIPPLE_STYLE].type = C_CHOICES;
@@ -2381,7 +2375,6 @@ static config_item *get_prefs(game_ui *ui)
 static void set_prefs(game_ui *ui, const config_item *cfg)
 {
     ui->flash_type = cfg[PREF_FLASH_TYPE].u.choices.selected;
-    ui->show_numbers = cfg[PREF_SHOW_NUMBERS].u.boolean.bval;
     ui->large_stipples = cfg[PREF_STIPPLE_STYLE].u.choices.selected;
 }
 
