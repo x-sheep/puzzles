@@ -33,7 +33,7 @@ for use by anyone attempting to implement a new puzzle or port to a
 new platform.
 
 This guide is believed correct as of \cw{git} commit
-\cw{a2212e82aa2f4b9a4ee22783d6fed2761c213432}. Hopefully it will be
+\cw{c610e24a56c3f54bbcf7f6ce56504d4feabc3454}. Hopefully it will be
 updated along with the code in future, but if not, I've at least left
 this version number in here so you can figure out what's changed by
 tracking commit comments from there onwards.
@@ -1770,41 +1770,53 @@ their solution process without altering their time.
 \c key_label *(*request_keys)(const game_params *params, int *nkeys);
 
 This function returns a dynamically allocated array of \cw{key_label}
-items containing the buttons the back end deems absolutely
-\e{necessary} for gameplay, not an exhaustive list of every button the
-back end could accept. For example, Keen only returns the digits up to
-the game size and the backspace character, \cw{\\b}, even though it
-\e{could} accept \cw{M}, as only these buttons are actually needed to
-play the game. Each \cw{key_label} item contains the following fields:
+structures listing the buttons, beyond the cursor keys, which the back
+end deems necessary for gameplay. Its intended use is to enable
+keyboard-less front ends to implement alternative control schemes for
+games which depend on button input beyond the cursor keys.
+
+Each \cw{key_label} item contains the following fields:
 
 \c struct key_label {
-\c     char *label; /* label for frontend use */
+\c     char *label; /* label for frontend use, dynamically allocated */
 \c     int button; /* button to pass to midend */
 \c } key_label;
 
-The \cw{label} field of this structure can (and often will) be set by
-the backend to \cw{NULL}, in which case the midend will instead call
-\c{button2label()} (\k{utils-button2label}) and fill in a generic
-label. The \cw{button} field is the associated code that can be passed
-to the midend when the frontend deems appropriate.
+The \cw{label} field points to a dynamically allocated string that
+should contain a succinct, human-readable label describing the
+function of the button. However, for generic buttons (i.e.,
+alphanumeric characters and \cw{'\\b'}), the \cw{label} field of this
+structure can be set by the backend to \cw{NULL}, in which case the
+midend will instead call \c{button2label()} (\k{utils-button2label})
+and fill in a generic label. The \cw{button} field is the associated
+button code that can be passed to the midend when the front end deems
+appropriate.
 
 If \cw{label} is not \cw{NULL}, then it's a dynamically allocated
 string. Therefore, freeing an array of these structures needs more
-than just a single free operatio. The function \c{free_keys()}
+than just a single free operation. The function \c{free_keys()}
 (\k{utils-free-keys}) can be used to free a whole array of these
 structures conveniently.
 
-The backend should set \cw{*nkeys} to the number of elements in the
+The back end author has some discretion in deciding which buttons to
+include in the returned list. This function need not generate an
+exhaustive list of every button the back end could accept. For
+example, Keen only returns the digits up to the game size and the
+backspace character \cw{'\\b'}, even though it \e{could} accept
+\cw{M}, as only these buttons are actually needed to play the game.
+
+The back end should set \cw{*nkeys} to the number of elements in the
 returned array.
 
-The field for this function pointer in the \cw{game} structure might
-be set to \cw{NULL} (and indeed it is for the majority of the games)
-to indicate that no additional buttons (apart from the cursor keys)
-are required to play the game.
+The field for this function pointer in the \cw{game} structure can be
+set to \cw{NULL} (and indeed it is for the majority of the games) to
+indicate that no additional buttons beyond the cursor keys are
+required to play the game.
 
-This function should not be called directly by frontends. Instead,
-frontends should use \cw{midend_request_keys()}
-(\k{midend-request-keys}).
+This function should not be called directly by front ends. Instead,
+front ends should use \cw{midend_request_keys()}
+(\k{midend-request-keys}), which will take care of calling
+\cw{button2label()} appropriately.
 
 \S{backend-current-key-label} \cw{current_key_label()}
 
@@ -1955,6 +1967,24 @@ should use it if they're not Mines; if you think you need to use it,
 think again repeatedly in the hope of finding a better way to do
 whatever it was you needed to do.
 
+\S{backend-set-public-desc} \cw{set_public_desc()}
+
+\c void (*set_public_desc)(game_state *state, const char *pubdesc);
+
+If a puzzle has used \cw{midend_supersede_game_desc()}
+(\k{backend-supersede}) to set a separate public and private game
+description, then when the game is saved and reloaded, the private
+description is the one used to reconstruct the initial \c{game_state}
+in the reloaded game. If the backend wants to know the public
+description as well, it can fill in this function pointer, and then
+this function will be called immediately after \cw{new_game()}
+(\k{backend-new-game}), on the same \c{game_state}, during a reload.
+
+Nobody who is not calling \cw{midend_supersede_game_desc()} should
+fill this function in at all. Even users of
+\cw{midend_supersede_game_desc()} won't need it if they're not setting
+a separate private and public description, and maybe not even then.
+
 \C{drawing} The drawing API
 
 The back end function \cw{redraw()} (\k{backend-redraw}) is required
@@ -1994,6 +2024,16 @@ with the top left pixel defined as \cw{(0,0)} and the bottom right
 pixel \cw{(w-1,h-1)}, where \c{w} and \c{h} are the width and height
 values returned by the back end function \cw{compute_size()}
 (\k{backend-compute-size}).
+
+The pixels used by the co-ordinate system may not be the same size as
+the physical pixels of the display.  On high-resolution displays it's
+possible that a pixel in the drawing API may correspond with multiple
+physical pixels.  However, it is guaranteed that an API pixel can be
+accurately overwritten without affecting its neighbours, so in general
+an API pixel will correspond with an integer-sided rectangle of device
+pixels.  Unless otherwise qualified, the word \q{pixel} in this
+document refers to the logical pixel of the drawing API rather than
+necessarily a physical pixel of a display device.
 
 When printing, the puzzle's print area is indexed in exactly the
 same way (with an arbitrary tile size provided by the printing
@@ -2518,14 +2558,8 @@ portion of the puzzle window from the specified blitter object.
 rectangle to be restored. The rectangle's width and height are the
 ones specified when the blitter object was created.
 
-Alternatively, you can specify both \c{x} and \c{y} as the special
-value \cw{BLITTER_FROMSAVED}, in which case the rectangle will be
-restored to exactly where it was saved from. (This is probably what
-you want to do almost all the time, if you're using blitters to
-implement draggable puzzle elements.)
-
 This function is required to cope and do the right thing if \c{x}
-and \c{y} (or the equivalent ones saved in the blitter) are out of
+and \c{y} are out of
 range. (The right thing probably means restoring whatever part of
 the blitter rectangle overlaps with the visible area of the puzzle
 window.)
@@ -3277,6 +3311,13 @@ of 1.
 The \cw{device_pixel_ratio} indicates the number of physical pixels in
 a normal-sized pixel, so values less than 1 indicate unusually large
 pixels and values greater than 1 indicate unusually small pixels.
+
+If the \cw{device_pixel_ratio} would be 2 or larger, it's generally a
+good idea for the front-end to apply its own (integer) scaling factor
+to the drawing to bring it down to under 2 first, and only pass the
+remaining factor to \cw{midend_size()}.  This ensures that 1-pixel
+lines won't become invisible on devices with very small physical
+pixels.
 
 The midend relies on the frontend calling \cw{midend_new_game()}
 (\k{midend-new-game}) before calling \cw{midend_size()}.
@@ -5294,16 +5335,27 @@ than one base colour.
 
 \c char *button2label(int button);
 
-This function generates a descriptive text label for \cw{button},
-which should be a button code that can be passed to the midend. For
-example, calling this function with \cw{CURSOR_UP} will result in the
-string \cw{"Up"}. This function should only be called when the
-\cw{key_label} item returned by a backend's \cw{request_keys()}
-(\k{backend-request-keys}) function has its \cw{label} field set to
-\cw{NULL}; in this case, the corresponding \cw{button} field can be
-passed to this function to obtain an appropriate label. If, however,
-the field is not \cw{NULL}, this function should not be called with
-the corresponding \cw{button} field.
+This function generates a descriptive text label for certain generic
+values of \cw{button}, which are button codes that can be passed to
+the midend.
+
+The allowable values of \cw{button} are \cw{A-Z, a-z, 0-9,
+CURSOR_\{UP,DOWN,LEFT,RIGHT,SELECT\}}, and \cw{'\\b'}. No other values
+are allowed. Passing an unsupported value will produce a fatal error.
+
+The intended use of this function is to generate strings which
+keyboard-less front ends can present to the user as keys which can be
+sent to the back end. For example, \cw{CURSOR_UP} produces
+\cw{"Up"}. Upper- and lowercase alphanumeric characters produce a
+singleton string containing that character. The backspace character
+\cw{'\\b'} produces \cw{"Clear"}.
+
+This function should only be called when the \cw{key_label} item
+returned by a backend's \cw{request_keys()} (\k{backend-request-keys})
+function has its \cw{label} field set to \cw{NULL}; in this case, the
+corresponding \cw{button} field can be passed to this function to
+obtain an appropriate generic label. If, however, the \cw{label} field
+is not \cw{NULL}, this function should not be used.
 
 The returned string is dynamically allocated and should be
 \cw{sfree}'d by the caller.
@@ -5424,6 +5476,19 @@ This macro, defined in the main Puzzles header file, retrieves the
 \c{handle} field from a \c{drawing *} pointer and casts it to \c{type
 *}. It is intended for use in implementations of drawing API
 functions, where this operation is idiomatic.
+
+\S{utils-getenv-bool} \cw{getenv_bool()}
+
+\c bool getenv_bool(const char *name, bool dflt)
+
+This is a simple wrapper around the standard library function
+\cw{getenv()}.  It queries the environment variable named \c{name} and
+returns \c{true} if the variable exists and looks kind of true (any
+value beginning with \c{y}, \c{Y}, \c{t}, or \c{T}).  If the variable
+is defined with some other value, it returns \c{false}, and if it's
+not defined, the function returns \c{dflt}.  This can be used for
+implementing preferences that are too obscure for the standard
+preferences mechanism (see \k{backend-get-prefs}).
 
 \C{writing} How to write a new puzzle
 

@@ -59,7 +59,7 @@ set(mines_crop 240x240 110x110+130+130)
 set(mosaic_crop 288x288 97x97+142+78)
 set(net_crop 193x193 113x113+0+80)
 set(netslide_crop 289x289 144x144+0+0)
-set(palisade_crop 288x288 192x192+0+0)
+set(palisade_crop 292x292 192x192+0+0)
 set(pattern_crop 384x384 223x223+0+0)
 set(pearl_crop 216x216 94x94+108+15)
 set(pegs_crop 263x263 147x147+116+0)
@@ -97,7 +97,7 @@ set(border_32 2)
 set(border_24 1)
 set(border_16 1)
 
-set(icon_srcdir ${CMAKE_SOURCE_DIR}/icons)
+set(icon_srcdir ${PUZZLES_ROOT_DIR}/icons)
 set(icon_bindir ${CMAKE_BINARY_DIR}/icons)
 
 # We'll need to point $SGT_PUZZLES_DIR at an empty directory, to avoid
@@ -110,7 +110,7 @@ function(build_icon name)
   # Compile the GTK puzzle binary without an icon, so that we can run
   # it to generate a screenshot to make the icon out of.
   add_executable(${NAME}-icon-maker ${NAME}.c
-    ${CMAKE_SOURCE_DIR}/no-icon.c)
+    ${PUZZLES_ROOT_DIR}/no-icon.c)
   target_link_libraries(${NAME}-icon-maker
     common ${platform_gui_libs} ${platform_libs})
   set_target_properties(${NAME}-icon-maker PROPERTIES

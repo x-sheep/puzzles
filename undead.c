@@ -57,6 +57,22 @@ enum {
     NCOLOURS
 };
 
+enum {
+  PREF_PENCIL_KEEP_HIGHLIGHT,
+  PREF_MONSTERS,
+  PREF_COUNT_STYLE,
+  N_PREF_ITEMS
+};
+
+enum {
+  COUNT_STYLE_TOTAL,
+  COUNT_STYLE_REMAINING,
+  COUNT_STYLE_PLACED_TOTAL, /* placed/total */
+  N_COUNT_STYLE,
+
+  COUNT_STYLE_DEFAULT=COUNT_STYLE_TOTAL
+};
+
 #define DIFFLIST(A)                             \
     A(EASY,Easy,e)                              \
     A(NORMAL,Normal,n)                          \
@@ -1655,6 +1671,12 @@ struct game_ui {
      * the highlight cluttering your view. So it's a preference.
      */
     bool pencil_keep_highlight;
+
+    /*
+     * User preference option: display monster counts as total (traditional),
+     * remaining (countdown), or placed/total.
+     */
+    int count_style;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -1666,6 +1688,7 @@ static game_ui *new_ui(const game_state *state)
     ui->ascii = false;
 
     ui->pencil_keep_highlight = true;
+    ui->count_style = COUNT_STYLE_DEFAULT;
 
     return ui;
 }
@@ -1674,30 +1697,39 @@ static config_item *get_prefs(game_ui *ui)
 {
     config_item *ret;
 
-    ret = snewn(3, config_item);
+    ret = snewn(N_PREF_ITEMS+1, config_item);
 
-    ret[0].name = "Keep mouse highlight after changing a pencil mark";
-    ret[0].kw = "pencil-keep-highlight";
-    ret[0].type = C_BOOLEAN;
-    ret[0].u.boolean.bval = ui->pencil_keep_highlight;
+    ret[PREF_PENCIL_KEEP_HIGHLIGHT].name =
+        "Keep mouse highlight after changing a pencil mark";
+    ret[PREF_PENCIL_KEEP_HIGHLIGHT].kw = "pencil-keep-highlight";
+    ret[PREF_PENCIL_KEEP_HIGHLIGHT].type = C_BOOLEAN;
+    ret[PREF_PENCIL_KEEP_HIGHLIGHT].u.boolean.bval = ui->pencil_keep_highlight;
 
-    ret[1].name = "Monster representation";
-    ret[1].kw = "monsters";
-    ret[1].type = C_CHOICES;
-    ret[1].u.choices.choicenames = ":Pictures:Letters";
-    ret[1].u.choices.choicekws = ":pictures:letters";
-    ret[1].u.choices.selected = ui->ascii;
+    ret[PREF_MONSTERS].name = "Monster representation";
+    ret[PREF_MONSTERS].kw = "monsters";
+    ret[PREF_MONSTERS].type = C_CHOICES;
+    ret[PREF_MONSTERS].u.choices.choicenames = ":Pictures:Letters";
+    ret[PREF_MONSTERS].u.choices.choicekws = ":pictures:letters";
+    ret[PREF_MONSTERS].u.choices.selected = ui->ascii;
 
-    ret[2].name = NULL;
-    ret[2].type = C_END;
+    ret[PREF_COUNT_STYLE].name = "Monster count display";
+    ret[PREF_COUNT_STYLE].kw = "count-style";
+    ret[PREF_COUNT_STYLE].type = C_CHOICES;
+    ret[PREF_COUNT_STYLE].u.choices.choicenames = ":Total:Remaining:Placed/Total";
+    ret[PREF_COUNT_STYLE].u.choices.choicekws = ":total:remaining:placed-total";
+    ret[PREF_COUNT_STYLE].u.choices.selected = ui->count_style;
+
+    ret[N_PREF_ITEMS].name = NULL;
+    ret[N_PREF_ITEMS].type = C_END;
 
     return ret;
 }
 
 static void set_prefs(game_ui *ui, const config_item *cfg)
 {
-    ui->pencil_keep_highlight = cfg[0].u.boolean.bval;
-    ui->ascii = cfg[1].u.choices.selected;
+    ui->pencil_keep_highlight = cfg[PREF_PENCIL_KEEP_HIGHLIGHT].u.boolean.bval;
+    ui->ascii = cfg[PREF_MONSTERS].u.choices.selected;
+    ui->count_style = cfg[PREF_COUNT_STYLE].u.choices.selected;
 }
 
 static void free_ui(game_ui *ui) {
@@ -1741,6 +1773,7 @@ struct game_drawstate {
     unsigned char *pencils;
 
     bool count_errors[3];
+    int count_placed[3];
     bool *cell_errors;
     bool *hint_errors;
     bool *hints_done;
@@ -1751,10 +1784,14 @@ struct game_drawstate {
     bool ascii;
     bool fixed_pencil;
 
-	int counts_y1, counts_y2,
-		counts_ghost_x1, counts_ghost_x2,
-		counts_vampire_x1, counts_vampire_x2,
-		counts_zombie_x1, counts_zombie_x2;
+    int count_style;
+
+    int count_fontsize;
+    int count_w;
+    int count_gap;
+    int count_padding;
+
+    char *minus_sign;
 };
 
 static bool is_clue(const game_state *state, int x, int y)
@@ -1787,19 +1824,99 @@ static int clue_index(const game_state *state, int x, int y)
 #define TILESIZE (ds->tilesize)
 #define BORDER (TILESIZE/4)
 
+/* Coordinates of monster counts at top */
+#define COUNT_MSIZE (2*TILESIZE/3) /* size of monster label */
+#define COUNT_GAP (TILESIZE/3) /* preferred space between blocks */
+#define COUNT_FONTSIZE (TILESIZE/2) /* preferred size */
+#define COUNT_PADDING (TILESIZE/10) /* space between label and count */
+#define COUNT_X(c) (BORDER + ((ds->w+2)*TILESIZE - ds->count_w) / 2 + ((c)-1) * (ds->count_gap + ds->count_w))
+#define COUNT_Y BORDER
+#define COUNT_W (ds->count_w)
+#define COUNT_H TILESIZE
+#define DIGIT_WIDTH 0.6f /* approximate digit width as a factor of fontsize */
+
+static void calculate_count_layout(game_drawstate *ds) {
+    char buf[MAX_DIGITS(int)];
+    int block_w, number_w, gap, padding, fontsize;
+    int total_w = (ds->w + 2) * TILESIZE; /* not including border */
+    int max_digits;
+    float max_chars;
+
+    sprintf(buf, "%d", ds->w * ds->h); /* max possible count for a monster */
+    max_digits = (int)strlen(buf);
+
+    switch (ds->count_style) {
+      case COUNT_STYLE_TOTAL:
+        max_chars = max_digits;
+        break;
+      case COUNT_STYLE_REMAINING:
+        /* +/- remaining */
+        max_chars = 1 + max_digits;
+        break;
+      case COUNT_STYLE_PLACED_TOTAL:
+        /* placed / total (a '/' is roughly half a digit wide) */
+        max_chars = max_digits + 0.5f + max_digits;
+        break;
+    }
+
+    fontsize = COUNT_FONTSIZE;
+    padding = COUNT_PADDING;
+    number_w = (int)(max_chars * DIGIT_WIDTH * fontsize);
+    block_w = COUNT_MSIZE + padding + number_w;
+    gap = min(COUNT_GAP, (total_w - 3 * block_w) / 2);
+
+    if (gap < 0) {
+        /* Doesn't fit: try reducing padding then fontsize */
+        padding -= min(-gap/3, padding);
+        block_w = COUNT_MSIZE + padding + number_w;
+        gap = (total_w - 3 * block_w) / 2;
+        if (gap < 0) {
+            fontsize = (int)((total_w / 3.0f - COUNT_MSIZE - padding) / (max_chars * DIGIT_WIDTH));
+            fontsize = max(fontsize, TILESIZE/10); /* not too small */
+            number_w = (int)(max_chars * DIGIT_WIDTH * fontsize);
+            block_w = COUNT_MSIZE + padding + number_w;
+            gap = (total_w - 3 * block_w) / 2;
+        }
+        gap = max(gap, 0);
+    }
+
+    ds->count_fontsize = fontsize;
+    ds->count_w = block_w;
+    ds->count_gap = gap;
+    ds->count_padding = padding;
+}
+
 static char *interpret_move(const game_state *state, game_ui *ui,
                             const game_drawstate *ds,
                             int x, int y, int button)
 {
     int gx,gy;
     int g,xi;
-    char buf[80]; 
+    int c,cc;
+    char buf[80];
 
     gx = ((x-BORDER-1) / TILESIZE );
     gy = ((y-BORDER-2) / TILESIZE ) - 1;
 
+    cc = -1;
+    if (button == LEFT_BUTTON && y >= COUNT_Y && y < COUNT_Y + COUNT_H) {
+        for (c = 0; c < 3; c++) {
+            if (x >= COUNT_X(c) && x < COUNT_X(c) + COUNT_W) {
+                cc = c;
+                break;
+            }
+        }
+    }
+
     if (button == 'a' || button == 'A') {
         ui->ascii = !ui->ascii;
+        return MOVE_UI_UPDATE;
+    }
+
+    if (button == 'c' || button == 'C' ||
+        (button == RIGHT_BUTTON && y < COUNT_Y + COUNT_H)
+    ) {
+        ui->count_style = (ui->count_style + 1) % N_COUNT_STYLE;
         return MOVE_UI_UPDATE;
     }
 
@@ -1815,21 +1932,24 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     if (ui->hshow && !ui->hpencil) {
         xi = state->common->xinfo[ui->hx + ui->hy*(state->common->params.w+2)];
         if (xi >= 0 && !state->common->fixed[xi]) {
-            if (button == 'g' || button == 'G' || button == '1' || (IS_MOUSE_DOWN(button) && on_ghost)) {
+            if (cc >= 0 && state->guess[xi] == 1 << cc) {
+                cc = 127; /* clicked monster already in cell: delete it */
+            }
+            if (button == 'g' || button == 'G' || button == '1' || cc == 0) {
                 if (!ui->hcursor) ui->hshow = false;
                 if (state->guess[xi] == 1)
                     return ui->hcursor ? NULL : MOVE_UI_UPDATE;
                 sprintf(buf,"G%d",xi);
                 return dupstr(buf);
             }
-            if (button == 'v' || button == 'V' || button == '2' || (IS_MOUSE_DOWN(button) && on_vampire)) {
+            if (button == 'v' || button == 'V' || button == '2' || cc == 1) {
                 if (!ui->hcursor) ui->hshow = false;
                 if (state->guess[xi] == 2)
                     return ui->hcursor ? NULL : MOVE_UI_UPDATE;
                 sprintf(buf,"V%d",xi);
                 return dupstr(buf);
             }
-            if (button == 'z' || button == 'Z' || button == '3' || (IS_MOUSE_DOWN(button) && on_zombie)) {
+            if (button == 'z' || button == 'Z' || button == '3' || cc == 2) {
                 if (!ui->hcursor) ui->hshow = false;
                 if (state->guess[xi] == 4)
                     return ui->hcursor ? NULL : MOVE_UI_UPDATE;
@@ -1837,7 +1957,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 return dupstr(buf);
             }
             if (button == 'e' || button == 'E' || button == CURSOR_SELECT2 ||
-                button == '0' || button == '\b' ) {
+                button == '0' || button == '\b' || cc == 127) {
                 if (!ui->hcursor) ui->hshow = false;
                 if (state->guess[xi] == 7 && state->pencils[xi] == 0)
                     return ui->hcursor ? NULL : MOVE_UI_UPDATE;
@@ -1884,18 +2004,15 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (xi >= 0 && !state->common->fixed[xi]) {
             buf[0] = '\0';
 
-            if (button == 'g' || button == 'G' || button == '1') {
-                sprintf(buf, "g%d", xi);
-            }
-            else if (button == 'v' || button == 'V' || button == '2') {
-                sprintf(buf, "v%d", xi);
-            }
-            else if (button == 'z' || button == 'Z' || button == '3') {
-                sprintf(buf, "z%d", xi);
-            }
-            else if (button == 'e' || button == 'E' ||
-                button == CURSOR_SELECT2 || button == '0' ||
-                button == '\b') {
+            if (button == 'g' || button == 'G' || button == '1' || cc == 0) {
+                sprintf(buf,"g%d",xi);
+            } else if (button == 'v' || button == 'V' || button == '2' || cc == 1) {
+                sprintf(buf,"v%d",xi);
+            } else if (button == 'z' || button == 'Z' || button == '3' || cc == 2) {
+                sprintf(buf,"z%d",xi);
+            } else if (button == 'e' || button == 'E' ||
+                       button == CURSOR_SELECT2 || button == '0' ||
+                       button == '\b') {
                 if (state->pencils[xi] == 0)
                     return ui->hcursor ? NULL : MOVE_UI_UPDATE;
                 sprintf(buf, "E%d", xi);
@@ -2268,6 +2385,8 @@ static float *game_colours(frontend *fe, int *ncolours)
     return ret;
 }
 
+static const char *const minus_signs[] = { "\xE2\x88\x92", "-" };
+
 static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 {
     int i;
@@ -2280,10 +2399,15 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->ascii = false;
     
     ds->fixed_pencil = getenv_bool("FIXED_PENCIL_MARKS", false);
-    
+    ds->count_style = COUNT_STYLE_DEFAULT;
+
     ds->count_errors[0] = false;
     ds->count_errors[1] = false;
     ds->count_errors[2] = false;
+
+    ds->count_placed[0] = 0;
+    ds->count_placed[1] = 0;
+    ds->count_placed[2] = 0;
 
     ds->monsters = snewn(state->common->num_total,int);
     for (i=0;i<(state->common->num_total);i++)
@@ -2306,6 +2430,12 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     ds->hpencil = false;
     ds->hflash = false;
     ds->hx = ds->hy = 0;
+
+    // TODO: is this initialization necessary? (or should we call calculate_count_layout here?)
+    ds->count_w = ds->count_fontsize = ds->count_gap = ds->count_padding = 0;
+
+    ds->minus_sign = text_fallback(dr, minus_signs, lenof(minus_signs));
+
     return ds;
 }
 
@@ -2315,6 +2445,7 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds) {
     sfree(ds->cell_errors);
     sfree(ds->pencils);
     sfree(ds->monsters);
+    sfree(ds->minus_sign);
     sfree(ds);
     return;
 }
@@ -2485,57 +2616,77 @@ static void draw_monster(drawing *dr, game_drawstate *ds, int x, int y,
     draw_update(dr,x-(tilesize/2)+2,y-(tilesize/2)+2,tilesize-3,tilesize-3);
 }
 
+static void draw_monster_count_background(drawing *dr, const game_drawstate *ds) {
+    /* Clear the entire monster count row, in case layout is changing */
+    draw_rect(dr, 0, COUNT_Y, 2*BORDER + (ds->w+2)*TILESIZE, COUNT_H, COL_BACKGROUND);
+    draw_update(dr, 0, COUNT_Y, 2*BORDER + (ds->w+2)*TILESIZE, COUNT_H);
+}
+
 static void draw_monster_count(drawing *dr, game_drawstate *ds,
                                const game_state *state, int c, bool hflash) {
-    int dx,dy;
-    char buf[MAX_DIGITS(int) + 1];
+    int dx,dy,dw,dh,msize,fontsize,gap,padding;
+    char buf[2 * MAX_DIGITS(int) + 2];
     char bufm[8];
-    
-    dy = TILESIZE/4;
-    dx = BORDER+(ds->w+2)*TILESIZE/2+TILESIZE/4;
+    int placed, total;
 
-	ds->counts_y1 = (3 * TILESIZE / 4) - (2 * TILESIZE / 5);
-	ds->counts_y2 = (3 * TILESIZE / 4) + (2 * TILESIZE / 5);
-	int counts_mid = BORDER + (ds->w + 2)*TILESIZE / 2 + TILESIZE / 4;
-	ds->counts_ghost_x1 = counts_mid - 3 * TILESIZE / 2 - TILESIZE / 3 - (2 * TILESIZE / 5);
-	ds->counts_ghost_x2 = ds->counts_ghost_x1 + (4 * TILESIZE / 5);
-	ds->counts_vampire_x1 = counts_mid - (4 * TILESIZE / 5);
-	ds->counts_vampire_x2 = counts_mid;
-	ds->counts_zombie_x1 = counts_mid + 3 * TILESIZE / 2 - TILESIZE / 3 - (2 * TILESIZE / 5);
-	ds->counts_zombie_x2 = ds->counts_zombie_x1 + (4 * TILESIZE / 5);
+    dy = COUNT_Y;
+    dx = COUNT_X(c);
+    dw = COUNT_W;
+    dh = COUNT_H;
+    msize = COUNT_MSIZE;
+    fontsize = ds->count_fontsize;
+    gap = ds->count_gap;
+    padding = ds->count_padding;
 
+    placed = ds->count_placed[c];
     switch (c) {
-      case 0: 
-        sprintf(buf,"%d",state->common->num_ghosts);
+      case 0:
+        total = state->common->num_ghosts;
         sprintf(bufm,"G");
-        dx -= 3*TILESIZE/2;
         break;
       case 1: 
-        sprintf(buf,"%d",state->common->num_vampires); 
+        total = state->common->num_vampires;
         sprintf(bufm,"V");
         break;
       case 2: 
-        sprintf(buf,"%d",state->common->num_zombies); 
+        total = state->common->num_zombies;
         sprintf(bufm,"Z");
-        dx += 3*TILESIZE/2;
         break;
     }
 
-    draw_rect(dr, dx-2*TILESIZE/3, dy, 3*TILESIZE/2, TILESIZE,
-              COL_BACKGROUND);
+    switch (ds->count_style) {
+      case COUNT_STYLE_TOTAL:
+        sprintf(buf, "%d", total);
+        break;
+      case COUNT_STYLE_REMAINING:
+        if (placed == total)
+            sprintf(buf, "0");
+        else if (placed > total)
+            sprintf(buf, "%d", placed - total);
+        else
+            sprintf(buf, "%s%d", ds->minus_sign, total - placed);
+        break;
+      case COUNT_STYLE_PLACED_TOTAL:
+        sprintf(buf, "%d/%d", placed, total);
+        break;
+    }
+
+    /* Clear to the next block in case an earlier count ran wide */
+    draw_rect(dr, dx, dy, dw+gap, dh, COL_BACKGROUND);
     if (!ds->ascii) { 
-        draw_monster(dr, ds, dx-TILESIZE/3, dy+TILESIZE/2,
-                     2*TILESIZE/3, hflash, 1<<c);
+        draw_monster(dr, ds, dx+msize/2, dy+dh/2,
+                     msize, hflash, 1<<c);
     } else {
-        draw_text(dr, dx-TILESIZE/3,dy+TILESIZE/2,FONT_VARIABLE,TILESIZE/2,
+        draw_text(dr, dx+msize/2,dy+dh/2,FONT_VARIABLE, COUNT_FONTSIZE,
                   ALIGN_HCENTRE|ALIGN_VCENTRE,
                   hflash ? COL_FLASH : COL_TEXT, bufm);
     }
-    draw_text(dr, dx, dy+TILESIZE/2, FONT_VARIABLE, TILESIZE/2,
+    draw_text(dr, dx+msize+padding, dy+dh/2, FONT_VARIABLE, fontsize,
               ALIGN_HLEFT|ALIGN_VCENTRE,
-              (state->count_errors[c] ? COL_ERROR :
-               hflash ? COL_FLASH : COL_TEXT), buf);
-    draw_update(dr, dx-2*TILESIZE/3, dy, 3*TILESIZE/2, TILESIZE);
+              (state->count_errors[c] || placed > total ? COL_ERROR :
+               hflash ? COL_FLASH :
+               placed == total ? COL_DONE : COL_TEXT), buf);
+    draw_update(dr, dx, dy, dw+gap, dh);
 
     return;
 }
@@ -2569,7 +2720,7 @@ static void draw_path_hint(drawing *dr, game_drawstate *ds,
 
     sprintf(buf,"%d", hint);
     draw_rect(dr, dx, dy, text_size, text_size, COL_BACKGROUND);
-    draw_text(dr, text_dx, text_dy, FONT_FIXED, TILESIZE / 2,
+    draw_text(dr, text_dx, text_dy, FONT_VARIABLE, TILESIZE / 2,
               ALIGN_HCENTRE | ALIGN_VCENTRE, color, buf);
     draw_update(dr, dx, dy, text_size, text_size);
 
@@ -2615,7 +2766,7 @@ static void draw_big_monster(drawing *dr, game_drawstate *ds,
         else if (monster == 2) sprintf(buf,"V");
         else if (monster == 4) sprintf(buf,"Z");
         else sprintf(buf," ");
-        draw_text(dr,dx,dy,FONT_FIXED,TILESIZE/2,ALIGN_HCENTRE|ALIGN_VCENTRE,
+        draw_text(dr,dx,dy,FONT_VARIABLE,TILESIZE/2,ALIGN_HCENTRE|ALIGN_VCENTRE,
                   hflash ? COL_FLASH : COL_TEXT,buf);
         draw_update(dr,dx-(TILESIZE/2)+2,dy-(TILESIZE/2)+2,TILESIZE-3,
                     TILESIZE-3);
@@ -2661,7 +2812,7 @@ static void draw_pencils(drawing *dr, game_drawstate *ds,
                       case 4: sprintf(buf,"Z"); break;
                     }
                     draw_text(dr,dx + TILESIZE/2 * px,dy + TILESIZE/2 * py,
-                              FONT_FIXED,TILESIZE/4,ALIGN_HCENTRE|ALIGN_VCENTRE,
+                              FONT_VARIABLE,TILESIZE/4,ALIGN_HCENTRE|ALIGN_VCENTRE,
                               COL_TEXT,buf);
                 }
             }
@@ -2700,7 +2851,8 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 {
     int i,j,x,y,xy;
     int xi, c;
-    bool stale, hflash, hchanged, changed_ascii;
+    int placed[3];
+    bool stale, hflash, hchanged, changed_ascii, changed_count_style;
 
     hflash = (int)(flashtime * 5 / FLASH_TIME) % 2;
 
@@ -2728,18 +2880,43 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     } else
         changed_ascii = false;
 
+    if (ds->count_style != ui->count_style) {
+        ds->count_style = ui->count_style;
+        changed_count_style = true;
+    } else
+        changed_count_style = false;
+
     /* Draw monster count hints */
+
+    // TODO: should placed counts be maintained in game_state (like count_errors)?
+    placed[0] = placed[1] = placed[2] = 0;
+    for (i = 0; i < state->common->num_total; i++) {
+        if (state->guess[i] == 1) placed[0]++;
+        if (state->guess[i] == 2) placed[1]++;
+        if (state->guess[i] == 4) placed[2]++;
+    }
+
+    if (changed_count_style) {
+        draw_monster_count_background(dr, ds);
+    }
+    if (changed_count_style || !ds->started) {
+        calculate_count_layout(ds);
+    }
 
     for (i=0;i<3;i++) {
         stale = false;
         if (!ds->started) stale = true;
         if (ds->hflash != hflash) stale = true;
-        if (changed_ascii) stale = true;
+        if (changed_ascii || changed_count_style) stale = true;
         if (ds->count_errors[i] != state->count_errors[i]) {
             stale = true;
             ds->count_errors[i] = state->count_errors[i];
         }
-        
+        if (ds->count_placed[i] != placed[i]) {
+            stale = true;
+            ds->count_placed[i] = placed[i];
+        }
+
         if (stale) {
             draw_monster_count(dr, ds, state, i, hflash);
         }
@@ -2809,6 +2986,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     ds->hshow = ui->hshow;
     ds->hpencil = ui->hpencil;
     ds->hflash = hflash;
+    ds->count_style = ui->count_style;
     ds->started = true;
     return;
 }
@@ -2861,6 +3039,7 @@ const struct game thegame = {
     new_game_desc,
     validate_desc,
     new_game,
+    NULL, /* set_public_desc */
     dup_game,
     free_game,
     true, solve_game,

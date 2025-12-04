@@ -48,6 +48,10 @@ enum {
 struct game_params {
     int w, h, n;
     bool unique;
+
+    /* For non-interactive generation, you can set these to override
+     * the randomised first-click location. */
+    int first_click_x, first_click_y;
 };
 
 struct mine_layout {
@@ -65,6 +69,13 @@ struct mine_layout {
     bool unique;
     random_state *rs;
     midend *me;		       /* to give back the new game desc */
+    /*
+     * After we generate a layout on the first click, we want to
+     * remember what the location of that click was, so that we can
+     * mark the square if the user undoes the click, so they know
+     * which is the safe starting square.
+     */
+    int startx, starty;
 };
 
 struct game_state {
@@ -103,18 +114,19 @@ static game_params *default_params(void)
     ret->w = ret->h = 9;
     ret->n = 10;
     ret->unique = true;
+    ret->first_click_x = ret->first_click_y = -1;
 
     return ret;
 }
 
 static const struct game_params mines_presets[] = {
-  {9, 9, 10, true},
-  {9, 9, 35, true},
-  {16, 16, 40, true},
-  {16, 16, 99, true},
+    {9, 9, 10, true, -1, -1},
+    {9, 9, 35, true, -1, -1},
+    {16, 16, 40, true, -1, -1},
+    {16, 16, 99, true, -1, -1},
 #ifndef SMALL_SCREEN
-  {30, 16, 99, true},
-  {30, 16, 170, true},
+    {30, 16, 99, true, -1, -1},
+    {30, 16, 170, true, -1, -1},
 #endif
 };
 
@@ -175,6 +187,14 @@ static void decode_params(game_params *params, char const *string)
 	if (*p == 'a') {
             p++;
 	    params->unique = false;
+	} else if (*p == 'X') {
+            p++;
+            params->first_click_x = atoi(p);
+            while (*p && isdigit((unsigned char)*p)) p++;
+	} else if (*p == 'Y') {
+            p++;
+            params->first_click_y = atoi(p);
+            while (*p && isdigit((unsigned char)*p)) p++;
 	} else
 	    p++;		       /* skip any other gunk */
     }
@@ -194,6 +214,10 @@ static char *encode_params(const game_params *params, bool full)
 	len += sprintf(ret+len, "n%d", params->n);
     if (full && !params->unique)
         ret[len++] = 'a';
+    if (full && params->first_click_x >= 0)
+        len += sprintf(ret+len, "X%d", params->first_click_x);
+    if (full && params->first_click_y >= 0)
+        len += sprintf(ret+len, "Y%d", params->first_click_y);
     assert(len < lenof(ret));
     ret[len] = '\0';
 
@@ -242,6 +266,7 @@ static game_params *custom_params(const config_item *cfg)
     if (strchr(cfg[2].u.string.sval, '%'))
 	ret->n = ret->n * (ret->w * ret->h) / 100;
     ret->unique = cfg[3].u.boolean.bval;
+    ret->first_click_x = ret->first_click_y = -1;
 
     return ret;
 }
@@ -283,6 +308,10 @@ static const char *validate_params(const game_params *params, bool full)
         return "Number of mines must be greater than zero";
     if (params->n > params->w * params->h - 9)
 	return "Too many mines for grid size";
+    if (params->first_click_x >= params->w)
+	return "First-click x coordinate must be inside the grid";
+    if (params->first_click_y >= params->h)
+	return "First-click y coordinate must be inside the grid";
 
     /*
      * FIXME: Need more constraints here. Not sure what the
@@ -732,15 +761,17 @@ static int minesolve(int w, int h, int n, signed char *grid,
 		val = 0;
 		for (dy = -1; dy <= +1; dy++) {
 		    for (dx = -1; dx <= +1; dx++) {
-#ifdef SOLVER_DIAGNOSTICS
-			printf("grid %d,%d = %d\n", x+dx, y+dy, grid[i+dy*w+dx]);
-#endif
-			if (x+dx < 0 || x+dx >= w || y+dy < 0 || y+dy >= h)
+			if (x+dx < 0 || x+dx >= w || y+dy < 0 || y+dy >= h) {
 			    /* ignore this one */;
-			else if (grid[i+dy*w+dx] == -1)
-			    mines--;
-			else if (grid[i+dy*w+dx] == -2)
-			    val |= bit;
+                        } else {
+#ifdef SOLVER_DIAGNOSTICS
+                            printf("grid %d,%d = %d\n", x+dx, y+dy, grid[i+dy*w+dx]);
+#endif
+                            if (grid[i+dy*w+dx] == -1)
+                                mines--;
+                            else if (grid[i+dy*w+dx] == -2)
+                                val |= bit;
+                        }
 			bit <<= 1;
 		    }
 		}
@@ -1326,10 +1357,11 @@ static int minesolve(int w, int h, int n, signed char *grid,
  */
 
 struct minectx {
-    bool *grid;
+    bool *grid, *opened;
     int w, h;
     int sx, sy;
     bool allow_big_perturbs;
+    int nperturbs_since_last_new_open;
     random_state *rs;
 };
 
@@ -1341,6 +1373,11 @@ static int mineopen(void *vctx, int x, int y)
     assert(x >= 0 && x < ctx->w && y >= 0 && y < ctx->h);
     if (ctx->grid[y * ctx->w + x])
 	return -1;		       /* *bang* */
+
+    if (!ctx->opened[y * ctx->w + x]) {
+        ctx->opened[y * ctx->w + x] = true;
+        ctx->nperturbs_since_last_new_open = 0;
+    }
 
     n = 0;
     for (i = -1; i <= +1; i++) {
@@ -1413,8 +1450,42 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
     struct perturbations *ret;
     int *setlist;
 
-    if (!mask && !ctx->allow_big_perturbs)
+    if (!mask && !ctx->allow_big_perturbs) {
+#ifdef GENERATION_DIAGNOSTICS
+	printf("big perturbs forbidden on this run\n");
+#endif
 	return NULL;
+    }
+
+    if (ctx->nperturbs_since_last_new_open++ > ctx->w ||
+        ctx->nperturbs_since_last_new_open++ > ctx->h) {
+#ifdef GENERATION_DIAGNOSTICS
+	printf("too many perturb attempts without opening a new square\n");
+#endif
+	return NULL;
+    }
+
+#ifdef GENERATION_DIAGNOSTICS
+    {
+	int yy, xx;
+	printf("grid before perturbing:\n");
+	for (yy = 0; yy < ctx->h; yy++) {
+	    for (xx = 0; xx < ctx->w; xx++) {
+		int v = ctx->grid[yy*ctx->w+xx];
+		if (yy == ctx->sy && xx == ctx->sx) {
+		    assert(!v);
+		    putchar('S');
+		} else if (v) {
+		    putchar('*');
+		} else {
+		    putchar('-');
+		}
+	    }
+	    putchar('\n');
+	}
+	printf("\n");
+    }
+#endif
 
     /*
      * Make a list of all the squares in the grid which we can
@@ -1490,11 +1561,17 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
      * Now count up the number of full and empty squares in the set
      * we've been provided.
      */
+#ifdef GENERATION_DIAGNOSTICS
+    printf("perturb wants to fill or empty these squares:");
+#endif
     nfull = nempty = 0;
     if (mask) {
 	for (dy = 0; dy < 3; dy++)
 	    for (dx = 0; dx < 3; dx++)
 		if (mask & (1 << (dy*3+dx))) {
+#ifdef GENERATION_DIAGNOSTICS
+                    printf(" (%d,%d)", setx+dx, sety+dy);
+#endif
 		    assert(setx+dx <= ctx->w);
 		    assert(sety+dy <= ctx->h);
 		    if (ctx->grid[(sety+dy)*ctx->w+(setx+dx)])
@@ -1506,12 +1583,26 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
 	for (y = 0; y < ctx->h; y++)
 	    for (x = 0; x < ctx->w; x++)
 		if (grid[y*ctx->w+x] == -2) {
+#ifdef GENERATION_DIAGNOSTICS
+                    printf(" (%d,%d)", x, y);
+#endif
 		    if (ctx->grid[y*ctx->w+x])
 			nfull++;
 		    else
 			nempty++;
 		}
     }
+
+#ifdef GENERATION_DIAGNOSTICS
+    {
+        int i;
+	printf("\nperturb set includes %d full, %d empty\n", nfull, nempty);
+        printf("source squares in preference order:");
+        for (i = 0; i < n; i++)
+            printf(" (%d,%d)", sqlist[i].x, sqlist[i].y);
+        printf("\n");
+    }
+#endif
 
     /*
      * Now go through our sorted list until we find either `nfull'
@@ -1537,6 +1628,11 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
 	if (ntofill == nfull || ntoempty == nempty)
 	    break;
     }
+
+#ifdef GENERATION_DIAGNOSTICS
+    printf("can fill %d (of %d) or empty %d (of %d)\n",
+           ntofill, nfull, ntoempty, nempty);
+#endif
 
     /*
      * If we haven't found enough empty squares outside the set to
@@ -1578,6 +1674,10 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
 	/*
 	 * Now pick `ntoempty' items at random from the list.
 	 */
+#ifdef GENERATION_DIAGNOSTICS
+        printf("doing a partial fill:");
+#endif
+
 	for (k = 0; k < ntoempty; k++) {
 	    int index = k + random_upto(ctx->rs, i - k);
 	    int tmp;
@@ -1585,7 +1685,15 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
 	    tmp = setlist[k];
 	    setlist[k] = setlist[index];
 	    setlist[index] = tmp;
+
+#ifdef GENERATION_DIAGNOSTICS
+            printf(" (%d,%d)", setlist[index] % ctx->w,
+                   setlist[index] / ctx->w);
+#endif
 	}
+#ifdef GENERATION_DIAGNOSTICS
+        printf("\n");
+#endif
     } else
 	setlist = NULL;
 
@@ -1822,16 +1930,21 @@ static bool *minegen(int w, int h, int n, int x, int y, bool unique,
          */
 	if (unique) {
 	    signed char *solvegrid = snewn(w*h, signed char);
+            bool *opened = snewn(w*h, bool);
 	    struct minectx actx, *ctx = &actx;
 	    int solveret, prevret = -2;
 
+            memset(opened, 0, w*h * sizeof(bool));
+
 	    ctx->grid = ret;
+            ctx->opened = opened;
 	    ctx->w = w;
 	    ctx->h = h;
 	    ctx->sx = x;
 	    ctx->sy = y;
 	    ctx->rs = rs;
 	    ctx->allow_big_perturbs = (ntries > 100);
+            ctx->nperturbs_since_last_new_open = 0;
 
 	    while (1) {
 		memset(solvegrid, -2, w*h);
@@ -1850,6 +1963,7 @@ static bool *minegen(int w, int h, int n, int x, int y, bool unique,
 	    }
 
 	    sfree(solvegrid);
+	    sfree(opened);
 	} else {
 	    success = true;
 	}
@@ -1927,6 +2041,15 @@ static char *new_game_desc(const game_params *params, random_state *rs,
      */
     int x = random_upto(rs, params->w);
     int y = random_upto(rs, params->h);
+
+    /*
+     * Override with params->first_click_[xy] if those are set. (For
+     * the same reason, we still generated the random numbers first.)
+     */
+    if (params->first_click_x >= 0)
+        x = params->first_click_x;
+    if (params->first_click_y >= 0)
+        y = params->first_click_y;
 
     if (!interactive) {
 	/*
@@ -2020,6 +2143,12 @@ static int open_square(game_state *state, int x, int y)
 					       x, y, state->layout->unique,
 					       state->layout->rs,
 					       &desc);
+
+        /* Record the first-click location, so that if the user
+         * undoes this move they can still remember where it was. */
+        state->layout->startx = x;
+        state->layout->starty = y;
+
 	/*
 	 * Find the trailing substring of the game description
 	 * corresponding to just the mine layout; we will use this
@@ -2146,6 +2275,7 @@ static game_state *new_game(midend *me, const game_params *params,
     state->layout = snew(struct mine_layout);
     memset(state->layout, 0, sizeof(struct mine_layout));
     state->layout->refcount = 1;
+    state->layout->startx = state->layout->starty = -1;
 
     state->grid = snewn(wh, signed char);
     memset(state->grid, -2, wh);
@@ -2232,6 +2362,24 @@ static game_state *new_game(midend *me, const game_params *params,
     }
 
     return state;
+}
+
+static void set_public_desc(game_state *state, const char *pubdesc)
+{
+    int x = -1, y = -1;
+
+    if (*pubdesc && isdigit((unsigned char)*pubdesc)) {
+        x = atoi(pubdesc);
+        while (*pubdesc && isdigit((unsigned char)*pubdesc))
+            pubdesc++;                 /* skip over x coordinate */
+        if (*pubdesc) pubdesc++;       /* eat comma */
+        y = atoi(pubdesc);
+    }
+
+    if (x >= 0 && y >= 0 && x < state->w && y < state->h) {
+        state->layout->startx = x;
+        state->layout->starty = y;
+    }
 }
 
 static game_state *dup_game(const game_state *state)
@@ -2827,7 +2975,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds,
         int coords[12];
 	int hl = 0;
 
-	if (v == -22 || v == -23) {
+	if (v == -22 || v == -23 || v == -24) {
 	    v += 20;
 
 	    /*
@@ -2889,7 +3037,15 @@ static void draw_tile(drawing *dr, game_drawstate *ds,
 		      FONT_VARIABLE, TILE_SIZE * 6 / 8,
 		      ALIGN_VCENTRE | ALIGN_HCENTRE,
 		      COL_QUERY, "?");
-	}
+	} else if (v == -4) {
+            /*
+             * Draw a 'click here' cross, to mark the safe first click
+             * location.
+             */
+            int c0 = TILE_SIZE / 4, c1 = TILE_SIZE - 1 - c0;
+            draw_line(dr, x+c0, y+c0, x+c1, y+c1, COL_MINE);
+            draw_line(dr, x+c0, y+c1, x+c1, y+c0, COL_MINE);
+        }
     } else {
 	/*
 	 * Clear the square to the background colour, and draw thin
@@ -3040,7 +3196,10 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
                     v |= 32;
             }
 
-	    if ((v == -2 || v == -3) &&
+            if (v == -2 && x == state->layout->startx && y == state->layout->starty)
+                v = -4;                /* 'start here' cross */
+
+	    if ((v == -2 || v == -3 || v == -4) &&
 		(abs(x-ui->hx) <= ui->hradius && abs(y-ui->hy) <= ui->hradius))
 		v -= 20;
 
@@ -3189,6 +3348,7 @@ const struct game thegame = {
     new_game_desc,
     validate_desc,
     new_game,
+    set_public_desc,
     dup_game,
     free_game,
     true, solve_game,

@@ -96,6 +96,11 @@ struct game_params {
     puzzle_size h;
 };
 
+enum {
+  PREF_MOUSE_BUTTON_ORDER,
+  N_PREF_ITEMS
+};
+
 struct game_state {
     struct game_params params;
     bool has_cheated, was_solved;
@@ -1832,6 +1837,7 @@ struct game const thegame = {
     new_game_desc,
     validate_desc,
     new_game,
+    NULL, /* set_public_desc */
     dup_game,
     free_game,
     true, solve_game,

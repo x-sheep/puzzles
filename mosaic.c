@@ -587,6 +587,7 @@ static bool solve_game_actual(const game_params *params,
     solved = 0;
     while (solved < params->height * params->width && made_progress
            && !error) {
+        made_progress = false;
         for (y = 0; y < params->height; y++) {
             for (x = 0; x < params->width; x++) {
                 curr = solve_cell(params, NULL, desc, sol, x, y);
@@ -951,7 +952,7 @@ static char *solve_game(const game_state *state,
         return NULL;
     }
 
-    ret = snewn((size / 4) + 3, char);
+    ret = snewn((size / 4) + 4, char);
 
     ret[0] = 's';
     i = 0;
@@ -1499,7 +1500,7 @@ static void draw_cell(drawing* dr, int cell, int ts, signed char clue_val,
     if (clue_val >= 0) {
         char clue[80];
         sprintf(clue, "%d", clue_val);
-        draw_text(dr, startX + ts / 2, startY + ts / 2, 1, ts * 3 / 5,
+        draw_text(dr, startX + ts / 2, startY + ts / 2, FONT_VARIABLE, ts * 3 / 5,
             ALIGN_VCENTRE | ALIGN_HCENTRE, text_color, clue);
     }
 
@@ -1606,6 +1607,7 @@ const struct game thegame = {
     new_game_desc,
     validate_desc,
     new_game,
+    NULL, /* set_public_desc */
     dup_game,
     free_game,
     true, solve_game,

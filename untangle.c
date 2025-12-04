@@ -64,6 +64,13 @@ enum {
     NCOLOURS
 };
 
+enum {
+  PREF_SNAP_TO_GRID,
+  PREF_SHOW_CROSSED_EDGES,
+  PREF_VERTEX_STYLE,
+  N_PREF_ITEMS
+};
+
 typedef struct point {
     /*
      * Points are stored using rational coordinates, with the same
@@ -1193,36 +1200,36 @@ static config_item *get_prefs(game_ui *ui)
 {
     config_item *cfg;
 
-    cfg = snewn(4, config_item);
+    cfg = snewn(N_PREF_ITEMS+1, config_item);
 
-    cfg[0].name = "Snap points to a grid";
-    cfg[0].kw = "snap-to-grid";
-    cfg[0].type = C_BOOLEAN;
-    cfg[0].u.boolean.bval = ui->snap_to_grid;
+    cfg[PREF_SNAP_TO_GRID].name = "Snap points to a grid";
+    cfg[PREF_SNAP_TO_GRID].kw = "snap-to-grid";
+    cfg[PREF_SNAP_TO_GRID].type = C_BOOLEAN;
+    cfg[PREF_SNAP_TO_GRID].u.boolean.bval = ui->snap_to_grid;
 
-    cfg[1].name = "Show edges that cross another edge";
-    cfg[1].kw = "show-crossed-edges";
-    cfg[1].type = C_BOOLEAN;
-    cfg[1].u.boolean.bval = ui->show_crossed_edges;
+    cfg[PREF_SHOW_CROSSED_EDGES].name = "Show edges that cross another edge";
+    cfg[PREF_SHOW_CROSSED_EDGES].kw = "show-crossed-edges";
+    cfg[PREF_SHOW_CROSSED_EDGES].type = C_BOOLEAN;
+    cfg[PREF_SHOW_CROSSED_EDGES].u.boolean.bval = ui->show_crossed_edges;
 
-    cfg[2].name = "Display style for vertices";
-    cfg[2].kw = "vertex-style";
-    cfg[2].type = C_CHOICES;
-    cfg[2].u.choices.choicenames = ":Circles:Numbers";
-    cfg[2].u.choices.choicekws = ":circle:number";
-    cfg[2].u.choices.selected = ui->vertex_numbers;
+    cfg[PREF_VERTEX_STYLE].name = "Display style for vertices";
+    cfg[PREF_VERTEX_STYLE].kw = "vertex-style";
+    cfg[PREF_VERTEX_STYLE].type = C_CHOICES;
+    cfg[PREF_VERTEX_STYLE].u.choices.choicenames = ":Circles:Numbers";
+    cfg[PREF_VERTEX_STYLE].u.choices.choicekws = ":circle:number";
+    cfg[PREF_VERTEX_STYLE].u.choices.selected = ui->vertex_numbers;
 
-    cfg[3].name = NULL;
-    cfg[3].type = C_END;
+    cfg[N_PREF_ITEMS].name = NULL;
+    cfg[N_PREF_ITEMS].type = C_END;
 
     return cfg;
 }
 
 static void set_prefs(game_ui *ui, const config_item *cfg)
 {
-    ui->snap_to_grid = cfg[0].u.boolean.bval;
-    ui->show_crossed_edges = cfg[1].u.boolean.bval;
-    ui->vertex_numbers = cfg[2].u.choices.selected;
+    ui->snap_to_grid = cfg[PREF_SNAP_TO_GRID].u.boolean.bval;
+    ui->show_crossed_edges = cfg[PREF_SHOW_CROSSED_EDGES].u.boolean.bval;
+    ui->vertex_numbers = cfg[PREF_VERTEX_STYLE].u.choices.selected;
 }
 
 static void free_ui(game_ui *ui)
@@ -1544,6 +1551,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     } else if(button == CURSOR_SELECT) {
         if(ui->dragpoint < 0 && ui->cursorpoint >= 0) {
             /* begin drag */
+            ui->dragtype = DRAG_MOVE_POINT;
             ui->dragpoint = ui->cursorpoint;
             ui->cursorpoint = -1;
             ui->newpoint.x = state->pts[ui->dragpoint].x * ds->tilesize / state->pts[ui->dragpoint].d;
@@ -2027,6 +2035,7 @@ const struct game thegame = {
     new_game_desc,
     validate_desc,
     new_game,
+    NULL, /* set_public_desc */
     dup_game,
     free_game,
 #ifndef EDITOR

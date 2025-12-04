@@ -26,6 +26,11 @@ enum {
     NCOLOURS
 };
 
+enum {
+    PREF_SHOW_LABELS,
+    N_PREF_ITEMS
+};
+
 struct game_params {
     int ncolours, npegs, nguesses;
     bool allow_blank, allow_multiple;
@@ -531,7 +536,7 @@ static const char *current_key_label(const game_ui *ui,
 #define HINTOFF (ds->hintsz + ds->gapsz)
 
 #define GAP     (ds->gapsz)
-#define CGAP    (ds->gapsz / 2)
+#define CGAP    max((ds->gapsz / 2), 1)
 
 #define PEGRAD  (ds->pegrad)
 #define HINTRAD (ds->hintrad)
@@ -1516,6 +1521,7 @@ const struct game thegame = {
     new_game_desc,
     validate_desc,
     new_game,
+    NULL, /* set_public_desc */
     dup_game,
     free_game,
     true, solve_game,
