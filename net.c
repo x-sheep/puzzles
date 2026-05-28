@@ -2149,6 +2149,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     char *nullret;
     int tx = -1, ty = -1, dir = 0;
     bool shift = button & MOD_SHFT, ctrl = button & MOD_CTRL;
+    bool stylus = button & MOD_STYLUS;
     enum {
         NONE, ROTATE_LEFT, ROTATE_180, ROTATE_RIGHT, TOGGLE_LOCK, JUMBLE,
         MOVE_ORIGIN, MOVE_SOURCE, MOVE_ORIGIN_AND_SOURCE, MOVE_CURSOR
@@ -2203,20 +2204,15 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
 #ifdef USE_DRAGGING
 
-        if (button == MIDDLE_BUTTON
-#ifdef STYLUS_BASED
-	    || button == RIGHT_BUTTON  /* with a stylus, `right-click' locks */
-#endif
-	    ) {
+        if (button == MIDDLE_BUTTON ||
+            (stylus && button == RIGHT_BUTTON)) {
             /*
              * Middle button never drags: it only toggles the lock.
+             * With a stylus, `right-click' locks.
              */
             action = TOGGLE_LOCK;
-        } else if (button == LEFT_BUTTON
-#ifndef STYLUS_BASED
-                   || button == RIGHT_BUTTON /* (see above) */
-#endif
-                  ) {
+        } else if (button == LEFT_BUTTON ||
+            (!stylus && button == RIGHT_BUTTON)) {
             /*
              * Otherwise, we note down the start point for a drag.
              */
@@ -2226,11 +2222,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->dragstarty = y % TILE_SIZE;
             ui->dragged = false;
             return nullret;            /* no actual action */
-        } else if (button == LEFT_DRAG
-#ifndef STYLUS_BASED
-                   || button == RIGHT_DRAG
-#endif
-                  ) {
+        } else if (button == LEFT_DRAG ||
+            (stylus && button == RIGHT_DRAG)) {
             if (ui->dragtilex < 0)
                 return nullret;
 
@@ -2282,11 +2275,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->dragstarty = yC;
                 ui->dragged = true;
             }
-        } else if (button == LEFT_RELEASE
-#ifndef STYLUS_BASED
-                   || button == RIGHT_RELEASE
-#endif
-                  ) {
+        } else if (button == LEFT_RELEASE ||
+            (stylus && button == RIGHT_RELEASE)) {
             if (!ui->dragged && ui->dragtilex >= 0) {
                 /*
                  * There was a click but no perceptible drag:
@@ -3362,5 +3352,5 @@ const struct game thegame = {
     true, false, game_print_size, game_print,
     true,			       /* wants_statusbar */
     false, NULL,                       /* timing_state */
-    0,				       /* flags */
+    STYLUS_SUPPORT,		       /* flags */
 };

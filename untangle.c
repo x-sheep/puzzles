@@ -2067,5 +2067,9 @@ const struct game thegame = {
     false, false, NULL, NULL,          /* print_size, print */
     false,			       /* wants_statusbar */
     false, NULL,                       /* timing_state */
+#ifdef EDITOR
+    SOLVE_ANIMATES | REQUIRE_RBUTTON,  /* flags */
+#else
     SOLVE_ANIMATES | DISABLE_RBUTTON,	       /* flags */
+#endif
 };

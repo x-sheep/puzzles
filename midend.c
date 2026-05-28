@@ -1002,6 +1002,17 @@ static bool midend_really_process_key(midend *me, int x, int y, int button)
     me->just_performed_undo = false;
     me->just_performed_redo = false;
 
+    if ((me->ourgame->flags & STYLUS_SUPPORT) &&
+        (IS_MOUSE_DOWN(STRIP_BUTTON_MODIFIERS(button)) ||
+         IS_MOUSE_DRAG(STRIP_BUTTON_MODIFIERS(button)) ||
+         IS_MOUSE_RELEASE(STRIP_BUTTON_MODIFIERS(button)))) {
+#ifdef STYLUS_BASED
+        button |= MOD_STYLUS;
+#endif
+    } else {
+        button &= ~MOD_STYLUS;
+    }
+
     if (!IS_UI_FAKE_KEY(button)) {
         movestr = me->ourgame->interpret_move(
             me->states[me->statepos-1].state,
@@ -1111,6 +1122,8 @@ static bool midend_really_process_key(midend *me, int x, int y, int button)
 int midend_process_key(midend *me, int x, int y, int button)
 {
     int ret = PKR_UNUSED, ret2;
+    int stylus = button & MOD_STYLUS;
+    button &= ~MOD_STYLUS;
 
     /*
      * Harmonise mouse drag and release messages.
@@ -1190,13 +1203,15 @@ int midend_process_key(midend *me, int x, int y, int button)
      * specially recognising Ctrl+Shift+Z, and stripping modifier
      * flags off keys that aren't meant to have them.
      */
+
     if (IS_MOUSE_DRAG(button) || IS_MOUSE_RELEASE(button)) {
         if (me->pressed_mouse_button) {
+            stylus = me->pressed_mouse_button & MOD_STYLUS;
             if (IS_MOUSE_DRAG(button)) {
-                button = me->pressed_mouse_button +
+                button = STRIP_BUTTON_MODIFIERS(me->pressed_mouse_button) +
                     (LEFT_DRAG - LEFT_BUTTON);
             } else {
-                button = me->pressed_mouse_button +
+                button = STRIP_BUTTON_MODIFIERS(me->pressed_mouse_button) +
                     (LEFT_RELEASE - LEFT_BUTTON);
             }
         } else
@@ -1207,7 +1222,7 @@ int midend_process_key(midend *me, int x, int y, int button)
 	 * don't bother doing this.
 	 */
 	if (me->ourgame->flags &
-	    BUTTON_BEATS(me->pressed_mouse_button, button))
+	    BUTTON_BEATS((me->pressed_mouse_button & ~MOD_STYLUS), button))
 	    return ret;		       /* just ignore it */
 
         /*
@@ -1261,7 +1276,7 @@ int midend_process_key(midend *me, int x, int y, int button)
     /*
      * Now send on the event we originally received.
      */
-    ret2 = midend_really_process_key(me, x, y, button);
+    ret2 = midend_really_process_key(me, x, y, button | stylus);
     ret = min(ret, ret2);
 
     /*
@@ -1270,7 +1285,7 @@ int midend_process_key(midend *me, int x, int y, int button)
     if (IS_MOUSE_RELEASE(button))
         me->pressed_mouse_button = 0;
     else if (IS_MOUSE_DOWN(button))
-        me->pressed_mouse_button = button;
+        me->pressed_mouse_button = button | stylus;
 
     return ret;
 }

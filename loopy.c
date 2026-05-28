@@ -3058,6 +3058,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     int movelen, movesize;
     char button_char = ' ';
     enum line_state old_state;
+    bool stylus = button & MOD_STYLUS;
 
     button = STRIP_BUTTON_MODIFIERS(button);
 
@@ -3086,10 +3087,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    button_char = 'y';
 	    break;
 	  case LINE_YES:
-#ifdef STYLUS_BASED
-	    button_char = 'n';
-	    break;
-#endif
+	    if (stylus) {
+		button_char = 'n';
+		break;
+	    }
 	  case LINE_NO:
 	    button_char = 'u';
 	    break;
@@ -3104,10 +3105,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    button_char = 'n';
 	    break;
 	  case LINE_NO:
-#ifdef STYLUS_BASED
-	    button_char = 'y';
-	    break;
-#endif
+	    if (stylus) {
+		button_char = 'y';
+		break;
+	    }
 	  case LINE_YES:
 	    button_char = 'u';
 	    break;
@@ -3782,7 +3783,7 @@ const struct game thegame = {
     true, false, game_print_size, game_print,
     false /* wants_statusbar */,
     false, NULL,                       /* timing_state */
-    REQUIRE_RBUTTON,                                       /* mouse_priorities */
+    REQUIRE_RBUTTON | STYLUS_SUPPORT,  /* flags */
 };
 
 #ifdef STANDALONE_SOLVER

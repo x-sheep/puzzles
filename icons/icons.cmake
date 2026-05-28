@@ -129,7 +129,7 @@ function(build_icon name)
     COMMAND ${CMAKE_COMMAND} -E env
       ASAN_OPTIONS=detect_leaks=0
       SGT_PUZZLES_DIR=${empty_config_dir}
-      ${icon_bindir}/${name}-icon-maker
+      $<TARGET_FILE:${name}-icon-maker>
       ${redo_arg}
       --screenshot ${icon_bindir}/${name}-base.png
       --load ${icon_srcdir}/${name}.sav

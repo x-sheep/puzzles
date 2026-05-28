@@ -1301,6 +1301,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                             int x, int y, int button)
 {
     bool control = button & MOD_CTRL, shift = button & MOD_SHFT;
+    bool stylus = button & MOD_STYLUS;
+
     button = STRIP_BUTTON_MODIFIERS(button);
 
     x = FROMCOORD(state->common->w, x);
@@ -1309,28 +1311,26 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     if (x >= 0 && x < state->common->w && y >= 0 && y < state->common->h &&
         (button == LEFT_BUTTON || button == RIGHT_BUTTON ||
          button == MIDDLE_BUTTON)) {
-#ifdef STYLUS_BASED
         int currstate = state->grid[y * state->common->w + x];
-#endif
 
         ui->dragging = true;
 
         if (button == LEFT_BUTTON) {
             ui->drag = LEFT_DRAG;
             ui->release = LEFT_RELEASE;
-#ifdef STYLUS_BASED
-            ui->state = (currstate + 2) % 3; /* FULL -> EMPTY -> UNKNOWN */
-#else
-            ui->state = GRID_FULL;
-#endif
+	    if (stylus) {
+                ui->state = (currstate + 2) % 3; /* FULL -> EMPTY -> UNKNOWN */
+	    } else {
+                ui->state = GRID_FULL;
+            }
         } else if (button == RIGHT_BUTTON) {
             ui->drag = RIGHT_DRAG;
             ui->release = RIGHT_RELEASE;
-#ifdef STYLUS_BASED
-            ui->state = (currstate + 1) % 3; /* EMPTY -> FULL -> UNKNOWN */
-#else
-            ui->state = GRID_EMPTY;
-#endif
+	    if (stylus) {
+                ui->state = (currstate + 1) % 3; /* EMPTY -> FULL -> UNKNOWN */
+	    } else {
+                ui->state = GRID_EMPTY;
+            }
         } else /* if (button == MIDDLE_BUTTON) */ {
             ui->drag = MIDDLE_DRAG;
             ui->release = MIDDLE_RELEASE;
@@ -2127,7 +2127,7 @@ const struct game thegame = {
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
     false, NULL,                       /* timing_state */
-    REQUIRE_RBUTTON,		       /* flags */
+    REQUIRE_RBUTTON | STYLUS_SUPPORT,  /* flags */
 };
 
 #ifdef STANDALONE_SOLVER

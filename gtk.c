@@ -138,6 +138,189 @@ void fatal(const char *fmt, ...)
  * GTK front end to puzzles.
  */
 
+#if GTK_CHECK_VERSION(3,0,0)
+struct _WrapBox {
+    GtkContainer parent_instance;
+    GList *children;
+};
+struct _WrapBoxClass {
+    GtkContainerClass parent_class;
+};
+
+G_DECLARE_FINAL_TYPE(WrapBox, wrap_box, PUZZLES, WRAP_BOX, GtkContainer)
+
+static GtkWidget* wrap_box_new(void)
+{
+    return GTK_WIDGET(g_object_new(wrap_box_get_type(), NULL));
+}
+
+static void wrap_box_init(WrapBox *box)
+{
+    gtk_widget_set_has_window(GTK_WIDGET(box), false);
+    gtk_widget_set_redraw_on_allocate(GTK_WIDGET(box), false);
+    box->children = NULL;
+}
+
+G_DEFINE_TYPE(WrapBox, wrap_box, GTK_TYPE_CONTAINER)
+
+static void wrap_box_add(GtkContainer* container, GtkWidget *widget)
+{
+    WrapBox *box = PUZZLES_WRAP_BOX(container);
+    gtk_widget_set_parent(widget, GTK_WIDGET(box));
+    box->children = g_list_append(box->children, widget);
+}
+
+static void wrap_box_remove(GtkContainer* container, GtkWidget *widget)
+{
+    WrapBox *box = PUZZLES_WRAP_BOX(container);
+    box->children = g_list_remove(box->children, widget);
+    gtk_widget_unparent(widget);
+}
+
+static void wrap_box_forall(GtkContainer* container, gboolean include_internals,
+    GtkCallback callback, gpointer callback_data)
+{
+    WrapBox *box = PUZZLES_WRAP_BOX(container);
+    GList *child = box->children;
+    (void)include_internals;
+    while (child != NULL) {
+        GtkWidget *widget = GTK_WIDGET(child->data);
+        child = child->next;
+        callback(widget, callback_data);
+    }
+}
+
+static void wrap_box_get_child_size(GtkWidget* widget, int *width, int *height)
+{
+    WrapBox *box = PUZZLES_WRAP_BOX(widget);
+    GList *child;
+    GtkRequisition size;
+    *width = 0;
+    *height = 0;
+    for (child = box->children; child != NULL; child = child->next) {
+        gtk_widget_get_preferred_size(GTK_WIDGET(child->data), &size, NULL);
+        *width = max(*width, size.width);
+        *height = max(*height, size.height);
+    }
+}
+
+static GtkSizeRequestMode wrap_box_get_request_mode(GtkWidget *widget)
+{
+    return GTK_SIZE_REQUEST_HEIGHT_FOR_WIDTH;
+}
+
+static void wrap_box_get_preferred_width(GtkWidget *widget,
+    int *minimal, int *natural)
+{
+    int width, height;
+    wrap_box_get_child_size(widget, &width, &height);
+    if (minimal)
+        *minimal = width;
+    if (natural)
+        *natural = width * g_list_length(PUZZLES_WRAP_BOX(widget)->children);
+}
+
+static void wrap_box_get_preferred_height(GtkWidget *widget,
+    int *minimal, int *natural)
+{
+    int width, height;
+    wrap_box_get_child_size(widget, &width, &height);
+    if (minimal)
+        *minimal = height;
+    if (natural)
+        *natural = height;
+}
+
+static void wrap_box_get_preferred_width_for_height(GtkWidget *widget,
+    int height, int *minimal, int *natural)
+{
+    (void)height;
+    wrap_box_get_preferred_width(widget, minimal, natural);
+}
+
+static void wrap_box_get_preferred_height_for_width(GtkWidget *widget,
+    int width, int *minimal, int *natural)
+{
+    WrapBox *box = PUZZLES_WRAP_BOX(widget);
+    int child_count = g_list_length(box->children);
+    int children_per_line = 0, lines = 0;
+    int child_width, child_height;
+    wrap_box_get_child_size(widget, &child_width, &child_height);
+
+    if (child_width > 0)
+        children_per_line = width / child_width;
+    if (children_per_line > 0)
+        lines = child_count / children_per_line;
+    if (children_per_line * lines < child_count)
+        ++lines;
+
+    if (minimal)
+        *minimal = child_height * lines;
+    if (natural)
+        *natural = child_height * lines;
+}
+
+static void wrap_box_size_allocate(GtkWidget *widget,
+    GtkAllocation *allocation)
+{
+    GTK_WIDGET_CLASS(wrap_box_parent_class)->size_allocate(widget, allocation);
+
+    WrapBox *box = PUZZLES_WRAP_BOX(widget);
+    if (box->children == NULL)
+        return;
+    int child_count = g_list_length(box->children);
+    int child_width, child_height;
+    wrap_box_get_child_size(widget, &child_width, &child_height);
+
+    int children_per_line = min(allocation->width / child_width, child_count);
+    int lines = child_count / children_per_line;
+    if (children_per_line * lines < child_count)
+        ++lines;
+
+    int width_remaining = allocation->width;
+    int height_remaining = allocation->height;
+    int x = 0, y = 0;
+
+    GList *child;
+    GtkAllocation child_allocation;
+    child_allocation.x = allocation->x;
+    child_allocation.y = allocation->y;
+    for (child = box->children; child != NULL; child = child->next) {
+        child_allocation.width = width_remaining / (children_per_line - x);
+        child_allocation.height = height_remaining / (lines - y);
+        gtk_widget_size_allocate(GTK_WIDGET(child->data), &child_allocation);
+        child_allocation.x += child_allocation.width;
+        width_remaining -= child_allocation.width;
+        if (++x == children_per_line) {
+            x = 0;
+            ++y;
+            child_allocation.x = allocation->x;
+            child_allocation.y += child_allocation.height;
+            width_remaining = allocation->width;
+            height_remaining -= child_allocation.height;
+        }
+    }
+}
+
+static void wrap_box_class_init(WrapBoxClass *class)
+{
+    GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(class);
+    GtkContainerClass *container_class = GTK_CONTAINER_CLASS(class);
+    widget_class->get_request_mode = wrap_box_get_request_mode;
+    widget_class->get_preferred_width = wrap_box_get_preferred_width;
+    widget_class->get_preferred_height = wrap_box_get_preferred_height;
+    widget_class->get_preferred_width_for_height
+        = wrap_box_get_preferred_width_for_height;
+    widget_class->get_preferred_height_for_width
+        = wrap_box_get_preferred_height_for_width;
+    widget_class->size_allocate = wrap_box_size_allocate;
+
+    container_class->add = wrap_box_add;
+    container_class->remove = wrap_box_remove;
+    container_class->forall = wrap_box_forall;
+}
+#endif
+
 static void changed_preset(frontend *fe);
 static void load_prefs(frontend *fe);
 static char *save_prefs(frontend *fe);
@@ -179,6 +362,14 @@ struct frontend {
     GtkWidget *area;
     GtkWidget *statusbar;
     GtkWidget *menubar;
+    GtkWidget *keybar_swap_button;
+    GtkWidget *keybar;
+#if GTK_CHECK_VERSION(3,14,0)
+    GtkGesture *long_press;
+    GdkEventSequence *touch_sequence;
+    int touch_button;
+    int touch_ox, touch_oy;
+#endif
 #if GTK_CHECK_VERSION(3,20,0)
     GtkCssProvider *css_provider;
 #endif
@@ -1546,6 +1737,11 @@ static gint key_event(GtkWidget *widget, GdkEventKey *event, gpointer data)
     return true;
 }
 
+static bool mouse_is_swapped(frontend *fe) {
+    return (fe->keybar_swap_button != NULL &&
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe->keybar_swap_button)));
+}
+
 static gint button_event(GtkWidget *widget, GdkEventButton *event,
                          gpointer data)
 {
@@ -1561,9 +1757,9 @@ static gint button_event(GtkWidget *widget, GdkEventButton *event,
     if (event->button == 2 || (event->state & GDK_SHIFT_MASK))
 	button = MIDDLE_BUTTON;
     else if (event->button == 3 || (event->state & GDK_MOD1_MASK))
-	button = RIGHT_BUTTON;
+	button = mouse_is_swapped(fe) ? LEFT_BUTTON : RIGHT_BUTTON;
     else if (event->button == 1)
-	button = LEFT_BUTTON;
+	button = mouse_is_swapped(fe) ? RIGHT_BUTTON : LEFT_BUTTON;
     else if (event->button == 8 && event->type == GDK_BUTTON_PRESS)
         button = 'u';
     else if (event->button == 9 && event->type == GDK_BUTTON_PRESS)
@@ -1593,9 +1789,9 @@ static gint motion_event(GtkWidget *widget, GdkEventMotion *event,
     if (event->state & (GDK_BUTTON2_MASK | GDK_SHIFT_MASK))
 	button = MIDDLE_DRAG;
     else if (event->state & GDK_BUTTON1_MASK)
-	button = LEFT_DRAG;
+	button = mouse_is_swapped(fe) ? RIGHT_DRAG : LEFT_DRAG;
     else if (event->state & GDK_BUTTON3_MASK)
-	button = RIGHT_DRAG;
+	button = mouse_is_swapped(fe) ? LEFT_DRAG : RIGHT_DRAG;
     else
 	return false;		       /* don't even know what button! */
 
@@ -1609,6 +1805,190 @@ static gint motion_event(GtkWidget *widget, GdkEventMotion *event,
 #endif
 
     return true;
+}
+
+#if GTK_CHECK_VERSION(3,14,0)
+static gint touch_event(GtkWidget *widget, GdkEventTouch *event,
+                         gpointer data)
+{
+    frontend *fe = (frontend *)data;
+
+    if (!backing_store_ok(fe))
+        return true;
+
+    if (event->type == GDK_TOUCH_BEGIN) {
+        if (fe->touch_sequence)
+            return true;
+        fe->touch_sequence = event->sequence;
+        fe->touch_ox = event->x;
+        fe->touch_oy = event->y;
+        fe->touch_button = 0;
+        return true;
+    }
+
+    if (event->sequence != fe->touch_sequence)
+        return true;
+
+    if (event->type == GDK_TOUCH_UPDATE) {
+        if (!fe->touch_button)
+            return true;
+
+        if (midend_process_key(fe->me, event->x - fe->ox, event->y - fe->oy,
+                               fe->touch_button + (LEFT_DRAG - LEFT_BUTTON))
+            == PKR_QUIT)
+            gtk_widget_destroy(fe->window);
+        return true;
+    }
+
+    if (event->type == GDK_TOUCH_END && !fe->touch_button) {
+        fe->touch_button = (mouse_is_swapped(fe) ? RIGHT_BUTTON : LEFT_BUTTON)
+            | MOD_STYLUS;
+        if (midend_process_key(fe->me, event->x - fe->ox, event->y - fe->oy,
+                               fe->touch_button) == PKR_QUIT) {
+            gtk_widget_destroy(fe->window);
+            return true;
+        }
+    }
+
+    if (fe->touch_button) {
+        if (midend_process_key(fe->me, event->x - fe->ox, event->y - fe->oy,
+                               fe->touch_button + (LEFT_RELEASE - LEFT_BUTTON))
+            == PKR_QUIT)
+            gtk_widget_destroy(fe->window);
+        fe->touch_sequence = NULL;
+        fe->touch_button = 0;
+    }
+
+    return true;
+}
+
+static void long_press_pressed(GtkGestureLongPress *gesture, double x, double y,
+                               gpointer data)
+{
+    frontend *fe = (frontend *)data;
+    if (!fe->touch_sequence)
+        return;
+
+    fe->touch_button = (mouse_is_swapped(fe) ? LEFT_BUTTON : RIGHT_BUTTON)
+        | MOD_STYLUS;
+    if (midend_process_key(fe->me, fe->touch_ox - fe->ox, fe->touch_oy - fe->oy,
+                           fe->touch_button) == PKR_QUIT)
+        gtk_widget_destroy(fe->window);
+}
+
+static void long_press_cancelled(GtkGestureLongPress *gesture, gpointer data) {
+    frontend *fe = (frontend *)data;
+    if (!fe->touch_sequence)
+        return;
+
+    fe->touch_button = (mouse_is_swapped(fe) ? RIGHT_BUTTON : LEFT_BUTTON)
+        | MOD_STYLUS;
+    if (midend_process_key(fe->me, fe->touch_ox - fe->ox, fe->touch_oy - fe->oy,
+                           fe->touch_button) == PKR_QUIT)
+        gtk_widget_destroy(fe->window);
+}
+#endif
+
+static bool want_keybar(frontend *fe)
+{
+#ifdef STYLUS_BASED
+    return true;
+#elif GTK_CHECK_VERSION(3,20,0)
+    GdkDisplay *display = gdk_screen_get_display(
+        gtk_window_get_screen(GTK_WINDOW(fe->window)));
+    GList *seats = gdk_display_list_seats(display);
+    GList *seat;
+    bool touch = false;
+
+    for (seat = seats; seat != NULL; seat = seat->next) {
+        if (gdk_seat_get_capabilities(GDK_SEAT(seat->data))
+            & GDK_SEAT_CAPABILITY_TOUCH) {
+            touch = true;
+            break;
+        }
+    }
+    g_list_free(seats);
+    return touch;
+#else
+    return false;
+#endif
+}
+
+static void keybar_button_clicked(GtkButton *button, gpointer data)
+{
+    frontend *fe = (frontend *)data;
+
+    int keyval = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "user-data"));
+    if (midend_process_key(fe->me, 0, 0, keyval) == PKR_QUIT)
+        gtk_widget_destroy(fe->window);
+}
+
+static GtkWidget *make_keybar_button(frontend *fe, const char *label, const char *icon, int keyval)
+{
+    GtkWidget *button = gtk_button_new_with_label(icon ? NULL : label);
+#if GTK_CHECK_VERSION(3,20,0)
+    GtkStyleContext *context = gtk_widget_get_style_context(button);
+    gtk_style_context_remove_class(context, "text-button");
+    gtk_style_context_add_class(context, "image-button");
+#endif
+    if (icon != NULL)
+        gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_icon_name(
+            icon, GTK_ICON_SIZE_BUTTON));
+    gtk_widget_set_focus_on_click(button, false);
+    gtk_widget_show(button);
+    g_object_set_data(G_OBJECT(button), "user-data", GINT_TO_POINTER(keyval));
+    g_signal_connect(G_OBJECT(button), "clicked",
+                     G_CALLBACK(keybar_button_clicked), fe);
+    return button;
+}
+
+static void populate_keybar(frontend *fe)
+{
+    int i, n;
+    key_label *keys;
+    GList *children, *child;
+    GtkWidget *button;
+    bool toggled = false;
+
+    if (fe->keybar_swap_button != NULL) {
+        toggled = gtk_toggle_button_get_active(
+            GTK_TOGGLE_BUTTON(fe->keybar_swap_button));
+        fe->keybar_swap_button = NULL;
+    }
+
+    children = gtk_container_get_children(GTK_CONTAINER(fe->keybar));
+    for (child = children; child != NULL; child = child->next)
+        gtk_widget_destroy(GTK_WIDGET(child->data));
+    g_list_free(children);
+
+    if (thegame.flags & (REQUIRE_RBUTTON | STYLUS_SUPPORT)) {
+        button = gtk_toggle_button_new();
+        gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_icon_name(
+            "input-mouse-symbolic", GTK_ICON_SIZE_BUTTON));
+        gtk_widget_set_focus_on_click(button, false);
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), toggled);
+        gtk_widget_show(button);
+        gtk_container_add(GTK_CONTAINER(fe->keybar), button);
+        fe->keybar_swap_button = button;
+    }
+
+    button = make_keybar_button(fe, "Undo", "edit-undo-symbolic", UI_UNDO);
+    gtk_container_add(GTK_CONTAINER(fe->keybar), button);
+
+    button = make_keybar_button(fe, "Redo", "edit-redo-symbolic", UI_REDO);
+    gtk_container_add(GTK_CONTAINER(fe->keybar), button);
+
+    keys = midend_request_keys(fe->me, &n);
+    for (i = 0; i < n; ++i) {
+        if (keys[i].button == '\b')
+            button = make_keybar_button(fe,
+                "Clear", "edit-clear-symbolic", '\b');
+        else
+            button = make_keybar_button(fe,
+                keys[i].label, NULL, keys[i].button);
+        gtk_container_add(GTK_CONTAINER(fe->keybar), button);
+    }
+    free_keys(keys, n);
 }
 
 #if GTK_CHECK_VERSION(3,0,0)
@@ -2290,6 +2670,9 @@ static void changed_preset(frontend *fe)
         bool enabled = midend_can_format_as_text_now(fe->me);
 	gtk_widget_set_sensitive(fe->copy_menu_item, enabled);
     }
+
+    if (fe->keybar != NULL)
+        populate_keybar(fe);
 }
 
 #if !GTK_CHECK_VERSION(3,0,0)
@@ -2360,7 +2743,7 @@ static gint configure_window(GtkWidget *widget,
 }
 
 #if GTK_CHECK_VERSION(3,0,0)
-static int window_extra_height(frontend *fe)
+static int window_extra_height(frontend *fe, int width)
 {
     int ret = 0;
     if (fe->menubar) {
@@ -2373,6 +2756,12 @@ static int window_extra_height(frontend *fe)
         gtk_widget_get_preferred_size(fe->statusbar, &req, NULL);
         ret += req.height;
     }
+    if (fe->keybar && width > 0) {
+        int height;
+        gtk_widget_get_preferred_height_for_width(fe->keybar,
+            width, &height, NULL);
+        ret += height;
+    }
     return ret;
 }
 #endif
@@ -2384,7 +2773,7 @@ static void resize_fe(frontend *fe)
     get_size(fe, &x, &y);
 
 #if GTK_CHECK_VERSION(3,0,0)
-    gtk_window_resize(GTK_WINDOW(fe->window), x, y + window_extra_height(fe));
+    gtk_window_resize(GTK_WINDOW(fe->window), x, y + window_extra_height(fe, x));
     fe->awaiting_resize_ack = true;
 #else
     fe->drawing_area_shrink_pending = false;
@@ -3416,7 +3805,7 @@ static frontend *new_window(
 #ifdef USE_PRINTING
     frontend *print_fe = NULL;
 #endif
-    GtkBox *vbox, *hbox;
+    GtkBox *vbox;
     GtkWidget *menu, *menuitem;
     GList *iconlist;
     int x, y, n;
@@ -3587,12 +3976,8 @@ static frontend *new_window(
      * gtk_window_add_accel_group; see menu_key_event
      */
 
-    hbox = GTK_BOX(gtk_hbox_new(false, 0));
-    gtk_box_pack_start(vbox, GTK_WIDGET(hbox), false, false, 0);
-    gtk_widget_show(GTK_WIDGET(hbox));
-
     fe->menubar = gtk_menu_bar_new();
-    gtk_box_pack_start(hbox, fe->menubar, true, true, 0);
+    gtk_box_pack_start(vbox, fe->menubar, false, false, 0);
     gtk_widget_show(fe->menubar);
 
     menuitem = gtk_menu_item_new_with_mnemonic("_Game");
@@ -3680,11 +4065,9 @@ static frontend *new_window(
         gtk_widget_show(menuitem);
     }
 #endif
-#ifndef STYLUS_BASED
     add_menu_separator(GTK_CONTAINER(menu));
     add_menu_ui_item(fe, GTK_CONTAINER(menu), "Undo", UI_UNDO, 'u', 0);
     add_menu_ui_item(fe, GTK_CONTAINER(menu), "Redo", UI_REDO, 'r', 0);
-#endif
     if (thegame.can_format_as_text_ever) {
 	add_menu_separator(GTK_CONTAINER(menu));
 	menuitem = gtk_menu_item_new_with_label("Copy");
@@ -3749,45 +4132,23 @@ static frontend *new_window(
                      G_CALLBACK(menu_about_event), fe);
     gtk_widget_show(menuitem);
 
-#ifdef STYLUS_BASED
-    menuitem=gtk_button_new_with_mnemonic("_Redo");
-    g_object_set_data(G_OBJECT(menuitem), "user-data",
-                      GINT_TO_POINTER(UI_REDO));
-    g_signal_connect(G_OBJECT(menuitem), "clicked",
-                     G_CALLBACK(menu_key_event), fe);
-    gtk_box_pack_end(hbox, menuitem, false, false, 0);
-    gtk_widget_show(menuitem);
-
-    menuitem=gtk_button_new_with_mnemonic("_Undo");
-    g_object_set_data(G_OBJECT(menuitem), "user-data",
-                      GINT_TO_POINTER(UI_UNDO));
-    g_signal_connect(G_OBJECT(menuitem), "clicked",
-                     G_CALLBACK(menu_key_event), fe);
-    gtk_box_pack_end(hbox, menuitem, false, false, 0);
-    gtk_widget_show(menuitem);
-
-    if (thegame.flags & REQUIRE_NUMPAD) {
-	hbox = GTK_BOX(gtk_hbox_new(false, 0));
-	gtk_box_pack_start(vbox, GTK_WIDGET(hbox), false, false, 0);
-	gtk_widget_show(GTK_WIDGET(hbox));
-
-	*((int*)errbuf)=0;
-	errbuf[1]='\0';
-	for(errbuf[0]='0';errbuf[0]<='9';errbuf[0]++) {
-	    menuitem=gtk_button_new_with_label(errbuf);
-	    g_object_set_data(G_OBJECT(menuitem), "user-data",
-                              GINT_TO_POINTER((int)(errbuf[0])));
-	    g_signal_connect(G_OBJECT(menuitem), "clicked",
-                             G_CALLBACK(menu_key_event), fe);
-	    gtk_box_pack_start(hbox, menuitem, true, true, 0);
-	    gtk_widget_show(menuitem);
-	}
-    }
-#endif /* STYLUS_BASED */
-
     changed_preset(fe);
 
     snaffle_colours(fe);
+
+    fe->keybar_swap_button = NULL;
+    if (want_keybar(fe)) {
+#if GTK_CHECK_VERSION(3,0,0)
+        fe->keybar = wrap_box_new();
+#else
+        fe->keybar = gtk_hbox_new(false, 0);
+#endif
+        gtk_widget_show(fe->keybar);
+        gtk_box_pack_end(vbox, fe->keybar, false, false, 0);
+
+        populate_keybar(fe);
+    } else
+        fe->keybar = NULL;
 
     if (midend_wants_statusbar(fe->me)) {
 	GtkWidget *viewport;
@@ -3821,7 +4182,7 @@ static frontend *new_window(
         GdkGeometry geom;
         geom.base_width = 0;
 #if GTK_CHECK_VERSION(3,0,0)
-        geom.base_height = window_extra_height(fe);
+        geom.base_height = window_extra_height(fe, 0);
         gtk_window_set_geometry_hints(GTK_WINDOW(fe->window), NULL,
                                       &geom, GDK_HINT_BASE_SIZE);
 #else
@@ -3835,7 +4196,7 @@ static frontend *new_window(
     get_size(fe, &x, &y);
 #if GTK_CHECK_VERSION(3,0,0)
     gtk_window_set_default_size(GTK_WINDOW(fe->window),
-                                x, y + window_extra_height(fe));
+                                x, y + window_extra_height(fe, x));
 #else
     fe->drawing_area_shrink_pending = false;
     gtk_drawing_area_size(GTK_DRAWING_AREA(fe->area), x, y);
@@ -3849,6 +4210,20 @@ static frontend *new_window(
 
     fe->paste_data = NULL;
     fe->paste_data_len = 0;
+
+#if GTK_CHECK_VERSION(3,14,0)
+    fe->long_press = gtk_gesture_long_press_new(fe->area);
+    gtk_gesture_single_set_touch_only(GTK_GESTURE_SINGLE(fe->long_press), true);
+    gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(fe->long_press), GTK_PHASE_CAPTURE);
+    fe->touch_sequence = NULL;
+    fe->touch_button = 0;
+    g_signal_connect(G_OBJECT(fe->area), "touch_event",
+                     G_CALLBACK(touch_event), fe);
+    g_signal_connect(G_OBJECT(fe->long_press), "pressed",
+                     G_CALLBACK(long_press_pressed), fe);
+    g_signal_connect(G_OBJECT(fe->long_press), "cancelled",
+                     G_CALLBACK(long_press_cancelled), fe);
+#endif
 
     g_signal_connect(G_OBJECT(fe->window), "destroy",
                      G_CALLBACK(destroy), fe);
@@ -3883,6 +4258,9 @@ static frontend *new_window(
 #endif
 
     gtk_widget_add_events(GTK_WIDGET(fe->area),
+#if GTK_CHECK_VERSION(3,14,0)
+                          GDK_TOUCH_MASK |
+#endif
                           GDK_BUTTON_PRESS_MASK |
                           GDK_BUTTON_RELEASE_MASK |
 			  GDK_BUTTON_MOTION_MASK |

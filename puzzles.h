@@ -58,10 +58,11 @@ enum {
     UI_UPPER_BOUND,
     
     /* made smaller because of 'limited range of datatype' errors. */
+    MOD_STYLUS     = 0x0800,
     MOD_CTRL       = 0x1000,
     MOD_SHFT       = 0x2000,
     MOD_NUM_KEYPAD = 0x4000,
-    MOD_MASK       = 0x7000 /* mask for all modifiers */
+    MOD_MASK       = 0x7800 /* mask for all modifiers */
 };
 
 #define IS_MOUSE_DOWN(m) ( (unsigned)((m) - LEFT_BUTTON) <= \
@@ -87,6 +88,8 @@ enum {
 #define REQUIRE_RBUTTON ( 1 << 10 )
 /* Flag indicating that no right mouse button emulation should take place */
 #define DISABLE_RBUTTON ( 1 << 11 )
+/* Game handles stylus and mouse input differently */
+#define STYLUS_SUPPORT ( 1 << 12 )
 /* end of `flags' word definitions */
 
 #define IGNOREARG(x) ( (x) = (x) )

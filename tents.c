@@ -1515,7 +1515,6 @@ static int drag_xform(const game_ui *ui, int x, int y, int v)
     ymin = min(ui->dsy, ui->dey);
     ymax = max(ui->dsy, ui->dey);
 
-#ifndef STYLUS_BASED
     /*
      * Left-dragging has no effect, so we treat a left-drag as a
      * single click on dsx,dsy.
@@ -1524,7 +1523,6 @@ static int drag_xform(const game_ui *ui, int x, int y, int v)
         xmin = xmax = ui->dsx;
         ymin = ymax = ui->dsy;
     }
-#endif
 
     if (x < xmin || x > xmax || y < ymin || y > ymax)
         return v;                      /* no change outside drag area */
@@ -1539,30 +1537,22 @@ static int drag_xform(const game_ui *ui, int x, int y, int v)
          * button clears a non-blank square.
          * If stylus-based however, it loops instead.
          */
-        if (ui->drag_button == LEFT_BUTTON)
-#ifdef STYLUS_BASED
+        if (ui->drag_button == (LEFT_BUTTON | MOD_STYLUS))
             v = (v == BLANK ? TENT : (v == TENT ? NONTENT : BLANK));
-        else
+        else if (ui->drag_button & MOD_STYLUS)
             v = (v == BLANK ? NONTENT : (v == NONTENT ? TENT : BLANK));
-#else
+        else if (ui->drag_button == LEFT_BUTTON)
             v = (v == BLANK ? TENT : BLANK);
         else
             v = (v == BLANK ? NONTENT : BLANK);
-#endif
     } else {
         /*
          * Results of a drag. Left-dragging has no effect.
          * Right-dragging sets all blank squares to non-tents and
          * has no effect on anything else.
          */
-        if (ui->drag_button == RIGHT_BUTTON)
+        if (ui->drag_button == RIGHT_BUTTON || ui->drag_button & MOD_STYLUS)
             v = (v == BLANK ? NONTENT : v);
-        else
-#ifdef STYLUS_BASED
-            v = (v == BLANK ? NONTENT : v);
-#else
-            /* do nothing */;
-#endif
     }
 
     return v;
@@ -1575,6 +1565,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     int w = state->p.w, h = state->p.h;
     char tmpbuf[80];
     bool shift = button & MOD_SHFT, control = button & MOD_CTRL;
+    int stylus = button & MOD_STYLUS;
 
     button = STRIP_BUTTON_MODIFIERS(button);
 
@@ -1584,7 +1575,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (x < 0 || y < 0 || x >= w || y >= h)
             return NULL;
 
-        ui->drag_button = button;
+        ui->drag_button = button | stylus;
         ui->dsx = ui->dex = x;
         ui->dsy = ui->dey = y;
         ui->drag_ok = true;
@@ -2677,7 +2668,7 @@ const struct game thegame = {
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
     false, NULL,                       /* timing_state */
-    REQUIRE_RBUTTON,		       /* flags */
+    REQUIRE_RBUTTON | STYLUS_SUPPORT,  /* flags */
 };
 
 #ifdef STANDALONE_SOLVER

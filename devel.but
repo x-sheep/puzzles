@@ -1149,6 +1149,12 @@ the \c{button} parameter:
 the key. They only apply to the cursor keys and the ASCII horizontal
 tab character \cw{\\t}, not to mouse buttons or anything else.
 
+\dt \cw{MOD_STYLUS}
+
+\dd This indicates that the button event came from a stylus or touch
+device, rather than a mouse. This applies to all mouse events, but
+only if the \cw{STYLUS_SUPPORT} flag is set.
+
 \dt \cw{MOD_NUM_KEYPAD}
 
 \dd This applies to some ASCII values, and indicates that the key
@@ -1901,6 +1907,12 @@ without the use of number-key input. On some PDA platforms it causes
 an emulated number pad to appear on the screen. Similarly to
 \cw{REQUIRE_RBUTTON}, a puzzle need not specify this simply if its
 use of the number keys is not critical.
+
+\dt \cw{STYLUS_SUPPORT}
+
+\dd This flag indicates that the puzzle may handle stylus or touch
+events differently from mouse events. The \cw{MOD_STYLUS} modifier
+will be set appropriately on each button event.
 
 \H{backend-initiative} Things a back end may do on its own initiative
 

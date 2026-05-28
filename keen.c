@@ -40,12 +40,13 @@ static char const keen_diffchars[] = DIFFLIST(ENCODE);
  * Clue notation. Important here that ADD and MUL come before SUB
  * and DIV, and that DIV comes last. 
  */
-#define C_ADD 0x00000000L
-#define C_MUL 0x20000000L
-#define C_SUB 0x40000000L
-#define C_DIV 0x60000000L
-#define CMASK 0x60000000L
-#define CUNIT 0x20000000L
+#define C_NO_CLUE 0x00000000UL
+#define C_ADD     0x20000000UL
+#define C_MUL     0x40000000UL
+#define C_SUB     0x60000000UL
+#define C_DIV     0x80000000UL
+#define CMASK     0xE0000000UL
+#define CUNIT     0x20000000UL
 
 /*
  * Maximum size of any clue block. Very large ones are annoying in UI
@@ -79,7 +80,7 @@ struct clues {
     int refcount;
     int w;
     DSF *dsf;
-    long *clues;
+    unsigned long *clues;
 };
 
 struct game_state {
@@ -238,7 +239,7 @@ struct solver_ctx {
     int w, diff;
     int nboxes;
     int *boxes, *boxlist, *whichbox;
-    long *clues;
+    unsigned long *clues;
     digit *soln;
     digit *dscratch;
     int *iscratch;
@@ -343,7 +344,10 @@ static int solver_common(struct latin_solver *solver, void *vctx, int diff)
 	int *sq = ctx->boxlist + ctx->boxes[box];
 	int n = ctx->boxes[box+1] - ctx->boxes[box];
 	long value = ctx->clues[box] & ~CMASK;
-	long op = ctx->clues[box] & CMASK;
+	unsigned long op = ctx->clues[box] & CMASK;
+
+        if (op == C_NO_CLUE)
+            continue;
 
         /*
          * Initialise ctx->iscratch for this clue box. At different
@@ -618,7 +622,7 @@ static bool keen_valid(struct latin_solver *solver, void *vctx)
 	int *sq = ctx->boxlist + ctx->boxes[box];
 	int n = ctx->boxes[box+1] - ctx->boxes[box];
 	long value = ctx->clues[box] & ~CMASK;
-	long op = ctx->clues[box] & CMASK;
+	unsigned long op = ctx->clues[box] & CMASK;
         bool fail = false;
 
         switch (op) {
@@ -686,7 +690,7 @@ static bool keen_valid(struct latin_solver *solver, void *vctx)
     return true;
 }
 
-static int solver(int w, DSF *dsf, long *clues, digit *soln, int maxdiff)
+static int solver(int w, DSF *dsf, unsigned long *clues, digit *soln, int maxdiff)
 {
     int a = w*w;
     struct solver_ctx ctx;
@@ -710,7 +714,7 @@ static int solver(int w, DSF *dsf, long *clues, digit *soln, int maxdiff)
 	    ctx.nboxes++;
     ctx.boxlist = snewn(a, int);
     ctx.boxes = snewn(ctx.nboxes+1, int);
-    ctx.clues = snewn(ctx.nboxes, long);
+    ctx.clues = snewn(ctx.nboxes, unsigned long);
     ctx.whichbox = snewn(a, int);
     for (n = m = i = 0; i < a; i++)
 	if (dsf_minimal(dsf, i) == i) {
@@ -900,7 +904,8 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     digit *grid, *soln;
     int *order, *revorder, *singletons;
     DSF *dsf;
-    long *clues, *cluevals;
+    unsigned long *clues;
+    long *cluevals;
     int i, j, k, n, x, y, ret;
     int diff = params->diff;
     char *desc, *p;
@@ -937,7 +942,7 @@ done
     revorder = snewn(a, int);
     singletons = snewn(a, int);
     dsf = dsf_new_min(a);
-    clues = snewn(a, long);
+    clues = snewn(a, unsigned long);
     cluevals = snewn(a, long);
     soln = snewn(a, digit);
 
@@ -1140,7 +1145,7 @@ done
 	    bool done_something = false;
 
 	    for (k = 0; k < 4; k++) {
-		long clue;
+		unsigned long clue;
 		int good, bad;
 		switch (k) {
 		  case 0:                clue = C_DIV; good = F_DIV; break;
@@ -1263,6 +1268,7 @@ done
 	j = dsf_minimal(dsf, i);
 	if (j == i) {
 	    switch (clues[j] & CMASK) {
+	      case C_NO_CLUE: *p++ = 'n'; continue;
 	      case C_ADD: *p++ = 'a'; break;
 	      case C_SUB: *p++ = 's'; break;
 	      case C_MUL: *p++ = 'm'; break;
@@ -1330,22 +1336,24 @@ static const char *validate_desc(const game_params *params, const char *desc)
      */
     for (i = 0; i < a; i++) {
 	if (dsf_minimal(dsf, i) == i) {
-	    if (*p == 'a' || *p == 'm') {
+            char cluetype = *p++;
+	    if (cluetype == 'a' || cluetype == 'm' || cluetype == 'n') {
 		/* these clues need no validation */
-	    } else if (*p == 'd' || *p == 's') {
+	    } else if (cluetype == 'd' || cluetype == 's') {
 		if (dsf_size(dsf, i) != 2) {
                     dsf_free(dsf);
 		    return "Subtraction and division blocks must have area 2";
                 }
-	    } else if (!*p) {
+	    } else if (!cluetype) {
                 dsf_free(dsf);
 		return "Too few clues for block structure";
 	    } else {
                 dsf_free(dsf);
 		return "Unrecognised clue type";
 	    }
-	    p++;
-	    while (*p && isdigit((unsigned char)*p)) p++;
+            if (cluetype != 'n') {
+                while (*p && isdigit((unsigned char)*p)) p++;
+            }
 	}
     }
     dsf_free(dsf);
@@ -1394,11 +1402,14 @@ static game_state *new_game(midend *me, const game_params *params,
     assert(*p == ',');
     p++;
 
-    state->clues->clues = snewn(a, long);
+    state->clues->clues = snewn(a, unsigned long);
     for (i = 0; i < a; i++) {
 	if (dsf_minimal(state->clues->dsf, i) == i) {
-	    long clue = 0;
+	    unsigned long clue = 0;
 	    switch (*p) {
+	      case 'n':
+		clue = C_NO_CLUE;
+                break;
 	      case 'a':
 		clue = C_ADD;
 		break;
@@ -1417,8 +1428,10 @@ static game_state *new_game(midend *me, const game_params *params,
 		assert(!"Bad description in new_game");
 	    }
 	    p++;
-	    clue |= atol(p);
-	    while (*p && isdigit((unsigned char)*p)) p++;
+            if (clue != C_NO_CLUE) {
+                clue |= atol(p);
+                while (*p && isdigit((unsigned char)*p)) p++;
+            }
 	    state->clues->clues[i] = clue;
 	} else
 	    state->clues->clues[i] = 0;
@@ -1651,14 +1664,16 @@ static bool check_errors(const game_state *state, long *errors)
 	}
 
     for (i = 0; i < a; i++) {
-	long clue;
+	unsigned long clue;
 
 	j = dsf_minimal(state->clues->dsf, i);
+        clue = state->clues->clues[j] & CMASK;
 	if (j == i) {
-	    cluevals[i] = state->grid[i];
+            if (clue == C_NO_CLUE)
+                cluevals[i] = 0;
+            else
+                cluevals[i] = state->grid[i];
 	} else {
-	    clue = state->clues->clues[j] & CMASK;
-
 	    switch (clue) {
 	      case C_ADD:
 		cluevals[j] += state->grid[i];
@@ -2062,27 +2077,30 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
 
     /* Draw the box clue. */
     if (draw_clue) {
-	long clue = clues->clues[y*w+x];
-	long cluetype = clue & CMASK, clueval = clue & ~CMASK;
+	unsigned long clue = clues->clues[y*w+x];
+	unsigned long cluetype = clue & CMASK, clueval = clue & ~CMASK;
 	int size = dsf_size(clues->dsf, y*w+x);
-	/*
-	 * Special case of clue-drawing: a box with only one square
-	 * is written as just the number, with no operation, because
-	 * it doesn't matter whether the operation is ADD or MUL.
-	 * The generation code above should never produce puzzles
-	 * containing such a thing - I think they're inelegant - but
-	 * it's possible to type in game IDs from elsewhere, so I
-	 * want to display them right if so.
-	 */
-	sprintf (str, "%ld%s", clueval,
-		 (size == 1 || only_one_op ? "" :
-		  cluetype == C_ADD ? "+" :
-		  cluetype == C_SUB ? ds->minus_sign :
-		  cluetype == C_MUL ? ds->times_sign :
-		  /* cluetype == C_DIV ? */ ds->divide_sign));
-	draw_text(dr, tx + GRIDEXTRA * 2, ty + GRIDEXTRA * 2 + TILESIZE/4,
-		  FONT_VARIABLE, TILESIZE/4, ALIGN_VNORMAL | ALIGN_HLEFT,
-		  (tile & DF_ERR_CLUE ? COL_ERROR : COL_GRID), str);
+        if (clue != C_NO_CLUE) {
+            /*
+             * Special case of clue-drawing: a box with only one
+             * square is written as just the number, with no
+             * operation, because it doesn't matter whether the
+             * operation is ADD or MUL. The generation code above
+             * should never produce puzzles containing such a thing -
+             * I think they're inelegant - but it's possible to type
+             * in game IDs from elsewhere, so I want to display them
+             * right if so.
+             */
+            sprintf (str, "%ld%s", clueval,
+                     (size == 1 || only_one_op ? "" :
+                      cluetype == C_ADD ? "+" :
+                      cluetype == C_SUB ? ds->minus_sign :
+                      cluetype == C_MUL ? ds->times_sign :
+                      /* cluetype == C_DIV ? */ ds->divide_sign));
+            draw_text(dr, tx + GRIDEXTRA * 2, ty + GRIDEXTRA * 2 + TILESIZE/4,
+                      FONT_VARIABLE, TILESIZE/4, ALIGN_VNORMAL | ALIGN_HLEFT,
+                      (tile & DF_ERR_CLUE ? COL_ERROR : COL_GRID), str);
+        }
     }
 
     /* new number needs drawing? */
@@ -2475,10 +2493,13 @@ static void game_print(drawing *dr, const game_state *state, const game_ui *ui,
     for (y = 0; y < w; y++)
 	for (x = 0; x < w; x++)
 	    if (dsf_minimal(state->clues->dsf, y*w+x) == y*w+x) {
-		long clue = state->clues->clues[y*w+x];
-		long cluetype = clue & CMASK, clueval = clue & ~CMASK;
+		unsigned long clue = state->clues->clues[y*w+x];
+		unsigned long cluetype = clue & CMASK, clueval = clue & ~CMASK;
 		int size = dsf_size(state->clues->dsf, y*w+x);
 		char str[64];
+
+                if (cluetype == C_NO_CLUE)
+                    continue;
 
 		/*
 		 * As in the drawing code, we omit the operator for
