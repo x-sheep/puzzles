@@ -14,8 +14,8 @@ Port of [Simon Tatham's Portable Puzzle Collection](https://www.chiark.greenend.
 Note that this fork has several modifications which cause the original makefiles (for other platforms) to no longer work.
 
 ### UWP Version
-* Visual Studio 2019 or higher
-* Windows 10 SDK (10.0.19041.0) or higher
+* Visual Studio 2026
+* Windows 10 SDK (10.0.26100.0) or higher
 
 ### Windows 8.1 version
 * Visual Studio 2013 or 2015
@@ -38,7 +38,7 @@ Note that this fork has several modifications which cause the original makefiles
 
 ## Copyright
 
-(C) 2021 Lennard Sprong
+(C) 2026 Lennard Sprong
 
 Contains icons from ModernUIIcons.com
 
