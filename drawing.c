@@ -185,7 +185,7 @@ void unclip(drawing *dr)
 int start_draw(drawing *dr)
 {
     drawing_internal *dri = PRIVATE_CAST(dr);
-    dri->pub.api->start_draw(dr);
+    return dri->pub.api->start_draw(dr);
 }
 
 void end_draw(drawing *dr)
