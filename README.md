@@ -4,7 +4,10 @@
 
 Port of [Simon Tatham's Portable Puzzle Collection](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/) to C++ Windows Store and Windows Phone apps. The interface is built in XAML, and the graphics are drawn with Direct2D.
 
-[![Download From Windows Store](docs/download_small.png)](https://www.microsoft.com/store/apps/9nblggh16n44)
+<a href="https://get.microsoft.com/installer/download/9nblggh16n44?referrer=appbadge" target="_self" >
+	<img src="docs/get.svg" alt="Download from the Microsoft Store" title="Download from the Microsoft Store" 
+	width="284" />
+</a>
 
 ## Building requirements
 
