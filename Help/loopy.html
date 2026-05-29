@@ -13,7 +13,16 @@
 </head>
 <body>
 <p><a href="map.html">Previous</a> | <a href="index.html">Contents</a> | <a href="docindex.html">Index</a> | <a href="inertia.html">Next</a></p>
-<h1><a name="loopy"></a>Chapter 23: <a name="i0"></a>Loopy</h1>
+
+<ul>
+<li><a href="#C23">Chapter 23: Loopy</a>
+<ul>
+<li><a href="#S23.1">23.1 Loopy controls</a></li>
+<li><a href="#S23.2">23.2 Loopy parameters</a></li>
+<li><a href="#S23.3">23.3 Loopy user preferences</a></li>
+</ul></li>
+</ul>
+<h1><a name="C23"></a>Chapter 23: <a name="i0"></a>Loopy</h1>
 <p>
 You are given a grid of dots, marked with yellow lines to indicate which dots you are allowed to connect directly together. Your aim is to use some subset of those yellow lines to draw a single unbroken loop from dot to dot within the grid.
 </p>
@@ -32,7 +41,7 @@ Loopy was originally contributed to this collection by Mike Pinna, and subsequen
 <p><a name="p0"></a>
 [10] <a href="https://www.nikoli.co.jp/en/puzzles/slitherlink/"><code>https://www.nikoli.co.jp/en/puzzles/slitherlink/</code></a>
 </p>
-<h2><a name="loopy-controls"></a>23.1 <a name="i2"></a>Loopy controls</h2>
+<h2><a name="S23.1"></a>23.1 <a name="i2"></a>Loopy controls</h2>
 <p>
 Click the left mouse button on a yellow line to turn it black, indicating that you think it is part of the loop. Click again to turn the line yellow again (meaning you aren't sure yet).
 </p>
@@ -40,9 +49,9 @@ Click the left mouse button on a yellow line to turn it black, indicating that y
 If you are sure that a particular line segment is <em>not</em> part of the loop, you can click the right mouse button to remove it completely. Again, clicking a second time will turn the line back to yellow.
 </p>
 <p>
-(All the actions described in <a href="common.html#common-actions">section 2.1</a> are also available.)
+(All the actions described in <a href="common.html#S2.1">section 2.1</a> are also available.)
 </p>
-<h2><a name="loopy-parameters"></a>23.2 <a name="i3"></a>Loopy parameters</h2>
+<h2><a name="S23.2"></a>23.2 <a name="i3"></a>Loopy parameters</h2>
 <p>
 These parameters are available from the &#8216;Custom...&#8217; option on the &#8216;Type&#8217; menu.
 </p>
@@ -65,7 +74,22 @@ Allows you to choose between a selection of types of tiling. Some have all the f
 Controls the difficulty of the generated puzzle. 
 </dd>
 </dl>
+<h2><a name="S23.3"></a>23.3 <a name="i4"></a>Loopy user preferences</h2>
+<p>
+On platforms that support user preferences, the &#8216;Preferences&#8217; option on the &#8216;Game&#8217; menu will let you configure the following things:
+</p>
+<p>
+&#8216;Draw excluded grid lines faintly&#8217;. This is on by default: when a line of the grid has been explicitly excluded from the solution by right-clicking it, the line is still drawn, just in a faint grey colour. If you turn this option off, excluded lines are not drawn at all.
+</p>
+<p>
+&#8216;Auto-follow unique paths of edges&#8217;. This is off by default. When it's on, clicking to change the status of a single grid line will potentially propagate the change along multiple lines, if one or both ends of the line you clicked connect to only one other line. (The idea is that if two lines meet at a vertex and no other lines do at all, then those lines are either both part of the loop or neither, so there's no reason you should have to click separately to toggle each one.)
+</p>
+<p>
+In the mode &#8216;Based on grid only&#8217;, the effects of a click will only propagate across vertices that have degree 2 in the underlying grid. For example, in the square grid, the effect will <em>only</em> occur at the four grid corners.
+</p>
+<p>
+In the mode &#8216;Based on grid and game state&#8217;, the propagation will also take account of edges you've already excluded from the solution, so that it will do even more work for you.
+</p>
 
-<hr><address>
-[Simon Tatham's Portable Puzzle Collection, version 20230411.6fb890e]</address></body>
+<hr><address></address></body>
 </html>
