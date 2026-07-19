@@ -1650,6 +1650,9 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->dragpos = ty;
             ui->edgepos = FROMCOORD(y + TILESIZE/2);
             return MOVE_UI_UPDATE;
+        } else {
+            ui->hshow = false;
+            return MOVE_UI_UPDATE;
         }
     } else if (IS_MOUSE_DRAG(button)) {
         if (!ui->hpencil &&
