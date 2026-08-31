@@ -65,7 +65,7 @@ struct mine_layout {
      * If we haven't yet actually generated the mine layout, here's
      * all the data we will need to do so.
      */
-    int n;
+    int n;             /* nominal mine count, provided they all fit */
     bool unique;
     random_state *rs;
     midend *me;		       /* to give back the new game desc */
@@ -306,8 +306,6 @@ static const char *validate_params(const game_params *params, bool full)
 	return "Mine count may not be negative";
     if (params->n < 1)
         return "Number of mines must be greater than zero";
-    if (params->n > params->w * params->h - 9)
-	return "Too many mines for grid size";
     if (params->first_click_x >= params->w)
 	return "First-click x coordinate must be inside the grid";
     if (params->first_click_y >= params->h)
@@ -1855,7 +1853,7 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
     return ret;
 }
 
-static bool *minegen(int w, int h, int n, int x, int y, bool unique,
+static bool *minegen(int w, int h, int n_orig, int x, int y, bool unique,
 		     random_state *rs)
 {
     bool *ret = snewn(w*h, bool);
@@ -1863,14 +1861,16 @@ static bool *minegen(int w, int h, int n, int x, int y, bool unique,
     int ntries = 0;
 
     do {
+        int n;
+
 	success = false;
 	ntries++;
 
 	memset(ret, 0, w*h);
 
 	/*
-	 * Start by placing n mines, none of which is at x,y or within
-	 * one square of it.
+	 * Start by placing n mines (or as many as we can), none of
+	 * which is at x,y or within one square of it.
 	 */
 	{
 	    int *tmp = snewn(w*h, int);
@@ -1886,9 +1886,11 @@ static bool *minegen(int w, int h, int n, int x, int y, bool unique,
 			tmp[k++] = i*w+j;
 
 	    /*
-	     * Now pick n off the list at random.
+	     * Now pick n off the list at random. If we run out of
+	     * places to put mines, reduce nn to the maximum number we
+	     * _can_ place.
 	     */
-	    nn = n;
+	    n = nn = (n_orig < k ? n_orig : k);
 	    while (nn-- > 0) {
 		i = random_upto(rs, k);
 		ret[tmp[i]] = true;
@@ -1973,7 +1975,7 @@ static bool *minegen(int w, int h, int n, int x, int y, bool unique,
     return ret;
 }
 
-static char *describe_layout(bool *grid, int area, int x, int y,
+static char *describe_layout(bool *grid, int area, int x, int y, int n,
                              bool obfuscate)
 {
     char *ret, *p;
@@ -1986,8 +1988,10 @@ static char *describe_layout(bool *grid, int area, int x, int y,
     bmp = snewn((area + 7) / 8, unsigned char);
     memset(bmp, 0, (area + 7) / 8);
     for (i = 0; i < area; i++) {
-        if (grid[i])
+        if (grid[i]) {
             bmp[i / 8] |= 0x80 >> (i % 8);
+            n--;
+        }
     }
     if (obfuscate)
         obfuscate_bitmap(bmp, area, false);
@@ -2007,7 +2011,11 @@ static char *describe_layout(bool *grid, int area, int x, int y,
             v >>= 4;
         *p++ = "0123456789abcdef"[v & 0xF];
     }
-    *p = '\0';
+    /* Encode an indication that not all mines were placed */
+    if (n > 0)
+        sprintf(p, "+%d", n);
+    else
+        *p = '\0';
 
     sfree(bmp);
 
@@ -2020,7 +2028,7 @@ static bool *new_mine_layout(int w, int h, int n, int x, int y, bool unique,
     bool *grid = minegen(w, h, n, x, y, unique, rs);
 
     if (game_desc)
-        *game_desc = describe_layout(grid, w * h, x, y, true);
+        *game_desc = describe_layout(grid, w * h, x, y, n, true);
 
     return grid;
 }
@@ -2082,8 +2090,6 @@ static const char *validate_desc(const game_params *params, const char *desc)
         desc++;
 	if (!*desc || !isdigit((unsigned char)*desc))
 	    return "No initial mine count in game description";
-	if (atoi(desc) > wh - 9)
-            return "Too many mines for grid size";
 	while (*desc && isdigit((unsigned char)*desc))
 	    desc++;		       /* skip over mine count */
 	if (*desc != ',')
@@ -2096,6 +2102,8 @@ static const char *validate_desc(const game_params *params, const char *desc)
 	    return "No ',' after uniqueness specifier in game description";
 	/* now ignore the rest */
     } else {
+        size_t hexlen;
+
 	if (*desc && isdigit((unsigned char)*desc)) {
 	    x = atoi(desc);
 	    if (x < 0 || x >= params->w)
@@ -2119,9 +2127,21 @@ static const char *validate_desc(const game_params *params, const char *desc)
 	/* eat `m' for `masked' or `u' for `unmasked', if present */
 	if (*desc == 'm' || *desc == 'u')
 	    desc++;
-	/* now just check length of remainder */
-	if (strlen(desc) != (wh+3)/4)
-	    return "Game description is wrong length";
+        /* expect a hex string of the right length */
+        hexlen = strspn(desc, "0123456789abcdefABCDEF");
+	if (hexlen != (wh+3)/4)
+	    return "Description of mine layout is wrong length";
+        desc += hexlen;
+        /* accept a +nnn at the end indicating unplaced mines */
+        if (*desc == '+') {
+            desc++;
+            int unplaced = atoi(desc);
+            desc += strspn(desc, "0123456789");
+            if (unplaced <= 0)
+                return "Invalid unplaced-mines count";
+        }
+        if (*desc)
+            return "Trailing junk in game description";
     }
 
     return NULL;
@@ -2331,7 +2351,7 @@ static game_state *new_game(midend *me, const game_params *params,
 	bmp = snewn((wh + 7) / 8, unsigned char);
 	memset(bmp, 0, (wh + 7) / 8);
 	for (i = 0; i < (wh+3)/4; i++) {
-	    int c = desc[i];
+	    int c = *desc++;
 	    int v;
 
 	    assert(c != 0);	       /* validate_desc should have caught */
@@ -2350,11 +2370,20 @@ static game_state *new_game(midend *me, const game_params *params,
 	if (masked)
 	    obfuscate_bitmap(bmp, wh, true);
 
+        state->layout->n = 0;
 	memset(state->layout->mines, 0, wh * sizeof(bool));
 	for (i = 0; i < wh; i++) {
-	    if (bmp[i / 8] & (0x80 >> (i % 8)))
+	    if (bmp[i / 8] & (0x80 >> (i % 8))) {
 		state->layout->mines[i] = true;
+		state->layout->n++;
+            }
 	}
+
+        if (*desc == '+') {
+            /* The game description indicates some mines were unplaced */
+            int unplaced = atoi(desc);
+            state->layout->n += unplaced;
+        }
 
 	if (x >= 0 && y >= 0)
 	    open_square(state, x, y);
@@ -3227,10 +3256,17 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	if (state->dead) {
 	    sprintf(statusbar, "DEAD!");
 	} else if (state->won) {
-            if (state->used_solve)
+            if (mines < state->layout->n) {
+                int extra = state->layout->n - mines;
+                if (extra == 1)
+                    sprintf(statusbar, "1 mine didn't fit!");
+                else
+                    sprintf(statusbar, "%d mines didn't fit!", extra);
+            } else if (state->used_solve) {
                 sprintf(statusbar, "Auto-solved.");
-            else
+            } else {
                 sprintf(statusbar, "COMPLETED!");
+            }
 	} else {
             int safe_closed = closed - mines;
 	    sprintf(statusbar, "Marked: %d / %d", markers, mines);
