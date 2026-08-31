@@ -1455,8 +1455,9 @@ static struct perturbations *mineperturb(void *vctx, signed char *grid,
 	return NULL;
     }
 
-    if (ctx->nperturbs_since_last_new_open++ > ctx->w ||
-        ctx->nperturbs_since_last_new_open++ > ctx->h) {
+    ctx->nperturbs_since_last_new_open++;
+    if (ctx->nperturbs_since_last_new_open >= ctx->w ||
+        ctx->nperturbs_since_last_new_open >= ctx->h) {
 #ifdef GENERATION_DIAGNOSTICS
 	printf("too many perturb attempts without opening a new square\n");
 #endif
