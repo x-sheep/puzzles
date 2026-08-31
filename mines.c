@@ -28,6 +28,7 @@ enum {
     COL_HIGHLIGHT, COL_LOWLIGHT,
     COL_WRONGNUMBER,
     COL_CURSOR,
+    COL_FLAGLIGHT,
     NCOLOURS
 };
 
@@ -44,6 +45,11 @@ enum {
 #define FROMCOORD(x)  ( ((x) - BORDER + TILE_SIZE) / TILE_SIZE - 1 )
 
 #define FLASH_FRAME 0.13F
+
+enum {
+  PREF_HIGHLIGHT_FLAGS,
+  N_PREF_ITEMS
+};
 
 struct game_params {
     int w, h, n;
@@ -2494,6 +2500,7 @@ struct game_ui {
     bool completed;
     int cur_x, cur_y;
     bool cur_visible;
+    bool highlight_flags;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -2506,7 +2513,31 @@ static game_ui *new_ui(const game_state *state)
     ui->flash_is_death = false;	       /* *shrug* */
     ui->cur_x = ui->cur_y = 0;
     ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
+    ui->highlight_flags = false;
     return ui;
+}
+
+static config_item *get_prefs(game_ui *ui)
+{
+    config_item *cfg;
+
+    cfg = snewn(N_PREF_ITEMS+1, config_item);
+
+    cfg[PREF_HIGHLIGHT_FLAGS].name =
+        "Highlight adjacent flags when clicking on a clue";
+    cfg[PREF_HIGHLIGHT_FLAGS].kw = "highlight-flags";
+    cfg[PREF_HIGHLIGHT_FLAGS].type = C_BOOLEAN;
+    cfg[PREF_HIGHLIGHT_FLAGS].u.boolean.bval = ui->highlight_flags;
+
+    cfg[N_PREF_ITEMS].name = NULL;
+    cfg[N_PREF_ITEMS].type = C_END;
+
+    return cfg;
+}
+
+static void set_prefs(game_ui *ui, const config_item *cfg)
+{
+    ui->highlight_flags = cfg[PREF_HIGHLIGHT_FLAGS].u.boolean.bval;
 }
 
 static void free_ui(game_ui *ui)
@@ -2891,6 +2922,7 @@ static void game_set_size(drawing *dr, game_drawstate *ds,
 static float *game_colours(frontend *fe, int *ncolours)
 {
     float *ret = snewn(3 * NCOLOURS, float);
+    int i;
 
     frontend_default_colour(fe, &ret[COL_BACKGROUND * 3]);
 
@@ -2946,6 +2978,10 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_FLAG * 3 + 1] = 0.0F;
     ret[COL_FLAG * 3 + 2] = 0.0F;
 
+    ret[COL_FLAGLIGHT * 3 + 0] = 1.0F;
+    ret[COL_FLAGLIGHT * 3 + 1] = 1.0F;
+    ret[COL_FLAGLIGHT * 3 + 2] = 0.0F;
+
     ret[COL_FLAGBASE * 3 + 0] = 0.0F;
     ret[COL_FLAGBASE * 3 + 1] = 0.0F;
     ret[COL_FLAGBASE * 3 + 2] = 0.0F;
@@ -2998,7 +3034,7 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
     sfree(ds);
 }
 
-static void draw_tile(drawing *dr, game_drawstate *ds,
+static void draw_tile(drawing *dr, game_drawstate *ds, const game_ui *ui,
                       int x, int y, int v, int bg)
 {
     if (v < 0) {
@@ -3037,14 +3073,12 @@ static void draw_tile(drawing *dr, game_drawstate *ds,
 		      bg);
 	}
 
-	if (v == -1) {
-	    /*
-	     * Draw a flag.
-	     */
+	if (v == -1 || v == -21) {
 #define SETCOORD(n, dx, dy) do { \
     coords[(n)*2+0] = x + (int)(TILE_SIZE * (dx)); \
     coords[(n)*2+1] = y + (int)(TILE_SIZE * (dy)); \
 } while (0)
+
 	    SETCOORD(0, 0.6F,  0.35F);
 	    SETCOORD(1, 0.6F,  0.7F);
 	    SETCOORD(2, 0.8F,  0.8F);
@@ -3056,7 +3090,10 @@ static void draw_tile(drawing *dr, game_drawstate *ds,
 	    SETCOORD(0, 0.6F, 0.2F);
 	    SETCOORD(1, 0.6F, 0.5F);
 	    SETCOORD(2, 0.2F, 0.35F);
-	    draw_polygon(dr, coords, 3, COL_FLAG, COL_FLAG);
+            if (v == -21 && ui->highlight_flags)
+                draw_polygon(dr, coords, 3, COL_FLAGLIGHT, COL_FLAG);
+            else
+                draw_polygon(dr, coords, 3, COL_FLAG, COL_FLAG);
 #undef SETCOORD
 
 	} else if (v == -3) {
@@ -3229,7 +3266,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
             if (v == -2 && x == state->layout->startx && y == state->layout->starty)
                 v = -4;                /* 'start here' cross */
 
-	    if ((v == -2 || v == -3 || v == -4) &&
+	    if ((v == -1 || v == -2 || v == -3 || v == -4) &&
 		(abs(x-ui->hx) <= ui->hradius && abs(y-ui->hy) <= ui->hradius))
 		v -= 20;
 
@@ -3238,7 +3275,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
               cc = true;
 
 	    if (ds->grid[y*ds->w+x] != v || bg != ds->bg || cc) {
-		draw_tile(dr, ds, COORD(x), COORD(y), v,
+		draw_tile(dr, ds, ui, COORD(x), COORD(y), v,
                           (x == cx && y == cy) ? COL_CURSOR : bg);
 		ds->grid[y*ds->w+x] = v;
 	    }
@@ -3390,7 +3427,7 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
-    NULL, NULL, /* get_prefs, set_prefs */
+    get_prefs, set_prefs,
     new_ui,
     free_ui,
     encode_ui,
