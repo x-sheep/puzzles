@@ -1397,6 +1397,7 @@ void grid_find_incentre(grid_face *f)
     f->has_incentre = true;
     f->ix = xbest + 0.5;               /* round to nearest */
     f->iy = ybest + 0.5;
+    f->iradius = sqrt(bestdist);
 }
 
 /* ------ Generate various types of grid ------ */

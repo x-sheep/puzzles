@@ -53,6 +53,7 @@ struct grid_face {
    */
   bool has_incentre;
   int ix, iy;      /* incentre (centre of largest inscribed circle) */
+  double iradius;  /* radius of the largest inscribed circle  */
 };
 struct grid_edge {
   grid_dot *dot1, *dot2;
