@@ -31,6 +31,10 @@ if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
 
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
 /wd4244 /wd4267 /wd4018 /wd4146 /wd4305")
+
+  # Set the C standards version to C11. This prevents a very loud and
+  # annoying warning from the pervasive #include <tgmath.h>.
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /std:c11")
 endif()
 
 function(get_platform_puzzle_extra_source_files OUTVAR NAME AUXILIARY)
