@@ -117,6 +117,7 @@ typedef struct grid {
   A(PENROSE_P3,penrose_p3_thick) \
   A(HATS,hats) \
   A(SPECTRES,spectres) \
+  A(OCTAGONAL2,octagonal2) \
   /* end of list */
 
 #define ENUM(upper,lower) GRID_ ## upper,
