@@ -4127,8 +4127,13 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 
     if (button == LEFT_BUTTON || button == LEFT_DRAG ||
 	button == MIDDLE_BUTTON || button == MIDDLE_DRAG) {
-	if (ctile < 0)
+	if (ctile < 0) {
+            if (ui->cur_visible) {
+                ui->cur_visible = false;
+                return MOVE_UI_UPDATE;
+            }
 	    return MOVE_UNUSED;
+        }
 
 	/*
 	 * Mouse-downs and mouse-drags just cause highlighting
@@ -4145,8 +4150,13 @@ static char *interpret_move(const game_state *from, game_ui *ui,
     }
 
     if (button == RIGHT_BUTTON) {
-	if (ctile < 0)
+	if (ctile < 0) {
+            if (ui->cur_visible) {
+                ui->cur_visible = false;
+                return MOVE_UI_UPDATE;
+            }
 	    return MOVE_UNUSED;
+        }
 
 	/*
 	 * Right-clicking only works on a covered square, and it
@@ -4175,8 +4185,11 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 	 * MOVE_NO_EFFECT: we have adjusted the ui, so at worst we
 	 * return MOVE_UI_UPDATE.
 	 */
-	if (ctile < 0)
-	    return MOVE_UI_UPDATE;
+	if (ctile < 0) {
+            if (ui->cur_visible)
+                ui->cur_visible = false;
+            return MOVE_UI_UPDATE;
+        }
 
 	/*
 	 * Left-clicking on a covered square opens a tile. Not
