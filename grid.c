@@ -1397,6 +1397,7 @@ void grid_find_incentre(grid_face *f)
     f->has_incentre = true;
     f->ix = xbest + 0.5;               /* round to nearest */
     f->iy = ybest + 0.5;
+    f->iradius = sqrt(bestdist);
 }
 
 /* ------ Generate various types of grid ------ */
@@ -2304,6 +2305,100 @@ static grid *grid_new_octagonal(int width, int height, const char *desc)
     return g;
 }
 
+#define OCTAGONAL2_TILESIZE 55
+ /* We tweek these somewhat compared to OCTAGOANL to make the two
+  * different faces more equal in size. */
+#define OCTAGONAL2_A 18
+#define OCTAGONAL2_B 41
+
+static const char *grid_validate_params_octagonal2(int width, int height)
+{
+    int a = OCTAGONAL2_A;
+    int b = OCTAGONAL2_B;
+
+    if (width > (INT_MAX - 2*a) / (a + b) ||          /* xextent */
+        height > (INT_MAX - 2*a) / (a + b) ||         /* yextent */
+        height + 1 > INT_MAX / 4 / (width + 1)) /* max_dots */
+        return "Grid size must not be unreasonably large";
+    return NULL;
+}
+
+static void grid_size_octagonal2(int width, int height,
+                          int *tilesize, int *xextent, int *yextent)
+{
+    int a = OCTAGONAL2_A;
+    int b = OCTAGONAL2_B;
+
+    *tilesize = OCTAGONAL2_TILESIZE;
+    *xextent = 2*a * ((width+1)/2) + b * width + a * (height>1);
+    *yextent = 2*a * ((height+1)/2) + b * height + a * (width>1);
+}
+
+static grid *grid_new_octagonal2(int width, int height, const char *desc)
+{
+    int x, y;
+    int a = OCTAGONAL2_A;
+    int b = OCTAGONAL2_B;
+    int px, py;
+
+    tree234 *points;
+
+    grid *g = grid_empty();
+    g->tilesize = OCTAGONAL2_TILESIZE;
+
+    points = newtree234(grid_point_cmp_fn);
+
+    py = 0;
+    for (y = 0; y < height; y++) {
+        if (y%2 == 0)
+            px = 0;
+        else
+            px = a;
+        for (x = 0; x < width; x++) {
+            grid_dot *d;
+            if ((x+y)%2 == 0) {
+                /* octagon */
+                grid_face_add_new(g, 8);
+                d = grid_get_dot(g, points, px + a, py);
+                grid_face_set_dot(g, d, 0);
+                d = grid_get_dot(g, points, px + a + b, py);
+                grid_face_set_dot(g, d, 1);
+                d = grid_get_dot(g, points, px + 2*a + b, py + a);
+                grid_face_set_dot(g, d, 2);
+                d = grid_get_dot(g, points, px + 2*a + b, py + a + b);
+                grid_face_set_dot(g, d, 3);
+                d = grid_get_dot(g, points, px + a + b, py + 2*a + b);
+                grid_face_set_dot(g, d, 4);
+                d = grid_get_dot(g, points, px + a, py + 2*a + b);
+                grid_face_set_dot(g, d, 5);
+                d = grid_get_dot(g, points, px, py + a + b);
+                grid_face_set_dot(g, d, 6);
+                d = grid_get_dot(g, points, px, py + a);
+                grid_face_set_dot(g, d, 7);
+                px += 2*a+b;
+            } else {
+                /* diamond */
+                grid_face_add_new(g, 4);
+                d = grid_get_dot(g, points, px, py + a);
+                grid_face_set_dot(g, d, 0);
+                d = grid_get_dot(g, points, px + b, py + a);
+                grid_face_set_dot(g, d, 1);
+                d = grid_get_dot(g, points, px +b, py + a + b);
+                grid_face_set_dot(g, d, 2);
+                d = grid_get_dot(g, points, px, py + a + b);
+                grid_face_set_dot(g, d, 3);
+                px += b;
+            }
+        }
+        py += a+b;
+    }
+
+    freetree234(points);
+
+    grid_make_consistent(g);
+    return g;
+}
+
 #define KITE_TILESIZE 40
 /* b/a approx sqrt(3) */
 #define KITE_A 15
@@ -2495,46 +2590,46 @@ static grid *grid_new_floret(int width, int height, const char *desc)
                 continue; /* make better looking grids?  try 3x3 for instance */
 
             grid_face_add_new(g, 5);
-            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
-            d = grid_get_dot(g, points, cx+2*rx   , cy+2*ry   ); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx+2*rx   , cy+2*ry   ); grid_face_set_dot(g, d, 3);
             d = grid_get_dot(g, points, cx+2*rx+qx, cy+2*ry+qy); grid_face_set_dot(g, d, 2);
-            d = grid_get_dot(g, points, cx+2*qx+rx, cy+2*qy+ry); grid_face_set_dot(g, d, 3);
-            d = grid_get_dot(g, points, cx+2*qx   , cy+2*qy   ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx+2*qx+rx, cy+2*qy+ry); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx+2*qx   , cy+2*qy   ); grid_face_set_dot(g, d, 0);
 
             grid_face_add_new(g, 5);
-            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
-            d = grid_get_dot(g, points, cx+2*qx   , cy+2*qy   ); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx+2*qx   , cy+2*qy   ); grid_face_set_dot(g, d, 3);
             d = grid_get_dot(g, points, cx+2*qx+px, cy+2*qy+py); grid_face_set_dot(g, d, 2);
-            d = grid_get_dot(g, points, cx+2*px+qx, cy+2*py+qy); grid_face_set_dot(g, d, 3);
-            d = grid_get_dot(g, points, cx+2*px   , cy+2*py   ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx+2*px+qx, cy+2*py+qy); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx+2*px   , cy+2*py   ); grid_face_set_dot(g, d, 0);
 
             grid_face_add_new(g, 5);
-            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
-            d = grid_get_dot(g, points, cx+2*px   , cy+2*py   ); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx+2*px   , cy+2*py   ); grid_face_set_dot(g, d, 3);
             d = grid_get_dot(g, points, cx+2*px-rx, cy+2*py-ry); grid_face_set_dot(g, d, 2);
-            d = grid_get_dot(g, points, cx-2*rx+px, cy-2*ry+py); grid_face_set_dot(g, d, 3);
-            d = grid_get_dot(g, points, cx-2*rx   , cy-2*ry   ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx-2*rx+px, cy-2*ry+py); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx-2*rx   , cy-2*ry   ); grid_face_set_dot(g, d, 0);
 
             grid_face_add_new(g, 5);
-            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
-            d = grid_get_dot(g, points, cx-2*rx   , cy-2*ry   ); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx-2*rx   , cy-2*ry   ); grid_face_set_dot(g, d, 3);
             d = grid_get_dot(g, points, cx-2*rx-qx, cy-2*ry-qy); grid_face_set_dot(g, d, 2);
-            d = grid_get_dot(g, points, cx-2*qx-rx, cy-2*qy-ry); grid_face_set_dot(g, d, 3);
+            d = grid_get_dot(g, points, cx-2*qx-rx, cy-2*qy-ry); grid_face_set_dot(g, d, 1);
+            d = grid_get_dot(g, points, cx-2*qx   , cy-2*qy   ); grid_face_set_dot(g, d, 0);
+
+            grid_face_add_new(g, 5);
+            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
             d = grid_get_dot(g, points, cx-2*qx   , cy-2*qy   ); grid_face_set_dot(g, d, 4);
-
-            grid_face_add_new(g, 5);
-            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
-            d = grid_get_dot(g, points, cx-2*qx   , cy-2*qy   ); grid_face_set_dot(g, d, 1);
-            d = grid_get_dot(g, points, cx-2*qx-px, cy-2*qy-py); grid_face_set_dot(g, d, 2);
-            d = grid_get_dot(g, points, cx-2*px-qx, cy-2*py-qy); grid_face_set_dot(g, d, 3);
-            d = grid_get_dot(g, points, cx-2*px   , cy-2*py   ); grid_face_set_dot(g, d, 4);
-
-            grid_face_add_new(g, 5);
-            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
+            d = grid_get_dot(g, points, cx-2*qx-px, cy-2*qy-py); grid_face_set_dot(g, d, 3);
+            d = grid_get_dot(g, points, cx-2*px-qx, cy-2*py-qy); grid_face_set_dot(g, d, 2);
             d = grid_get_dot(g, points, cx-2*px   , cy-2*py   ); grid_face_set_dot(g, d, 1);
-            d = grid_get_dot(g, points, cx-2*px+rx, cy-2*py+ry); grid_face_set_dot(g, d, 2);
-            d = grid_get_dot(g, points, cx+2*rx-px, cy+2*ry-py); grid_face_set_dot(g, d, 3);
-            d = grid_get_dot(g, points, cx+2*rx   , cy+2*ry   ); grid_face_set_dot(g, d, 4);
+
+            grid_face_add_new(g, 5);
+            d = grid_get_dot(g, points, cx        , cy        ); grid_face_set_dot(g, d, 0);
+            d = grid_get_dot(g, points, cx-2*px   , cy-2*py   ); grid_face_set_dot(g, d, 4);
+            d = grid_get_dot(g, points, cx-2*px+rx, cy-2*py+ry); grid_face_set_dot(g, d, 3);
+            d = grid_get_dot(g, points, cx+2*rx-px, cy+2*ry-py); grid_face_set_dot(g, d, 2);
+            d = grid_get_dot(g, points, cx+2*rx   , cy+2*ry   ); grid_face_set_dot(g, d, 1);
         }
     }
 
@@ -3397,7 +3492,7 @@ static void grid_penrose_callback(void *vctx, const int *coords)
                 coords[4*i+3] * ctx->yunit, 5),
             coords[4*i+0] * ctx->xunit + n_times_root_k(
                 coords[4*i+1] * ctx->xunit, 5));
-        grid_face_set_dot(ctx->g, d, i);
+        grid_face_set_dot(ctx->g, d, 3-i);
     }
 }
 

@@ -1548,7 +1548,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		sprintf(buf, "F%d,%d,%d", x, y, F_SPENT_DOWN);
 	    else if (y + 1 < ds->order && GRID(state, flags, x, y + 1) & F_ADJ_UP)
 		sprintf(buf, "F%d,%d,%d", x, y + 1, F_SPENT_UP);
-	    else return NULL;
+	    else {
+                ui->hshow = false;
+                return MOVE_UI_UPDATE;
+            }
 	    return dupstr(buf);
 	}
 
@@ -1557,7 +1560,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		sprintf(buf, "F%d,%d,%d", x, y, F_SPENT_RIGHT);
 	    else if (x + 1 < ds->order && GRID(state, flags, x + 1, y) & F_ADJ_LEFT)
 		sprintf(buf, "F%d,%d,%d", x + 1, y, F_SPENT_LEFT);
-	    else return NULL;
+	    else {
+                ui->hshow = false;
+                return MOVE_UI_UPDATE;
+            }
 	    return dupstr(buf);
 	}
 
@@ -1587,6 +1593,11 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hshow = true;
             }
             ui->hcursor = false;
+            return MOVE_UI_UPDATE;
+        }
+    } else {
+        if (button == LEFT_BUTTON) {
+            ui->hshow = false;
             return MOVE_UI_UPDATE;
         }
     }

@@ -4702,6 +4702,11 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->hcursor = false;
             return MOVE_UI_UPDATE;
         }
+    } else {
+        if (button == LEFT_BUTTON) {
+            ui->hshow = false;
+            return MOVE_UI_UPDATE;
+        }
     }
     if (IS_CURSOR_MOVE(button)) {
         ui->hcursor = true;

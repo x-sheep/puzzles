@@ -1510,7 +1510,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (is_clue(state, tx, ty)) {
             sprintf(buf, "%c%d,%d", 'D', tx, ty);
             return dupstr(buf);
-    }
+        } else {
+            ui->hshow = false;
+            return MOVE_UI_UPDATE;
+        }
     }
     if (IS_CURSOR_MOVE(button)) {
         if (shift_or_control) {

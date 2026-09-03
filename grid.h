@@ -53,6 +53,7 @@ struct grid_face {
    */
   bool has_incentre;
   int ix, iy;      /* incentre (centre of largest inscribed circle) */
+  double iradius;  /* radius of the largest inscribed circle  */
 };
 struct grid_edge {
   grid_dot *dot1, *dot2;
@@ -117,6 +118,7 @@ typedef struct grid {
   A(PENROSE_P3,penrose_p3_thick) \
   A(HATS,hats) \
   A(SPECTRES,spectres) \
+  A(OCTAGONAL2,octagonal2) \
   /* end of list */
 
 #define ENUM(upper,lower) GRID_ ## upper,
