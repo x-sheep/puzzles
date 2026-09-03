@@ -13,6 +13,15 @@
 </head>
 <body>
 <p><a href="solo.html">Previous</a> | <a href="index.html">Contents</a> | <a href="docindex.html">Index</a> | <a href="samegame.html">Next</a></p>
+
+<ul>
+<li><a href="#C12">Chapter 12: Mines</a>
+<ul>
+<li><a href="#S12.1">12.1 Mines controls</a></li>
+<li><a href="#S12.2">12.2 Mines parameters</a></li>
+<li><a href="#S12.3">12.3 Mines user preferences</a></li>
+</ul></li>
+</ul>
 <h1><a name="C12"></a>Chapter 12: <a name="i0"></a>Mines</h1>
 <p>
 You have a grid of covered squares, some of which contain mines, but you don't know which. Your job is to uncover every square which does <em>not</em> contain a mine. If you uncover a square containing a mine, you lose. If you uncover a square which does not contain a mine, you are told how many mines are contained within the eight surrounding squares.
@@ -23,24 +32,30 @@ This game needs no introduction; popularised by Windows, it is perhaps the singl
 <p>
 This version of it has an unusual property. By default, it will generate its mine positions in such a way as to ensure that you never need to <em>guess</em> where a mine is: you will always be able to deduce it somehow. So you will never, as can happen in other versions, get to the last four squares and discover that there are two mines left but you have no way of knowing for sure where they are.
 </p>
+<p>
+You can also play the same game on various other tilings, similarly to Loopy (<a href="loopy.html#C23">chapter 23</a>). In other tilings, the &#8216;neighbours&#8217; of a tile are taken to be any tile that touches it, <em>even if only at a corner</em>. This means that on some grids &#8211; the triangular grid, in particular &#8211; a tile can have a <em>lot</em> of neighbours!
+</p>
+<p>
+The simplest types of tiling &#8211; squares, triangles and hexagons &#8211; also have a &#8216;Cyclic&#8217; mode, in which the left side of the grid is considered adjacent to the right side, and the top adjacent to the bottom.
+</p>
 <h2><a name="S12.1"></a>12.1 <a name="i1"></a>Mines controls</h2>
 <p>
 This game is played with the mouse.
 </p>
 <p>
-If you left-click in a covered square, it will be uncovered.
+If you left-click in a covered space, it will be uncovered.
 </p>
 <p>
-If you right-click in a covered square, it will place a flag which indicates that the square is believed to be a mine. Left-clicking in a marked square will not uncover it, for safety. You can right-click again to remove a mark placed in error.
+If you right-click in a covered space, it will place a flag which indicates that that space is believed to contain a mine. Left-clicking in a marked space will not uncover it, for safety. You can right-click again to remove a mark placed in error.
 </p>
 <p>
-If you left-click in an <em>uncovered</em> square, it will &#8216;clear around&#8217; the square. This means: if the square has exactly as many flags surrounding it as it should have mines, then all the covered squares next to it which are <em>not</em> flagged will be uncovered. So once you think you know the location of all the mines around a square, you can use this function as a shortcut to avoid having to click on each of the remaining squares one by one.
+If you left-click in an <em>uncovered</em> space, it will &#8216;clear around&#8217; the space. This means: if the space has exactly as many flags surrounding it as it should have mines, then all the covered spaces next to it which are <em>not</em> flagged will be uncovered. So once you think you know the location of all the mines around a space, you can use this function as a shortcut to avoid having to click on each of the remaining spaces one by one.
 </p>
 <p>
-If you uncover a square which has <em>no</em> mines in the surrounding eight squares, then it is obviously safe to uncover those squares in turn, and so on if any of them also has no surrounding mines. This will be done for you automatically; so sometimes when you uncover a square, a whole new area will open up to be explored.
+If you uncover a space which has <em>no</em> mines in any of the neighbouring spaces, then it is obviously safe to uncover those spaces in turn, and so on if any of them also has no surrounding mines. This will be done for you automatically; so sometimes when you uncover a space, a whole new area will open up to be explored.
 </p>
 <p>
-You can also use the cursor keys to move around the minefield. Pressing the return key in a covered square uncovers it, and in an uncovered square will clear around it (so it acts as the left button), pressing the space bar in a covered square will place a flag (similarly, it acts as the right button).
+On the default square grid, you can also use the cursor keys to move around the minefield. Pressing the return key in a covered space uncovers it, and in an uncovered space will clear around it (so it acts as the left button), pressing the space bar in a covered space will place a flag (similarly, it acts as the right button).
 </p>
 <p>
 All the actions described in <a href="common.html#S2.1">section 2.1</a> are also available.
@@ -59,17 +74,13 @@ The options available from the &#8216;Custom...&#8217; option on the &#8216;Type
 <em>Width</em>, <em>Height</em>
 </dt>
 <dd>
-Size of grid in squares.
+Size of grid, measured in number of regions across and down. For square grids, it's clear how this is counted; for other types of grid you may have to think a bit to see how the dimensions are measured.
 </dd>
 <dt>
 <em>Mines</em>
 </dt>
 <dd>
 Number of mines in the grid. You can enter this as an absolute mine count, or alternatively you can put a <code>%</code> sign on the end in which case the game will arrange for that proportion of the squares in the grid to be mines.
-<p>
-Beware of setting the mine count too high. At very high densities, the program may spend forever searching for a solvable grid.
-</p>
-
 </dd>
 <dt>
 <em>Ensure solubility</em>
@@ -77,7 +88,23 @@ Beware of setting the mine count too high. At very high densities, the program m
 <dd>
 When this option is enabled (as it is by default), Mines will ensure that the entire grid can be fully deduced starting from the initial open space. If you prefer the riskier grids generated by other implementations, you can switch off this option.
 </dd>
+<dt>
+<em>Grid type</em>
+</dt>
+<dd>
+Allows you to choose between a selection of types of tiling. Some are more regular than others!
+</dd>
 </dl>
+<h2><a name="S12.3"></a>12.3 <a name="i3"></a>Mines user preferences</h2>
+<p>
+On platforms that support user preferences, the &#8216;Preferences&#8217; option on the &#8216;Game&#8217; menu will let you configure the following setting:
+</p>
+<p>
+&#8216;Highlight adjacent flags when clicking on a clue&#8217;. This is off by default. When it's turned on, left-clicking in an <em>uncovered</em> space (to clear around it) will temporarily highlight all the flagged spaces that are already neighbours of the space you clicked on, until you release the button. This makes it easier to count them, and work out how many more mines you expect to find in the remaining covered neighbours of the space.
+</p>
+<p>
+(If there <em>are</em> any more mines to be found, then the left-click will not open any squares, so the only effect of the click is to display the highlights temporarily.)
+</p>
 
 <hr><address></address></body>
 </html>
