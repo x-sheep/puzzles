@@ -12,6 +12,7 @@
     <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
     <TargetName>PuzzleCommon</TargetName>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
@@ -51,13 +52,11 @@
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
