@@ -1140,9 +1140,10 @@ This means that on some grids \dash the triangular grid, in particular
 \dash a tile can have a \e{lot} of neighbours!
 
 The simplest types of tiling \dash squares, triangles and hexagons
-\dash also have a \q{Cyclic} mode, in which the left side of the grid
-is considered adjacent to the right side, and the top adjacent to the
-bottom.
+\dash also have a \q{wrapping} mode, in which the left side of the
+grid is considered adjacent to the right side, and the top adjacent to
+the bottom, similar to the \q{Walls wrap around} option in Net
+(\k{net-params}).
 
 \H{mines-controls} \I{controls, for Mines}Mines controls
 

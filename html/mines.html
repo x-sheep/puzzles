@@ -1,25 +1,32 @@
 Mines
 <p>
-Try to expose every square in the grid that is not one of the hidden
-mines, without opening any square that is a mine.
+Try to expose every cell of the grid that does not contain one of the
+hidden mines, without opening any cell that does contain a mine.
 <p>
-Click in a square to open it. Every opened square is marked with
-the number of mines in the surrounding 8 squares, if there are any;
-if not, all the surrounding squares are automatically opened.
+Click in a grid cell to open it. Every opened cell is marked with the
+number of mines in the surrounding cells, if there are any; if not,
+all the surrounding cell are automatically opened. Grid cells that
+touch only at a corner still count as adjacent, so on the default
+square grid setting, a cell has 8 neighbours, not 4.
 <p>
-Right-click in a square to mark it with a flag if you think it is a
-mine. If a numbered square has exactly the right number of flags
-around it, you can click in it to open all the squares around it
-that are not flagged.
+Right-click in a cell to mark it with a flag if you think it is a
+mine. If a numbered cell has exactly the right number of flags around
+it, you can left-click in it to open all the cells around it that are
+not flagged.
 <p>
-The first square you open is guaranteed to be safe, and (by default)
+The first cell you open is guaranteed to be safe, and (by default)
 you are guaranteed to be able to solve the whole grid by deduction
 rather than guesswork. (Deductions may require you to think about
 the total number of mines.)
 <p>
+As well as playing on a square grid, you can also choose to play the
+game on a collection of other tilings. Try several and see which you
+think is most fun. (Beware of tiles that touch at a corner
+unexpectedly, or in some cases, tiles that <em>nearly</em> touch but
+not quite.)
+<p>
 If you think you've found a grid which can't be solved without
 guessing, <b>think harder!</b> Mines was written in 2005, and since it
 was written, I've had over 50 reports claiming that a grid had two
-solutions, or required guessing at a safe square to
-open. <em>None</em> of those reports turned out to be a real bug in
-the game generation.
+solutions, or required guessing at a safe space to open. <em>None</em>
+of those reports turned out to be a real bug in the game generation.

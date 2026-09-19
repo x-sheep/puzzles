@@ -1934,7 +1934,11 @@ static GtkWidget *make_keybar_button(frontend *fe, const char *label, const char
     if (icon != NULL)
         gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_icon_name(
             icon, GTK_ICON_SIZE_BUTTON));
+#if GTK_CHECK_VERSION(3,20,0)
     gtk_widget_set_focus_on_click(button, false);
+#else
+    gtk_button_set_focus_on_click(GTK_BUTTON(button), false);
+#endif
     gtk_widget_show(button);
     g_object_set_data(G_OBJECT(button), "user-data", GINT_TO_POINTER(keyval));
     g_signal_connect(G_OBJECT(button), "clicked",
@@ -1965,7 +1969,11 @@ static void populate_keybar(frontend *fe)
         button = gtk_toggle_button_new();
         gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_icon_name(
             "input-mouse-symbolic", GTK_ICON_SIZE_BUTTON));
-        gtk_widget_set_focus_on_click(button, false);
+#if GTK_CHECK_VERSION(3,20,0)
+	gtk_widget_set_focus_on_click(button, false);
+#else
+	gtk_button_set_focus_on_click(GTK_BUTTON(button), false);
+#endif
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), toggled);
         gtk_widget_show(button);
         gtk_container_add(GTK_CONTAINER(fe->keybar), button);
@@ -2230,8 +2238,8 @@ static void msgbox_button_clicked(GtkButton *button, gpointer data)
     gtk_widget_destroy(GTK_WIDGET(data));
 }
 
-bool message_box(GtkWidget *parent, const char *title, const char *msg,
-                 bool centre, int type)
+static bool message_box(GtkWidget *parent, const char *title, const char *msg,
+                        bool centre, int type)
 {
     GtkWidget *window, *hbox, *text, *button;
     const char *titles;

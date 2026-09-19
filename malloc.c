@@ -15,6 +15,17 @@
  */
 void *smalloc(size_t size) {
     void *p;
+
+    /*
+     * malloc implementations are allowed to return NULL for
+     * malloc(0). Apparently newlib in particular does so. If this
+     * happens below, it will falsely trip the 'out of memory' check.
+     * Pre-empt this by declaring that _our_ malloc and free wrappers
+     * treat alloc(0) as a no-op, whether or not malloc itself does.
+     */
+    if (size == 0)
+        return NULL;
+
 #ifdef PTRDIFF_MAX
     if (size > PTRDIFF_MAX)
 	fatal("allocation too large");
@@ -40,6 +51,16 @@ void sfree(void *p) {
  */
 void *srealloc(void *p, size_t size) {
     void *q;
+
+    /*
+     * As above, handle zero-sized reallocations, and treat them as
+     * equivalent to frees.
+     */
+    if (size == 0) {
+        sfree(p);
+        return NULL;
+    }
+
 #ifdef PTRDIFF_MAX
     if (size > PTRDIFF_MAX)
 	fatal("allocation too large");

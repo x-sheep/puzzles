@@ -376,6 +376,17 @@ ${unfinishedpara}
   </p>
 </main>
 <div id="apology">
+<noscript>
+This puzzle game is provided to your browser in javascript and
+WebAssembly, so it won't run with Javascript disabled. Sorry about
+that!
+<style>
+.apology-js-enabled {
+    display: none;
+}
+</style>
+</noscript>
+<div class="apology-js-enabled">
 <p class="apology-title">If you've been reading this message for more
 than a second or two, then <strong>this WebAssembly puzzle doesn't
 seem to be working in your web browser</strong>. Sorry!</p>
@@ -415,6 +426,7 @@ auxiliary files <code>${filename}.js</code> and
 <code>${filename}.wasm</code>.</p>
 </details>
 </p>
+</div>
 </div>
 <hr>
 

@@ -2787,7 +2787,7 @@ static const char *current_key_label(const game_ui *ui,
 #define PREFERRED_TILESIZE 32
 #define TILESIZE (ds->tilesize)
 #define BORDER (TILESIZE * 3 / 4)
-#define DOMINO_GUTTER (TILESIZE / 16)
+#define DOMINO_GUTTER ((TILESIZE + 15) / 16)
 #define DOMINO_RADIUS (TILESIZE / 8)
 #define DOMINO_COFFSET (DOMINO_GUTTER + DOMINO_RADIUS)
 #define CURSOR_RADIUS (TILESIZE / 4)
