@@ -1,10 +1,6 @@
 /*
  * mines.c: Minesweeper clone with sophisticated grid generation.
  * 
- * Still TODO:
- *
- *  - think about configurably supporting question marks.
- *
  * To include new grids:
  *
  *  - Add a line last in the GRIDLIST macro (if not last, then old
@@ -146,6 +142,7 @@ static float grid_scale[] = { GRIDLIST(GRID_SCALE) };
 
 enum {
   PREF_HIGHLIGHT_FLAGS,
+  PREF_QUESTION_MARKS,
   N_PREF_ITEMS
 };
 
@@ -211,8 +208,7 @@ struct game_state {
      * 
      *  - -2 means the square is unknown.
      * 
-     * 	- -3 means the square is marked with a question mark
-     * 	  (FIXME: do we even want to bother with this?).
+     * 	- -3 means the square is marked with a question mark.
      * 
      * 	- 64 means the square has had a mine revealed when the game
      * 	  was lost.
@@ -4108,6 +4104,7 @@ struct game_ui {
     bool cur_visible;
     bool highlight_flags;
     bool flashed;
+    bool question_marks;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -4124,6 +4121,7 @@ static game_ui *new_ui(const game_state *state)
         state->grid->has_cursor;
     ui->highlight_flags = false;
     ui->flashed = false;
+    ui->question_marks = false;
     return ui;
 }
 
@@ -4139,6 +4137,12 @@ static config_item *get_prefs(game_ui *ui)
     cfg[PREF_HIGHLIGHT_FLAGS].type = C_BOOLEAN;
     cfg[PREF_HIGHLIGHT_FLAGS].u.boolean.bval = ui->highlight_flags;
 
+    cfg[PREF_QUESTION_MARKS].name =
+        "Permit marking squares with a ? instead of a flag";
+    cfg[PREF_QUESTION_MARKS].kw = "question-marks";
+    cfg[PREF_QUESTION_MARKS].type = C_BOOLEAN;
+    cfg[PREF_QUESTION_MARKS].u.boolean.bval = ui->question_marks;
+
     cfg[N_PREF_ITEMS].name = NULL;
     cfg[N_PREF_ITEMS].type = C_END;
 
@@ -4148,6 +4152,7 @@ static config_item *get_prefs(game_ui *ui)
 static void set_prefs(game_ui *ui, const config_item *cfg)
 {
     ui->highlight_flags = cfg[PREF_HIGHLIGHT_FLAGS].u.boolean.bval;
+    ui->question_marks = cfg[PREF_QUESTION_MARKS].u.boolean.bval;
 }
 
 static void free_ui(game_ui *ui)
@@ -4184,6 +4189,58 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 	ui->completed = true;
 }
 
+/*
+ * Decide what a square should turn into when you right-click on it.
+ * Returns 0 for 'no change'.
+ */
+static int right_click_result(const game_ui *ui, int curr_cell_value)
+{
+    switch (curr_cell_value) {
+      case -2:
+        /* An empty square gets marked with a flag. */
+        return -1;
+      case -3:
+        /* A question mark turns into an empty square. This isn't
+         * conditional on ui->question_marks, because a user might
+         * change that preference in mid-game, so there might be
+         * question marks on the board even though they're turned
+         * off. */
+        return -2;
+      case -1:
+        /* A flag turns into a question mark, or straight back to
+         * empty, depending on the preference. */
+        return ui->question_marks ? -3 : -2;
+      default:
+        return 0;
+    }
+}
+
+/*
+ * Return the command used in interpret_move encoding for a right
+ * click on a square. NULL for no effect.
+ */
+static const char *right_click_command(const game_ui *ui, int vold)
+{
+    int vnew = right_click_result(ui, vold);
+
+    /*
+     * The commands PF, PE, PQ place a flag, empty or question mark
+     * respectively. But we also have the shorter command F to toggle
+     * between a flag and empty, and for save-file backwards compat
+     * with pre-question-mark versions of Mines (which didn't support
+     * the P commands) we use it if possible.
+     */
+    if ((vnew == -2 && vold == -1) || (vnew == -1 && vold == -2))
+        return "F";
+    else if (vnew == -1)
+        return "PF";
+    else if (vnew == -2)
+        return "PE";
+    else if (vnew == -3)
+        return "PQ";
+    return NULL;
+}
+
 static const char *current_key_label(const game_ui *ui,
                                      const game_state *state, int button)
 {
@@ -4192,8 +4249,10 @@ static const char *current_key_label(const game_ui *ui,
 
     if (state->dead || state->won || !ui->cur_visible) return "";
     if (button == CURSOR_SELECT2) {
-        if (v == -2) return "Mark";
-        if (v == -1) return "Unmark";
+        int vnew = right_click_result(ui, v);
+        if (vnew == -1) return "Mark";
+        if (vnew == -2) return "Unmark";
+        if (vnew == -3) return "Question";
         return "";
     }
     if (button == CURSOR_SELECT) {
@@ -4316,13 +4375,14 @@ static char *interpret_move(const game_state *from, game_ui *ui,
             return MOVE_UI_UPDATE;
         }
         if (button == CURSOR_SELECT2) {
-            /* As for RIGHT_BUTTON; only works on covered square. */
-            if (v != -2 && v != -1)
+            const char *cmd = right_click_command(ui, v);
+            if (!cmd)
                 return MOVE_NO_EFFECT;
             if (ds->grid->type == MINES_GRID_SQUARE)
-                sprintf(buf, "F%d,%d", ui->cur_tile%ds->w, ui->cur_tile/ds->w);
+                sprintf(buf, "%s%d,%d", cmd,
+                        ui->cur_tile%ds->w, ui->cur_tile/ds->w);
             else
-                sprintf(buf, "F%d", ui->cur_tile);
+                sprintf(buf, "%s%d", cmd, ui->cur_tile);
             return dupstr(buf);
         }
         /* Otherwise, treat as LEFT_BUTTON, for a single square. */
@@ -4367,6 +4427,8 @@ static char *interpret_move(const game_state *from, game_ui *ui,
     }
 
     if (button == RIGHT_BUTTON) {
+        const char *cmd;
+
 	if (ctile < 0) {
             if (ui->cur_visible) {
                 ui->cur_visible = false;
@@ -4375,21 +4437,14 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 	    return MOVE_UNUSED;
         }
 
-	/*
-	 * Right-clicking only works on a covered square, and it
-	 * toggles between -1 (marked as mine) and -2 (not marked
-	 * as mine).
-	 *
-	 * FIXME: question marks.
-	 */
-	if (from->board[ctile] != -2 &&
-	    from->board[ctile] != -1)
-	    return MOVE_NO_EFFECT;
+        cmd = right_click_command(ui, from->board[ctile]);
+        if (!cmd)
+            return MOVE_NO_EFFECT;
 
         if (ds->grid->type == MINES_GRID_SQUARE)
-            sprintf(buf, "F%d,%d", ctile % ds->w, ctile/ds->w);
+            sprintf(buf, "%s%d,%d", cmd, ctile % ds->w, ctile/ds->w);
         else
-            sprintf(buf, "F%d", ctile);
+            sprintf(buf, "%s%d", cmd, ctile);
 	return dupstr(buf);
     }
 
@@ -4563,6 +4618,11 @@ static game_state *execute_move(const game_state *from, const char *move)
                     (ret->board[cy * from->w + cx] == -1 ||
                      ret->board[cy * from->w + cx] == -2)) {
                     ret->board[cy * from->w + cx] ^= (-2 ^ -1);
+                } else if (move[0] == 'P' &&
+                    sscanf(move+2, "%d,%d", &cx, &cy) == 2 &&
+                    cx >= 0 && cx < from->w && cy >= 0 && cy < from->h) {
+                    ret->board[cy * from->w + cx] = (
+                        move[1] == 'Q' ? -3 : move[1] == 'F' ? -1 : -2);
                 } else if (move[0] == 'O' &&
                            sscanf(move+1, "%d,%d", &cx, &cy) == 2 &&
                            cx >= 0 && cx < from->w && cy >= 0 && cy < from->h) {
@@ -4591,6 +4651,11 @@ static game_state *execute_move(const game_state *from, const char *move)
                     (ret->board[ctile] == -1 ||
                      ret->board[ctile] == -2)) {
                     ret->board[ctile] ^= (-2 ^ -1);
+                } else if (move[0] == 'P' &&
+                    sscanf(move+2, "%d", &ctile) == 1 &&
+                    ctile >= 0 && ctile < from->grid->ntiles) {
+                    ret->board[ctile] = (
+                        move[1] == 'Q' ? -3 : move[1] == 'F' ? -1 : -2);
                 } else if (move[0] == 'O' &&
                            sscanf(move+1, "%d", &ctile) == 1 &&
                            ctile >= 0 &&  ctile < from->grid->ntiles) {
